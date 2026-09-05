@@ -12,6 +12,7 @@
 - Log every design decision that refines or deviates from the brief in `DECISIONS.md` with a one-line rationale.
 - Keep `CHANGELOG.md` up to date.
 - Prefer small, reviewable commits. Never force-push.
+- Never add `Co-Authored-By`, "Generated with Claude Code", or `Claude-Session` trailers to commits or PRs (a `commit-msg` hook strips them; `~/.claude/settings.json` sets `attribution` to empty).
 - Do not fabricate data sources, URLs, licenses, or citations. If something cannot be verified, say so in the report.
 
 ## Compute environment: Georgia Tech PACE-ICE (Slurm)
