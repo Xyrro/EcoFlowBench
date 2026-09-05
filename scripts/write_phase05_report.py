@@ -30,9 +30,10 @@ def main() -> None:
     args = ap.parse_args()
     py = sys.executable
     analysis = run([py, "scripts/analyze_build.py", "--builds", *args.builds, "--out", "docs/figures", "--prefix", "phase05"])
-    budget4 = run([py, "scripts/budget_extrapolation.py", "--builds", *args.builds, "--target-cpu-hours", "500", "--cpus-per-job", "4"])
+    scale = ["--omniscape-scale", "XL=0.265,XXL=0.258"]   # adopted blocks 33 / 65 vs measured 17 / 33: (17/33)^2, (33/65)^2
+    budget4 = run([py, "scripts/budget_extrapolation.py", "--builds", *args.builds, "--target-cpu-hours", "500", "--cpus-per-job", "4", *scale])
     budget1 = run([py, "scripts/budget_extrapolation.py", "--builds", *args.builds, "--target-cpu-hours", "500", "--cpus-per-job", "1",
-                   "--out", "docs/figures/phase05_budget_1core.json"])
+                   "--out", "docs/figures/phase05_budget_1core.json", *scale])
     cmp_path = ROOT / "data/builds/mini/stats/solver_comparison.json"
     cmp = json.load(open(cmp_path))
     c = pd.DataFrame(cmp["compare"])
@@ -50,7 +51,9 @@ def main() -> None:
     def sect(text: str, title: str) -> str:
         i = text.find(title)
         j = text.find("\n### ", i + 1)
-        return text[i:j if j > 0 else None].strip()
+        body = text[i:j if j > 0 else None].strip().splitlines()
+        body = [ln for ln in body[1:] if not ln.startswith("wrote ")]   # drop the inner header and log lines
+        return "\n".join(body).strip()
 
     gens = man[man.family == "synthetic"].generator.value_counts().to_dict()
     tables = man[man.family == "real"].table_id.value_counts().to_dict()
@@ -171,6 +174,9 @@ Pairwise maps for K ≤ 4 dominate (`voltage` + `pairwise_current` = 12 maps at 
 {sect(budget4, '### Power-law')}
 
 Omniscape scales super-linearly in pixels because the window size grows with the tier (radius ∝ size).
+The XL and XXL Omniscape times in the budget tables are the measured values scaled to the **adopted**
+block sizes (XL block 33 instead of the probed 17, XXL block 65 instead of 33; cost ∝ 1/block², i.e.
+×0.265 and ×0.258); every other number is measured.
 
 ### 6.1 Brief's original ladder (§4.3), 4 cores per job
 

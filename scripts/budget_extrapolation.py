@@ -52,6 +52,8 @@ def main() -> None:
     ap.add_argument("--cpus-per-job", type=int, default=4)
     ap.add_argument("--overhead", type=float, default=0.15, help="fraction added for JIT, I/O, QC, finalize")
     ap.add_argument("--out", default="docs/figures/phase05_budget.json")
+    ap.add_argument("--omniscape-scale", default="", help="per-tier multipliers for the omniscape time, e.g. XL=0.27,XXL=0.26 "
+                    "(adopted block sizes vs the measured ones)")
     args = ap.parse_args()
     frames, stor = [], {}
     for b in args.builds:
@@ -68,6 +70,12 @@ def main() -> None:
     print("\n### Measured median solve time per config (s)\n")
     print(med.round(3).to_markdown())
     # per-tier seconds per landscape = Σ configs × multiplicity; missing kinds at a tier are extrapolated
+    oscale = {kv.split("=")[0]: float(kv.split("=")[1]) for kv in args.omniscape_scale.split(",") if kv}
+    if oscale and "omniscape" in med:
+        for t, f in oscale.items():
+            if t in med.index:
+                med.loc[t, "omniscape"] = med.loc[t, "omniscape"] * f
+        print(f"\n(omniscape times scaled for adopted window sizes: {oscale})")
     per_tier_s = {}
     fits = {}
     for kind, mult in CONFIGS_PER_SAMPLE.items():
