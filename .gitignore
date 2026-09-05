@@ -1,0 +1,46 @@
+# Data and large artifacts (never commit)
+data/
+scratch/
+*.h5
+*.hdf5
+*.zarr/
+*.tif
+*.tiff
+*.parquet
+*.nc
+*.pbf
+*.zip
+checkpoints/
+runs/
+wandb/
+outputs/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.uv/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Julia
+julia/**/Manifest.toml.bak
+.julia/
+julia_depot/
+
+# Slurm
+slurm-*.out
+*.err
+logs/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Secrets
+.env
+*.token
