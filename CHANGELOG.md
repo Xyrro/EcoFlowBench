@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Phase 4 — 2026-09-05
+- `ecoflowbench/sources`: exact Circuitscape graph reconstruction (`graph.py`), config schema with tier scaling,
+  generators for point focal nodes (mixed placement), wall-to-wall strips, habitat-patch regions, T3 source/ground
+  rasters, T4 Omniscape sources; every configuration connectivity-checked on the exact graph; 21 tests.
+- `configs/tasks/sources_default.yaml` with documented defaults; `scripts/build_sources.py`.
+- Pilot: 1,865 configurations (60 tiles × 5 tables + 50 synthetic), all connected; `sources.parquet`, gallery.
+- Verified with Circuitscape (`examples/region_check.jl`) that repeated point-raster labels form one focal region.
+
 ### Phase 3 — 2026-09-05
 - `ecoflowbench/resistance`: pydantic YAML schema (`ResistanceTable`), `apply_table` mapping, `perturb_table`.
 - Five tables in `configs/resistance_tables/` (generic_hm, large_mammal, amphibian, forest_bird, random_lm_20260905) with citations.

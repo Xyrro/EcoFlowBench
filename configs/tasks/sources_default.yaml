@@ -1,0 +1,50 @@
+# Focal-node / source-configuration parameters (brief §6). Consumed by ecoflowbench.sources.
+# Every value here is recorded in each sample's `source_config` metadata. Units are pixels
+# unless stated. Per-tier overrides scale with raster size.
+config_id: sources_default_v1
+
+points:                        # T1 / T2 point focal nodes
+  k_range: [2, 8]              # number of focal nodes K, uniform integer
+  min_separation_px: 16        # minimum Chebyshev distance between any two focal nodes
+  frac_anywhere: 0.3           # per-node probability of "anywhere" placement (any valid pixel);
+                               # otherwise the node is restricted to low-resistance pixels
+  low_resistance_quantile: 0.25  # "low resistance" = R <= this quantile of valid pixels
+  max_attempts: 200            # rejection-sampling budget before relaxing separation by 25 %
+
+wall_to_wall:                  # T1W
+  strip_width_px: 2            # width of the N/S or E/W edge strips (label 1 = north/west, 2 = south/east)
+
+regions:                       # T1 focal regions from habitat patches (WDPA-free default)
+  habitat_classes: [10, 90, 95]   # WorldCover: tree cover, herbaceous wetland, mangroves
+  min_patch_px: 50             # patches smaller than this (8-connected) are ignored (0.5 km² at 100 m)
+  k_range: [2, 6]
+  min_separation_px: 16        # between patch centroids
+  max_region_px: 2000          # larger patches are trimmed to a disc of this many pixels around the centroid
+
+advanced:                      # T3 source-strength + ground rasters
+  source:
+    mode: inverse_resistance   # suitability = (1/R)^power on valid pixels; or "random_field"
+    power: 1.0
+    quantile: 0.7              # pixels with suitability above this quantile are sources
+    normalize_total: 1.0       # source strengths are rescaled to sum to this (comparability)
+    random_field_length_scale: 16   # for mode = random_field (GRF correlation length)
+  ground:
+    modes: [edge, all_edges, patches]   # one is drawn per sample (uniform)
+    edge_width_px: 1
+    n_patches_range: [1, 3]
+    patch_radius_px: 3
+
+omniscape:                     # T4 source raster (radius / block_size come from configs/solver/omniscape_reference.yaml)
+  source:
+    mode: inverse_resistance
+    power: 1.0
+    quantile: 0.5              # pixels above this suitability quantile are sources
+    scale_max: 1.0             # source strengths rescaled so the maximum is this
+  source_threshold: 0.0        # Omniscape `source_threshold` (recorded)
+
+tiers:                         # per-tier overrides (pixel quantities scale with size / 128)
+  S:   {scale: 1}
+  M:   {scale: 2}
+  L:   {scale: 4}
+  XL:  {scale: 8}
+  XXL: {scale: 16}

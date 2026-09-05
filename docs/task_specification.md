@@ -101,8 +101,9 @@ float64 Reff) exactly as produced by the solver.
   edge strips of width w_strip = max(1, H/64) pixels. Two samples per landscape:
   `orientation = "NS"` (top strip label 1, bottom strip label 2) and `"EW"` (left 1, right 2).
   Regions are passed as the point raster with repeated labels, which Circuitscape treats as one
-  short-circuited focal region (behaviour to be confirmed by a unit test in Phase 4; fallback is
-  `use_polygons = True` with the strips as polygons).
+  short-circuited focal region (**verified 2026-09-05** with `examples/region_check.jl`: strip
+  Reff 0.47 vs 1.04 for single pixels; every focal-region pixel carries the full injected
+  current in the current map, hence strip pixels are excluded from metrics).
 - **Input:** R, M, F (labels 1/2 on the strips, 0 elsewhere), scalar `orientation`.
 - **Output:** `outputs/cum_current` (H×W float32; equals the single pair map), `outputs/voltage`
   (1×H×W float32), `outputs/reff` (2×2 float64, the wall-to-wall effective resistance = a
