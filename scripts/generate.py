@@ -84,11 +84,15 @@ def cmd_prepare(a) -> None:
         print(f"shard {sh}: prepared {n} samples -> {p['inputs'].name}" if n else f"shard {sh}: inputs already present")
 
 
-def julia_cmd(inputs, outputs, tmp, solver, fallback, osolver, max_n=None) -> list[str]:
+def julia_cmd(inputs, outputs, tmp, solver, fallback, osolver, max_n=None, configs=None, force=False) -> list[str]:
     cmd = ["julia", f"--project={JULIA_PKG}", str(JULIA_PKG / "scripts" / "solve_shard.jl"), str(inputs), str(outputs),
            "--tmp", tmp, "--solver", solver, "--fallback", fallback, "--omniscape-solver", osolver]
     if max_n:
         cmd += ["--max", str(max_n)]
+    if configs:
+        cmd += ["--configs", configs]
+    if force:
+        cmd += ["--force", "true"]
     return cmd
 
 
@@ -97,7 +101,8 @@ def cmd_solve(a) -> None:
     p = shard_paths(build, a.shard)
     p["outputs"].parent.mkdir(parents=True, exist_ok=True)
     tmp = os.environ.get("TMPDIR", "/tmp")
-    cmd = julia_cmd(p["inputs"], p["outputs"], tmp, a.solver, a.fallback, a.omniscape_solver, a.max)
+    cmd = julia_cmd(p["inputs"], p["outputs"], tmp, a.solver, a.fallback, a.omniscape_solver, a.max,
+                    configs=a.configs, force=a.force)
     print(" ".join(cmd))
     sys.exit(subprocess.run(cmd, check=False).returncode)
 
@@ -114,7 +119,8 @@ def cmd_submit(a) -> None:
     (build / "logs").mkdir(exist_ok=True)
     cmd = ["sbatch", f"--array={arr}%{a.max_concurrent}", f"--time={a.time}", f"--cpus-per-task={a.cpus}", f"--mem={a.mem}",
            f"--partition={a.partition}", f"--job-name=efb-{build.name}", f"--output={build}/logs/%A_%a.out",
-           f"--export=ALL,EFB_BUILD={build},EFB_SOLVER={a.solver},EFB_FALLBACK={a.fallback},EFB_OSOLVER={a.omniscape_solver}",
+           f"--export=ALL,EFB_BUILD={build},EFB_SOLVER={a.solver},EFB_FALLBACK={a.fallback},EFB_OSOLVER={a.omniscape_solver},"
+           f"EFB_CONFIGS={a.configs or ''},EFB_FORCE={'1' if a.force_solve else '0'}",
            str(SBATCH_TEMPLATE)]
     print(" ".join(cmd))
     if not a.dry_run:
@@ -211,6 +217,8 @@ def main() -> None:
     s.add_argument("--fallback", default="cg+amg")
     s.add_argument("--omniscape-solver", default="cholmod")
     s.add_argument("--max", type=int, default=None)
+    s.add_argument("--configs", default=None, help="comma-separated configs to (re-)solve")
+    s.add_argument("--force", action="store_true", help="re-solve listed configs even if the sample is complete")
     s.set_defaults(func=cmd_solve)
     b = sub.add_parser("submit")
     b.add_argument("--build", required=True)
@@ -222,7 +230,9 @@ def main() -> None:
     b.add_argument("--solver", default="cholmod")
     b.add_argument("--fallback", default="cg+amg")
     b.add_argument("--omniscape-solver", default="cholmod")
-    b.add_argument("--force", action="store_true")
+    b.add_argument("--force", action="store_true", help="resubmit shards that already have final files")
+    b.add_argument("--configs", default=None, help="only (re-)solve these configs inside the job")
+    b.add_argument("--force-solve", action="store_true", help="re-solve listed configs even for complete samples")
     b.add_argument("--dry-run", action="store_true")
     b.set_defaults(func=cmd_submit)
     t = sub.add_parser("status")

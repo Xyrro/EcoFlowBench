@@ -17,6 +17,9 @@ trap 'rm -rf "$TMPDIR"' EXIT
 SHARD="${SLURM_ARRAY_TASK_ID:-0}"
 echo "host=$(hostname) build=$EFB_BUILD shard=$SHARD cpus=${SLURM_CPUS_PER_TASK:-1} start=$(date -u +%FT%TZ)"
 cd "$EFB_SCRATCH"
+EXTRA=()
+[ -n "${EFB_CONFIGS:-}" ] && EXTRA+=(--configs "$EFB_CONFIGS")
+[ "${EFB_FORCE:-0}" = "1" ] && EXTRA+=(--force)
 python scripts/generate.py solve --build "$EFB_BUILD" --shard "$SHARD" \
-    --solver "${EFB_SOLVER:-cholmod}" --fallback "${EFB_FALLBACK:-cg+amg}" --omniscape-solver "${EFB_OSOLVER:-cholmod}"
+    --solver "${EFB_SOLVER:-cholmod}" --fallback "${EFB_FALLBACK:-cg+amg}" --omniscape-solver "${EFB_OSOLVER:-cholmod}" "${EXTRA[@]}"
 echo "end=$(date -u +%FT%TZ)"

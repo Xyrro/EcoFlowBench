@@ -409,6 +409,26 @@ function h5_phw!(g, name, mats::Vector{<:AbstractMatrix{T}}) where {T}
 end
 
 # ---------------------------------------------------------------------------
+# Warm-up: trigger JIT compilation on a tiny problem so recorded solve times are steady-state
+# ---------------------------------------------------------------------------
+function warmup(; tmproot = tempdir())
+    R = ones(Float32, 12, 12); R[:, 6] .= 5.0f0
+    nd = falses(12, 12)
+    focal = zeros(Int32, 12, 12); focal[3, 3] = 1; focal[10, 10] = 2
+    S = zeros(Float32, 12, 12); S[2:4, 2:4] .= 1.0f0
+    G = zeros(Int8, 12, 12); G[12, :] .= 1
+    t = @elapsed begin
+        for sol in ("cholmod", "cg+amg")
+            solve_pairwise(R, nd, focal; solver = sol, fallback = nothing, workdir = mktempdir(tmproot))
+            solve_advanced(R, nd, S, G; solver = sol, fallback = nothing, workdir = mktempdir(tmproot))
+            solve_omniscape(R, nd, S; radius = 3, block_size = 1, solver = sol)
+        end
+    end
+    @info @sprintf("warm-up (JIT) done in %.1f s", t)
+    return t
+end
+
+# ---------------------------------------------------------------------------
 # Batch mode over a shard
 # ---------------------------------------------------------------------------
 """
@@ -427,7 +447,8 @@ Resumable: samples that already have a complete outputs group are skipped.
 """
 function solve_shard(inputs_h5::AbstractString, outputs_h5::AbstractString; solver = "cholmod", fallback = "cg+amg",
                      omniscape_solver = "cholmod", tmproot = tempdir(), keep_pair_maps_max_k = 4, only = nothing,
-                     max_samples = typemax(Int), log_every = 10)
+                     max_samples = typemax(Int), log_every = 10, configs = nothing, force = false, do_warmup = true)
+    do_warmup && warmup(; tmproot)
     t_start = time()
     fin = h5open(inputs_h5, "r")
     fout = h5open(outputs_h5, isfile(outputs_h5) ? "r+" : "w")
@@ -438,16 +459,23 @@ function solve_shard(inputs_h5::AbstractString, outputs_h5::AbstractString; solv
     for (n, sid) in enumerate(sids)
         n > max_samples && break
         gin = fin["samples"][sid]
-        if haskey(fout["samples"], sid) && haskey(fout["samples"][sid], "outputs") && haskey(attrs(fout["samples"][sid]), "complete")
+        done_before = haskey(fout["samples"], sid) && haskey(fout["samples"][sid], "outputs") && haskey(attrs(fout["samples"][sid]), "complete")
+        if done_before && !force
             n_skip += 1; continue
         end
         R = h5_hw(gin["inputs"], "resistance")
         nodata = h5_hw(gin["inputs"], "nodata_mask") .> 0
         gout = haskey(fout["samples"], sid) ? fout["samples"][sid] : create_group(fout["samples"], sid)
-        haskey(gout, "outputs") && delete_object(gout, "outputs")
-        oo = create_group(gout, "outputs")
+        if force && haskey(gout, "outputs")
+            oo = gout["outputs"]                      # re-solve only the listed configs, keep the others
+        else
+            haskey(gout, "outputs") && delete_object(gout, "outputs")
+            oo = create_group(gout, "outputs")
+        end
         for cname in keys(gin["configs"])
+            configs !== nothing && !(cname in configs) && continue
             gc = gin["configs"][cname]
+            haskey(oo, cname) && delete_object(oo, cname)
             kind = attrs(gc)["kind"]
             og = create_group(oo, cname)
             wd = mktempdir(tmproot)
