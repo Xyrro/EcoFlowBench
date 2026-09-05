@@ -39,6 +39,7 @@ dependencies = [
   "nlmpy==1.2.0",
   "scikit-image==0.26.0",
   "juliacall==0.9.35",
+  "numba==0.67.0",
 ]
 
 [project.optional-dependencies]

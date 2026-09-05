@@ -1,7 +1,7 @@
 # EcoFlowBench task specification (v0.1, Phase 1)
 
-Status: **draft for owner review** (acceptance criterion for Phase 1 is "task tensor specs
-reviewed"). Everything marked ⚠ is an open decision listed again in §9.
+Status: **v0.2, owner-reviewed 2026-09-05**. Remaining ⚠ items are Phase 5 measurements (Omniscape
+window sizes and solver), see §9.
 
 This document is normative for Phases 2–12. It defines the mathematical model, the fixed solver
 conventions, and the exact tensors (name, shape, dtype, units, semantics) stored for every task.
@@ -62,8 +62,8 @@ Verified from `Circuitscape.jl 5.17.1/src/raster/pairwise.jl::construct_graph` a
    until all K focal nodes share one connected component (Phase 4); samples violating this fail QC.
 7. **Raster geometry.** Rasters are stored north-up, row-major (C order), with CRS, affine
    transform and pixel size recorded in metadata. Synthetic samples carry a nominal CRS
-   (EPSG:3857-like, no georeference meaning) and `pixel_size_m` per tier. ⚠ Real tiles: CRS
-   convention to be decided (§9).
+   (EPSG:3857-like, no georeference meaning) and `pixel_size_m` per tier. Real tiles use the
+   WGS84/UTM zone of the tile centre (EPSG:326xx/327xx), recorded per tile.
 8. **Units.** R is dimensionless (per-cell resistance); with unit current injection, voltages
    are in "volts" = Ω·A with the same dimensionless Ω, effective resistance in Ω, currents in A.
    No normalisation, clipping or log transform is applied to stored outputs.
@@ -93,7 +93,7 @@ float64 Reff) exactly as produced by the solver.
 
   Note: Circuitscape's cumulative map includes the focal pixels themselves (each carries
   current 1 per pair it participates in); `set_focal_node_currents_to_zero = False`.
-  ⚠ Whether to store per-pair maps for K > 4 (§9).
+  For K > 4 only `cum_current` and `reff` are stored (owner decision, §9).
 
 ### 3.2 T1W — Wall-to-wall current mapping (T1 variant)
 
@@ -250,17 +250,19 @@ Regeneration: `scripts/generate.py --config configs/datasets/<name>.yaml --shard
 reproduce the shard bitwise on the same machine class (CHOLMOD is deterministic; Omniscape
 CG+AMG is deterministic single-threaded, which is why `parallelize = false` inside a solve).
 
-## 9. Open questions for the owner (do not silently decide)
+## 9. Open questions — resolved by the owner on 2026-09-05
 
-1. Storage/compute budget: 300 GB scratch quota vs multi-hundred-GB v1.0; off-cluster sync
-   destination.
-2. Per-pair current/voltage maps for K > 4: store none (current spec), or store for all K at
-   ~P× storage cost.
-3. Equal-area CRS convention for real tiles (continental EPSG codes vs a per-tile local
-   Lambert azimuthal equal-area).
-4. OSM-derived rasters under ODbL: store road-distance rasters (derived, non-reversible) or
-   omit OSM entirely.
-5. Omniscape solver for T4: CG+AMG (Omniscape default) vs CHOLMOD; and the proposed r/b per tier.
-6. Hugging Face organisation and whether the repo is gated during review.
-7. Target venue/cycle: NeurIPS 2026 E&D deadline (May 2026) has passed; NeurIPS 2027 or an
-   ecology venue.
+1. **Storage/compute.** Off-cluster destination = private HF dataset repo `Xirro/EcoFlowBench`;
+   shards are validated → uploaded → checksum-verified → deleted locally; local working set
+   < 150 GB. Per-tier storage estimate and feasible v1.0 ladder: `docs/compute_env.md` §10.
+2. **Per-pair maps:** stored only for K ≤ 4 (P ≤ 6). K > 4 samples store `cum_current` and
+   `reff` only (as specified in §3.1).
+3. **CRS for real tiles:** WGS84 / UTM zone of the tile centre (EPSG:326xx north, 327xx south),
+   EPSG code recorded per tile in the manifest and in `meta/crs`.
+4. **Roads:** GRIP4 (Global Roads Inventory Project), not OSM. URL and licence verified in
+   `docs/licenses.md` before use; if unavailable, report back before choosing an alternative.
+5. **Omniscape solver / r, b per tier:** proposals in `configs/solver/omniscape_reference.yaml`
+   to be finalised from measured mini-run timings (each Omniscape solve < 10 min on one node
+   for tiers S/M/L); justification goes to `DECISIONS.md`.
+6. **Hugging Face org:** `Xirro`; repo private during development.
+7. **Venue:** NeurIPS 2027 Datasets & Benchmarks; Croissant metadata is a Phase 7 deliverable.

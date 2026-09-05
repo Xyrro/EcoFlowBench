@@ -211,3 +211,88 @@ Sizes on scratch after install: `.venv` 6.4 GB, `julia_depot` ~1.5 GB, `envs/gda
 - Baselines: `coc-gpu` / `ice-gpu`, `--gres=gpu:<type>:1`, ≤ 16 h.
 - Never `srun`/`sbatch` from inside another job for installs; never rely on `$HOME` for caches.
 - Job templates live in `scripts/slurm/`.
+
+## 10. Storage plan: per-tier estimate, feasible v1.0 ladder, HF sync pipeline
+
+### 10.1 Bytes per sample (raw, before compression)
+
+Per pixel, a *fully solved* sample (T1+T2+T3+T4 on one landscape) stores:
+
+| Group | Arrays (float32 unless noted) | bytes / pixel |
+|---|---|---|
+| inputs, synthetic | resistance, nodata (1 B), focal (int32), source_strength, ground (1 B) | 14 |
+| inputs, real extra | covariates C = 8 channels | +32 |
+| T1 outputs, K ≤ 4 | cum_current + P·(voltage + pairwise_current), P ≤ 6 | 4 + 48 = 52 |
+| T1 outputs, K > 4 | cum_current | 4 |
+| T3 outputs | current, voltage | 8 |
+| T4 outputs | cum_current, flow_potential, normalized | 12 |
+| **total, K ≤ 4** | | **86 (synthetic) / 118 (real)** |
+| **total, K > 4** | | **38 (synthetic) / 70 (real)** |
+
+Assuming half the T1 samples have K ≤ 4, the mean is ≈ 62 B/px synthetic, 94 B/px real. Solver
+outputs and log-resistance compress poorly (smooth floats); gzip-4 on float32 maps typically
+gives 0.6–0.8×. I use **0.7×** below.
+
+| Tier | pixels | raw MB/sample (synthetic / real) | compressed MB/sample (synthetic / real) |
+|---|---|---|---|
+| S 128² | 16 384 | 1.0 / 1.5 | 0.7 / 1.1 |
+| M 256² | 65 536 | 4.1 / 6.2 | 2.8 / 4.3 |
+| L 512² | 262 144 | 16 / 25 | 11 / 17 |
+| XL 1024² | 1 048 576 | 65 / 99 | 46 / 69 |
+| XXL 2048² | 4 194 304 | 260 / 394 | 182 / 276 |
+
+### 10.2 Brief's ladder vs a feasible ladder
+
+| Tier | Brief target | Brief size (≈, 60 % synthetic) | **Proposed v1.0** | Proposed size |
+|---|---|---|---|---|
+| S | 100k | 85 GB | **60k** (40k synthetic + 20k real) | 50 GB |
+| M | 50k | 170 GB | **20k** (12k + 8k) | 68 GB |
+| L | 10k | 130 GB | **4k** (2.4k + 1.6k) | 53 GB |
+| XL | 2k | 110 GB | **600** (360 + 240) | 33 GB |
+| XXL | 200 | 44 GB | **100** (test only, cum_current + reff + T4 only) | 12 GB |
+| **total** | | **≈ 540 GB** | | **≈ 215 GB** |
+
+`ecoflowbench-mini` (≈ 250 samples at S, all tasks) ≈ 0.3 GB, well under the 500 MB target.
+
+Sample counts are placeholders until the Phase 5 mini run gives measured solve times; the
+*size* column is what the storage decision needs. Both ladders exceed the **100 GB free
+private-storage quota on Hugging Face** (verified 2026-09-05,
+https://huggingface.co/docs/hub/storage-limits): free accounts get 100 GB private, PRO gets
+1 TB private + pay-as-you-go ($18/TB/month), public repos are "best-effort" (up to 10 TB on
+PRO). **Decision needed from the owner** (see status report): (a) PRO account for `Xirro`,
+(b) make the repo public earlier than planned, or (c) cap v1.0 at ≈ 90 GB while private
+(roughly: S 30k, M 8k, L 1.5k, XL 250, XXL 50).
+
+### 10.3 Shard sizing and HF layout
+
+HF recommends < 100k files per repo, < 10k entries per folder, files well under 200 GB, and
+Parquet/WebDataset-friendly layouts. EcoFlowBench keeps HDF5 shards but sizes them by bytes so
+that every upload is resumable and no shard exceeds ~2 GB:
+
+| Tier | samples / shard | shard size (compressed) |
+|---|---|---|
+| S | 1000 | ~1 GB |
+| M | 400 | ~1.4 GB |
+| L | 100 | ~1.4 GB |
+| XL | 25 | ~1.4 GB |
+| XXL | 4 | ~1 GB |
+
+Repo layout: `data/{tier}/{task_group}/shard-{:05d}.h5`, `index/{tier}.parquet`,
+`splits/*.parquet`, `stats/`, `croissant.json`, `README.md` (dataset card).
+
+### 10.4 Sync pipeline (local working set < 150 GB)
+
+`scripts/sync_shards.py` (Phase 5/6) runs on the login node on a cron-like loop or after each
+job array:
+
+1. find shards with `*.h5` + `*.ok` (written by the validator) and no `*.uploaded` marker;
+2. upload with `huggingface_hub.HfApi.upload_file` (resumable, LFS/Xet);
+3. verify: compare local sha256 against the LFS object's sha256 reported by
+   `HfApi.get_paths_info(..., expand=True)`;
+4. on match, write `*.uploaded` (containing the remote sha256 + commit id) and delete the local
+   `.h5`; on mismatch, re-upload up to 3 times, then flag for the owner;
+5. refuse to start new generation jobs while `du data/shards` > 120 GB (soft) and abort at
+   150 GB (hard), so scratch never exceeds the owner's cap.
+
+Only the Parquet index, split lists, quicklook PNGs and stats stay on scratch permanently
+(< 5 GB). Re-download for evaluation uses `hf_hub_download` into a bounded LRU cache.

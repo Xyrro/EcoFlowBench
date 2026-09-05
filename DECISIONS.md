@@ -15,3 +15,10 @@ Record every decision that refines or deviates from `docs/TASK_BRIEF.md`.
 | 2026-09-05 | Circuitscape is driven through its public `compute(::Dict)` API with temporary ASCII/GeoTIFF files on node-local `/tmp`; Omniscape through the in-memory `run_omniscape(cfg, resistance, source)` method | Circuitscape 5.17.1 has no in-memory public API; writing to node-local disk is cheap and keeps us on the supported code path | 1 |
 | 2026-09-05 | Omniscape `block_size` values in the tier table are odd (Omniscape bumps even values with a warning) | verified behaviour of Omniscape 0.6.2 | 1 |
 | 2026-09-05 | Wall-to-wall T1 variant is stored as a separate task id `T1W` with 2 focal regions (N/S or E/W strips) | keeps T1 sample schema (K point nodes) uniform; strips are regions, not points | 1 |
+| 2026-09-05 | Owner accepted CHOLMOD reference solver and average-conductance rule; brief §3.2 amended accordingly | owner decision | 1 |
+| 2026-09-05 | Off-cluster sync = private HF dataset repo `Xirro/EcoFlowBench`; shards validated → uploaded → sha256-verified → deleted locally; local working set < 150 GB | 300 GB scratch quota; owner decision | 1 |
+| 2026-09-05 | Per-pair current/voltage maps stored only for K ≤ 4 | storage; owner decision (as in brief) | 1 |
+| 2026-09-05 | Real-tile CRS = WGS84/UTM zone of tile centre (EPSG:326xx/327xx), EPSG recorded per tile | owner decision; UTM is near-equal-area within a tile and universally supported | 1 |
+| 2026-09-05 | Roads from GRIP4 (CC BY 4.0, to be verified), OSM not used | ODbL share-alike avoided; owner decision | 1 |
+| 2026-09-05 | Target venue NeurIPS 2027 D&B; Croissant export added to Phase 7 | 2026 deadline passed; Croissant mandatory | 1 |
+| 2026-09-05 | HF org `Xirro`; `HF_ORG=Xirro` in CLAUDE.md | owner decision | 1 |

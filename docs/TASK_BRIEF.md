@@ -92,9 +92,9 @@ Additionally define a **wall-to-wall** variant of T1 (strip sources on opposite 
 
 ### 3.2 Fixed solver conventions (must be identical across the dataset)
 - Connectivity: **8-neighbour** (also generate a smaller 4-neighbour subset for ablations, flagged in metadata).
-- Resistance combination between neighbours: Circuitscape default (average resistance); document explicitly.
+- Resistance combination between neighbours: **Circuitscape's default, average conductance** (`connect_using_avg_resistances = False`: g_ij = (g_i+g_j)/2, diagonal /√2); document explicitly. *(Amended 2026-09-05 after verifying the Circuitscape.jl 5.17.1 source; see DECISIONS.md.)*
 - Inputs are resistances (not conductances); resistance ≥ 1; NoData handled as infinite resistance (stored as a separate mask channel).
-- Solver: Circuitscape.jl default CG + AMG; `precision = double`; tolerance ≤ 1e-8 relative residual (verify the config keys available in the installed version and record them).
+- Solver: **reference = Circuitscape.jl `solver = cholmod` (direct Cholesky, exact to round-off, deterministic)**, `precision = double`. CG + AMG (`solver = cg+amg`, hard-coded `rtol = 1e-6` in Circuitscape.jl 5.17.1) is the documented fallback only for rasters whose Cholesky factor exceeds node memory; samples record which solver was used and the achieved relative residual. *(Amended 2026-09-05; the brief's original "CG+AMG with tolerance ≤ 1e-8" is not configurable in the installed version.)*
 - Omniscape: fixed `block_size`, `radius` in pixels per resolution tier; `source_threshold` fixed; record all.
 - All rasters stored north-up, row-major, consistent CRS per tile (EPSG:3857 or an equal-area projection per continent; record the CRS string).
 
@@ -118,13 +118,13 @@ Implement `ecoflowbench/landscapes/real.py`:
 - Source layers (verify current URLs/licenses before downloading; record version/year):
   - Land cover: ESA WorldCover (10 m) and/or Copernicus Global Land Cover (100 m).
   - Elevation: Copernicus DEM GLO-30 or GLO-90.
-  - Roads / railways: OpenStreetMap extracts (via Geofabrik/OSM PBF).
+  - Roads: **GRIP4** (Global Roads Inventory Project, Meijer et al. 2018; CC BY 4.0 — verify). OSM is *not* used (ODbL share-alike; decided 2026-09-05).
   - Water: HydroSHEDS / HydroRIVERS.
   - Human modification: Global Human Modification Index (gHM) or Human Footprint.
   - Protected areas: WDPA (for realistic focal nodes).
   - Biomes/ecoregions: RESOLVE Ecoregions 2017 (for stratified sampling).
 - **Stratified global sampling**: sample tile centres stratified by biome × continent × human-modification tercile. Target a balanced design; log the number of tiles per stratum. Avoid tiles that are >90% ocean/ice/NoData.
-- Tile extraction at each resolution tier; reproject to a local equal-area CRS; cache tiles on disk as GeoTIFF; store the raw covariate stack alongside resistance so users can train end-to-end models.
+- Tile extraction at each resolution tier; reproject to the **WGS84 / UTM zone of the tile centre (EPSG:326xx north / 327xx south)**, recording the EPSG code per tile (decided 2026-09-05); cache tiles on disk as GeoTIFF; store the raw covariate stack alongside resistance so users can train end-to-end models.
 - Keep a manifest (`tiles.parquet`) with tile ID, centre lat/lon, CRS, stratum, source layer versions, and download checksums.
 
 ### 4.3 Resolution and size ladder
@@ -216,7 +216,8 @@ Provide official splits as Parquet lists of sample IDs:
 ## 9. Phase 7 — Python loaders and Hugging Face integration
 
 - `ecoflowbench.data.EcoFlowBenchDataset(task, split, tier, root)` → returns dict tensors; supports lazy shard loading, optional log-transform helper, normalization statistics computed on train only (`stats/norm_stats.json`).
-- Hugging Face: build a `datasets` loading script or use the Parquet + shard file convention so `load_dataset("<org>/ecoflowbench", "T1_S")` works; implement `scripts/push_to_hub.py` with dry-run mode. **Do not push without confirmation.**
+- Hugging Face: build a `datasets` loading script or use the Parquet + shard file convention so `load_dataset("Xirro/EcoFlowBench", "T1_S")` works; implement `scripts/push_to_hub.py` with dry-run mode. **Do not push without confirmation.** The dataset repo is **private** during development (`Xirro/EcoFlowBench`) and doubles as the off-cluster sync destination: every finished shard is validated → uploaded → checksum-verified → deleted from scratch, keeping the local working set under 150 GB (see `docs/compute_env.md` §10).
+- Generate **Croissant** metadata (`scripts/export_croissant.py`) and validate it; ship `croissant.json` in the HF repo.
 - Dataset card (`README.md` on HF) following the Datasheets for Datasets template: motivation, composition, collection process, preprocessing, uses, distribution, maintenance, licenses of upstream sources, known limitations, ethical considerations (sensitivity of protected-area locations; do not include any non-public data).
 
 ---
@@ -288,7 +289,7 @@ Produce in `paper/`:
 - `figures/`: publication-quality PDFs/PNGs generated by `ecoflowbench/viz/`.
 - `outline.md`: a suggested manuscript outline (Introduction/motivation, Related work, Task definitions, Dataset construction, Statistics, Baselines, OOD results, Limitations & ethics, Maintenance plan).
 
-Target venue: NeurIPS Datasets & Benchmarks track (primary); ecological venue as secondary. Follow the D&B checklist (hosting, license, maintenance, datasheet, DOI). Obtain a DOI via Zenodo mirror in addition to Hugging Face.
+Target venue: **NeurIPS 2027 Datasets & Benchmarks track** (primary; the 2026 deadline has passed); ecological venue as secondary. Follow the D&B checklist (hosting, license, maintenance, datasheet, DOI). **Croissant metadata (core + RAI fields) is mandatory for the track and is a Phase 7 deliverable (`scripts/export_croissant.py`, validated with the Hugging Face Croissant validator).** Obtain a DOI via Zenodo mirror in addition to Hugging Face.
 
 ---
 
@@ -320,9 +321,9 @@ After each phase, write the phase report and post a concise summary: what was bu
 ## 17. Open questions to flag early (do not silently decide)
 
 - Compute budget available (CPU-hours, node count, storage) — needed to fix v1.0 sample counts.
-- Hugging Face organization / repository name and whether the repo should be gated during review.
-- Which equal-area CRS convention to adopt for real tiles.
-- Whether to include OSM-derived rasters given ODbL share-alike.
-- Whether per-pair current maps should be stored for all samples (storage cost) or only for K ≤ 4.
+- ~~Hugging Face organization / repository name and whether the repo should be gated during review.~~ Decided 2026-09-05: `Xirro/EcoFlowBench`, private during development.
+- ~~Which equal-area CRS convention to adopt for real tiles.~~ Decided 2026-09-05: WGS84/UTM zone of tile centre.
+- ~~Whether to include OSM-derived rasters given ODbL share-alike.~~ Decided 2026-09-05: no OSM; roads from GRIP4.
+- ~~Whether per-pair current maps should be stored for all samples (storage cost) or only for K ≤ 4.~~ Decided 2026-09-05: only for K ≤ 4; K > 4 stores cumulative map + Reff only.
 
 Begin with Phase 1 and the repository scaffold. Proceed phase by phase, honouring the gates above.
