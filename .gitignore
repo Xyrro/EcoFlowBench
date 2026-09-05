@@ -44,3 +44,12 @@ logs/
 # Secrets
 .env
 *.token
+
+# EcoFlowBench scratch-local tooling (never commit)
+tools/
+.uv_cache/
+.pip_cache/
+.hf_cache/
+.cache/
+envs/
+.conda_pkgs/
