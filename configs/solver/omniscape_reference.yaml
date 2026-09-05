@@ -1,0 +1,30 @@
+# Reference Omniscape.jl settings for task T4. Verified against Omniscape.jl 0.6.2 (src/config.jl).
+# radius / block_size are per resolution tier (docs/task_specification.md §3.5).
+preset_id: omniscape_reference_v1
+solver_name: Omniscape.jl
+solver_version: "0.6.2"
+julia_version: "1.11.3"
+
+solver: cg+amg                       # Omniscape only supports cg+amg / cholmod; window solves are small
+precision: double
+connect_four_neighbors_only: false
+resistance_is_conductance: false
+source_from_resistance: false        # source strength raster is an explicit input
+source_threshold: 0.0                # pixels with source <= threshold are never targets
+r_cutoff: .inf                       # no resistance-based source cutoff (sources given explicitly)
+buffer: 0
+calc_flow_potential: true
+calc_normalized_current: true
+correct_artifacts: true              # Omniscape's block-artefact correction (recorded, kept at default)
+mask_nodata: true
+write_raw_currmap: true
+parallelize: false                   # parallelism is across samples
+parallel_batch_size: 10
+
+# per-tier window geometry, pixels (block_size must be odd)
+tiers:
+  S:   {radius: 16,  block_size: 3}
+  M:   {radius: 32,  block_size: 5}
+  L:   {radius: 64,  block_size: 9}
+  XL:  {radius: 128, block_size: 17}
+  XXL: {radius: 256, block_size: 33}

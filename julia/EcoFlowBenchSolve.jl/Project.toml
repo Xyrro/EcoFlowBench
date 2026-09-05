@@ -1,0 +1,19 @@
+name = "EcoFlowBenchSolve"
+uuid = "6b1b1c32-5994-4079-a933-43431ff108bf"
+authors = ["EcoFlowBench contributors"]
+version = "0.0.1"
+
+[deps]
+Circuitscape = "2b7a1792-8151-5239-925d-e2b8fdfa3201"
+Omniscape = "a38d70fc-99f5-11e9-1e3d-cbca093024c3"
+
+[compat]
+Circuitscape = "5.17.1"
+Omniscape = "0.6.2"
+julia = "1.10"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]

@@ -1,0 +1,37 @@
+# Reference Circuitscape.jl settings used for ALL EcoFlowBench ground truth.
+# Verified against Circuitscape.jl 5.17.1 (src/config.jl). See docs/task_specification.md §2
+# and DECISIONS.md (2026-09-05) for the rationale. Keys map 1:1 onto Circuitscape INI keys.
+preset_id: circuitscape_reference_v1
+solver_name: Circuitscape.jl
+solver_version: "5.17.1"            # pinned in julia/EcoFlowBenchSolve.jl/Manifest.toml
+julia_version: "1.11.3"
+
+# --- graph construction (identical for every task) ---
+connect_four_neighbors_only: false   # 8-neighbour grid graph
+connect_using_avg_resistances: false # Circuitscape default: average CONDUCTANCES between cells
+habitat_map_is_resistances: true     # inputs are resistances (>= 1); NoData = no node
+use_polygons: false                  # focal regions are handled via the point raster labels
+
+# --- linear solver ---
+solver: cholmod                      # direct Cholesky (SuiteSparse CHOLMOD); exact to round-off
+precision: double
+use_64bit_indexing: true
+cholmod_batch_size: 1000
+low_memory_mode: false
+parallelize: false                   # parallelism is across samples, not inside a solve
+
+# --- outputs requested from the solver ---
+write_cur_maps: true                 # per-pair current maps (kept only for K <= 4)
+write_volt_maps: true
+write_cum_cur_map_only: false
+write_max_cur_maps: false
+set_focal_node_currents_to_zero: false
+set_null_currents_to_nodata: false
+set_null_voltages_to_nodata: false
+log_transform_maps: false            # raw outputs only; never post-processed
+compress_grids: false
+write_as_tif: false
+
+# --- ablation variant: 4-neighbour subset (flag samples with graph_connectivity: 4) ---
+ablation_four_neighbour:
+  connect_four_neighbors_only: true

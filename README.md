@@ -13,7 +13,17 @@ EcoFlowBench provides standardized (resistance landscape, source configuration) 
 - **T4** Omnidirectional connectivity (Omniscape)
 
 ## Repository layout
-See `docs/TASK_BRIEF.md` §2.2.
+See `docs/TASK_BRIEF.md` §2.2. Phase 1 documents: `docs/compute_env.md`, `docs/prior_art.md`,
+`docs/task_specification.md`, `docs/phase_01_report.md`.
+
+## Development setup (PACE-ICE)
+```bash
+source scripts/env.sh          # isolates from ~/.bashrc conda env, points caches at scratch
+uv sync --extra dev            # Python 3.11 venv on scratch (pinned in uv.lock)
+julia --project=julia/EcoFlowBenchSolve.jl -e 'using Pkg; Pkg.instantiate()'
+bash scripts/setup_gdal_env.sh # optional GDAL CLI tools
+python -m pytest -q
+```
 
 ## License
 Code: MIT. Data: CC BY 4.0 (subject to upstream data licenses; see `docs/licenses.md`).
