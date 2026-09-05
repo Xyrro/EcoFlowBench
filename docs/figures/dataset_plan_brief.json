@@ -1,0 +1,1016 @@
+{
+ "ladder": {
+  "S": 100000,
+  "M": 50000,
+  "L": 10000,
+  "XL": 2000,
+  "XXL": 200
+ },
+ "landscapes": [
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "stratum": "grf",
+   "table": "-",
+   "landscapes": 14400
+  },
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "stratum": "fractal",
+   "table": "-",
+   "landscapes": 9600
+  },
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "stratum": "random_cluster",
+   "table": "-",
+   "landscapes": 7200
+  },
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "stratum": "planar_gradient",
+   "table": "-",
+   "landscapes": 2400
+  },
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "stratum": "edge_gradient",
+   "table": "-",
+   "landscapes": 2400
+  },
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "stratum": "distance_gradient",
+   "table": "-",
+   "landscapes": 4800
+  },
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "stratum": "mosaic",
+   "table": "-",
+   "landscapes": 7200
+  },
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "stratum": "hard:high_contrast_1e4",
+   "table": "-",
+   "landscapes": 3600
+  },
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "stratum": "hard:rmax_saturated",
+   "table": "-",
+   "landscapes": 1800
+  },
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "stratum": "hard:narrow_corridor",
+   "table": "-",
+   "landscapes": 3600
+  },
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "stratum": "hard:large_nodata",
+   "table": "-",
+   "landscapes": 3000
+  },
+  {
+   "tier": "S",
+   "family": "real",
+   "stratum": "tiles=8000",
+   "table": "generic_hm",
+   "landscapes": 8000
+  },
+  {
+   "tier": "S",
+   "family": "real",
+   "stratum": "tiles=8000",
+   "table": "large_mammal",
+   "landscapes": 8000
+  },
+  {
+   "tier": "S",
+   "family": "real",
+   "stratum": "tiles=8000",
+   "table": "amphibian",
+   "landscapes": 8000
+  },
+  {
+   "tier": "S",
+   "family": "real",
+   "stratum": "tiles=8000",
+   "table": "forest_bird",
+   "landscapes": 8000
+  },
+  {
+   "tier": "S",
+   "family": "real",
+   "stratum": "tiles=8000",
+   "table": "random_lm",
+   "landscapes": 8000
+  },
+  {
+   "tier": "M",
+   "family": "synthetic",
+   "stratum": "grf",
+   "table": "-",
+   "landscapes": 7200
+  },
+  {
+   "tier": "M",
+   "family": "synthetic",
+   "stratum": "fractal",
+   "table": "-",
+   "landscapes": 4800
+  },
+  {
+   "tier": "M",
+   "family": "synthetic",
+   "stratum": "random_cluster",
+   "table": "-",
+   "landscapes": 3600
+  },
+  {
+   "tier": "M",
+   "family": "synthetic",
+   "stratum": "planar_gradient",
+   "table": "-",
+   "landscapes": 1200
+  },
+  {
+   "tier": "M",
+   "family": "synthetic",
+   "stratum": "edge_gradient",
+   "table": "-",
+   "landscapes": 1200
+  },
+  {
+   "tier": "M",
+   "family": "synthetic",
+   "stratum": "distance_gradient",
+   "table": "-",
+   "landscapes": 2400
+  },
+  {
+   "tier": "M",
+   "family": "synthetic",
+   "stratum": "mosaic",
+   "table": "-",
+   "landscapes": 3600
+  },
+  {
+   "tier": "M",
+   "family": "synthetic",
+   "stratum": "hard:high_contrast_1e4",
+   "table": "-",
+   "landscapes": 1800
+  },
+  {
+   "tier": "M",
+   "family": "synthetic",
+   "stratum": "hard:rmax_saturated",
+   "table": "-",
+   "landscapes": 900
+  },
+  {
+   "tier": "M",
+   "family": "synthetic",
+   "stratum": "hard:narrow_corridor",
+   "table": "-",
+   "landscapes": 1800
+  },
+  {
+   "tier": "M",
+   "family": "synthetic",
+   "stratum": "hard:large_nodata",
+   "table": "-",
+   "landscapes": 1500
+  },
+  {
+   "tier": "M",
+   "family": "real",
+   "stratum": "tiles=4000",
+   "table": "generic_hm",
+   "landscapes": 4000
+  },
+  {
+   "tier": "M",
+   "family": "real",
+   "stratum": "tiles=4000",
+   "table": "large_mammal",
+   "landscapes": 4000
+  },
+  {
+   "tier": "M",
+   "family": "real",
+   "stratum": "tiles=4000",
+   "table": "amphibian",
+   "landscapes": 4000
+  },
+  {
+   "tier": "M",
+   "family": "real",
+   "stratum": "tiles=4000",
+   "table": "forest_bird",
+   "landscapes": 4000
+  },
+  {
+   "tier": "M",
+   "family": "real",
+   "stratum": "tiles=4000",
+   "table": "random_lm",
+   "landscapes": 4000
+  },
+  {
+   "tier": "L",
+   "family": "synthetic",
+   "stratum": "grf",
+   "table": "-",
+   "landscapes": 1440
+  },
+  {
+   "tier": "L",
+   "family": "synthetic",
+   "stratum": "fractal",
+   "table": "-",
+   "landscapes": 960
+  },
+  {
+   "tier": "L",
+   "family": "synthetic",
+   "stratum": "random_cluster",
+   "table": "-",
+   "landscapes": 720
+  },
+  {
+   "tier": "L",
+   "family": "synthetic",
+   "stratum": "planar_gradient",
+   "table": "-",
+   "landscapes": 240
+  },
+  {
+   "tier": "L",
+   "family": "synthetic",
+   "stratum": "edge_gradient",
+   "table": "-",
+   "landscapes": 240
+  },
+  {
+   "tier": "L",
+   "family": "synthetic",
+   "stratum": "distance_gradient",
+   "table": "-",
+   "landscapes": 480
+  },
+  {
+   "tier": "L",
+   "family": "synthetic",
+   "stratum": "mosaic",
+   "table": "-",
+   "landscapes": 720
+  },
+  {
+   "tier": "L",
+   "family": "synthetic",
+   "stratum": "hard:high_contrast_1e4",
+   "table": "-",
+   "landscapes": 360
+  },
+  {
+   "tier": "L",
+   "family": "synthetic",
+   "stratum": "hard:rmax_saturated",
+   "table": "-",
+   "landscapes": 180
+  },
+  {
+   "tier": "L",
+   "family": "synthetic",
+   "stratum": "hard:narrow_corridor",
+   "table": "-",
+   "landscapes": 360
+  },
+  {
+   "tier": "L",
+   "family": "synthetic",
+   "stratum": "hard:large_nodata",
+   "table": "-",
+   "landscapes": 300
+  },
+  {
+   "tier": "L",
+   "family": "real",
+   "stratum": "tiles=800",
+   "table": "generic_hm",
+   "landscapes": 800
+  },
+  {
+   "tier": "L",
+   "family": "real",
+   "stratum": "tiles=800",
+   "table": "large_mammal",
+   "landscapes": 800
+  },
+  {
+   "tier": "L",
+   "family": "real",
+   "stratum": "tiles=800",
+   "table": "amphibian",
+   "landscapes": 800
+  },
+  {
+   "tier": "L",
+   "family": "real",
+   "stratum": "tiles=800",
+   "table": "forest_bird",
+   "landscapes": 800
+  },
+  {
+   "tier": "L",
+   "family": "real",
+   "stratum": "tiles=800",
+   "table": "random_lm",
+   "landscapes": 800
+  },
+  {
+   "tier": "XL",
+   "family": "synthetic",
+   "stratum": "grf",
+   "table": "-",
+   "landscapes": 288
+  },
+  {
+   "tier": "XL",
+   "family": "synthetic",
+   "stratum": "fractal",
+   "table": "-",
+   "landscapes": 192
+  },
+  {
+   "tier": "XL",
+   "family": "synthetic",
+   "stratum": "random_cluster",
+   "table": "-",
+   "landscapes": 144
+  },
+  {
+   "tier": "XL",
+   "family": "synthetic",
+   "stratum": "planar_gradient",
+   "table": "-",
+   "landscapes": 48
+  },
+  {
+   "tier": "XL",
+   "family": "synthetic",
+   "stratum": "edge_gradient",
+   "table": "-",
+   "landscapes": 48
+  },
+  {
+   "tier": "XL",
+   "family": "synthetic",
+   "stratum": "distance_gradient",
+   "table": "-",
+   "landscapes": 96
+  },
+  {
+   "tier": "XL",
+   "family": "synthetic",
+   "stratum": "mosaic",
+   "table": "-",
+   "landscapes": 144
+  },
+  {
+   "tier": "XL",
+   "family": "synthetic",
+   "stratum": "hard:high_contrast_1e4",
+   "table": "-",
+   "landscapes": 72
+  },
+  {
+   "tier": "XL",
+   "family": "synthetic",
+   "stratum": "hard:rmax_saturated",
+   "table": "-",
+   "landscapes": 36
+  },
+  {
+   "tier": "XL",
+   "family": "synthetic",
+   "stratum": "hard:narrow_corridor",
+   "table": "-",
+   "landscapes": 72
+  },
+  {
+   "tier": "XL",
+   "family": "synthetic",
+   "stratum": "hard:large_nodata",
+   "table": "-",
+   "landscapes": 60
+  },
+  {
+   "tier": "XL",
+   "family": "real",
+   "stratum": "tiles=160",
+   "table": "generic_hm",
+   "landscapes": 160
+  },
+  {
+   "tier": "XL",
+   "family": "real",
+   "stratum": "tiles=160",
+   "table": "large_mammal",
+   "landscapes": 160
+  },
+  {
+   "tier": "XL",
+   "family": "real",
+   "stratum": "tiles=160",
+   "table": "amphibian",
+   "landscapes": 160
+  },
+  {
+   "tier": "XL",
+   "family": "real",
+   "stratum": "tiles=160",
+   "table": "forest_bird",
+   "landscapes": 160
+  },
+  {
+   "tier": "XL",
+   "family": "real",
+   "stratum": "tiles=160",
+   "table": "random_lm",
+   "landscapes": 160
+  },
+  {
+   "tier": "XXL",
+   "family": "synthetic",
+   "stratum": "grf",
+   "table": "-",
+   "landscapes": 29
+  },
+  {
+   "tier": "XXL",
+   "family": "synthetic",
+   "stratum": "fractal",
+   "table": "-",
+   "landscapes": 19
+  },
+  {
+   "tier": "XXL",
+   "family": "synthetic",
+   "stratum": "random_cluster",
+   "table": "-",
+   "landscapes": 14
+  },
+  {
+   "tier": "XXL",
+   "family": "synthetic",
+   "stratum": "planar_gradient",
+   "table": "-",
+   "landscapes": 5
+  },
+  {
+   "tier": "XXL",
+   "family": "synthetic",
+   "stratum": "edge_gradient",
+   "table": "-",
+   "landscapes": 5
+  },
+  {
+   "tier": "XXL",
+   "family": "synthetic",
+   "stratum": "distance_gradient",
+   "table": "-",
+   "landscapes": 10
+  },
+  {
+   "tier": "XXL",
+   "family": "synthetic",
+   "stratum": "mosaic",
+   "table": "-",
+   "landscapes": 14
+  },
+  {
+   "tier": "XXL",
+   "family": "synthetic",
+   "stratum": "hard:high_contrast_1e4",
+   "table": "-",
+   "landscapes": 7
+  },
+  {
+   "tier": "XXL",
+   "family": "synthetic",
+   "stratum": "hard:rmax_saturated",
+   "table": "-",
+   "landscapes": 4
+  },
+  {
+   "tier": "XXL",
+   "family": "synthetic",
+   "stratum": "hard:narrow_corridor",
+   "table": "-",
+   "landscapes": 7
+  },
+  {
+   "tier": "XXL",
+   "family": "synthetic",
+   "stratum": "hard:large_nodata",
+   "table": "-",
+   "landscapes": 6
+  },
+  {
+   "tier": "XXL",
+   "family": "real",
+   "stratum": "tiles=16",
+   "table": "generic_hm",
+   "landscapes": 16
+  },
+  {
+   "tier": "XXL",
+   "family": "real",
+   "stratum": "tiles=16",
+   "table": "large_mammal",
+   "landscapes": 16
+  },
+  {
+   "tier": "XXL",
+   "family": "real",
+   "stratum": "tiles=16",
+   "table": "amphibian",
+   "landscapes": 16
+  },
+  {
+   "tier": "XXL",
+   "family": "real",
+   "stratum": "tiles=16",
+   "table": "forest_bird",
+   "landscapes": 16
+  },
+  {
+   "tier": "XXL",
+   "family": "real",
+   "stratum": "tiles=16",
+   "table": "random_lm",
+   "landscapes": 16
+  }
+ ],
+ "solves": [
+  {
+   "tier": "L",
+   "family": "real",
+   "config": "points",
+   "tasks": "T1,T2",
+   "solves": 4000
+  },
+  {
+   "tier": "L",
+   "family": "real",
+   "config": "wall_to_wall_NS",
+   "tasks": "T1W",
+   "solves": 4000
+  },
+  {
+   "tier": "L",
+   "family": "real",
+   "config": "wall_to_wall_EW",
+   "tasks": "T1W",
+   "solves": 4000
+  },
+  {
+   "tier": "L",
+   "family": "real",
+   "config": "regions",
+   "tasks": "T1R",
+   "solves": 1600
+  },
+  {
+   "tier": "L",
+   "family": "real",
+   "config": "advanced",
+   "tasks": "T3",
+   "solves": 4000
+  },
+  {
+   "tier": "L",
+   "family": "real",
+   "config": "omniscape",
+   "tasks": "T4",
+   "solves": 4000
+  },
+  {
+   "tier": "L",
+   "family": "synthetic",
+   "config": "points",
+   "tasks": "T1,T2",
+   "solves": 6000
+  },
+  {
+   "tier": "L",
+   "family": "synthetic",
+   "config": "wall_to_wall_NS",
+   "tasks": "T1W",
+   "solves": 6000
+  },
+  {
+   "tier": "L",
+   "family": "synthetic",
+   "config": "wall_to_wall_EW",
+   "tasks": "T1W",
+   "solves": 6000
+  },
+  {
+   "tier": "L",
+   "family": "synthetic",
+   "config": "advanced",
+   "tasks": "T3",
+   "solves": 6000
+  },
+  {
+   "tier": "L",
+   "family": "synthetic",
+   "config": "omniscape",
+   "tasks": "T4",
+   "solves": 6000
+  },
+  {
+   "tier": "M",
+   "family": "real",
+   "config": "points",
+   "tasks": "T1,T2",
+   "solves": 20000
+  },
+  {
+   "tier": "M",
+   "family": "real",
+   "config": "wall_to_wall_NS",
+   "tasks": "T1W",
+   "solves": 20000
+  },
+  {
+   "tier": "M",
+   "family": "real",
+   "config": "wall_to_wall_EW",
+   "tasks": "T1W",
+   "solves": 20000
+  },
+  {
+   "tier": "M",
+   "family": "real",
+   "config": "regions",
+   "tasks": "T1R",
+   "solves": 8000
+  },
+  {
+   "tier": "M",
+   "family": "real",
+   "config": "advanced",
+   "tasks": "T3",
+   "solves": 20000
+  },
+  {
+   "tier": "M",
+   "family": "real",
+   "config": "omniscape",
+   "tasks": "T4",
+   "solves": 20000
+  },
+  {
+   "tier": "M",
+   "family": "synthetic",
+   "config": "points",
+   "tasks": "T1,T2",
+   "solves": 30000
+  },
+  {
+   "tier": "M",
+   "family": "synthetic",
+   "config": "wall_to_wall_NS",
+   "tasks": "T1W",
+   "solves": 30000
+  },
+  {
+   "tier": "M",
+   "family": "synthetic",
+   "config": "wall_to_wall_EW",
+   "tasks": "T1W",
+   "solves": 30000
+  },
+  {
+   "tier": "M",
+   "family": "synthetic",
+   "config": "advanced",
+   "tasks": "T3",
+   "solves": 30000
+  },
+  {
+   "tier": "M",
+   "family": "synthetic",
+   "config": "omniscape",
+   "tasks": "T4",
+   "solves": 30000
+  },
+  {
+   "tier": "S",
+   "family": "real",
+   "config": "points",
+   "tasks": "T1,T2",
+   "solves": 40000
+  },
+  {
+   "tier": "S",
+   "family": "real",
+   "config": "wall_to_wall_NS",
+   "tasks": "T1W",
+   "solves": 40000
+  },
+  {
+   "tier": "S",
+   "family": "real",
+   "config": "wall_to_wall_EW",
+   "tasks": "T1W",
+   "solves": 40000
+  },
+  {
+   "tier": "S",
+   "family": "real",
+   "config": "regions",
+   "tasks": "T1R",
+   "solves": 16000
+  },
+  {
+   "tier": "S",
+   "family": "real",
+   "config": "advanced",
+   "tasks": "T3",
+   "solves": 40000
+  },
+  {
+   "tier": "S",
+   "family": "real",
+   "config": "omniscape",
+   "tasks": "T4",
+   "solves": 40000
+  },
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "config": "points",
+   "tasks": "T1,T2",
+   "solves": 60000
+  },
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "config": "wall_to_wall_NS",
+   "tasks": "T1W",
+   "solves": 60000
+  },
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "config": "wall_to_wall_EW",
+   "tasks": "T1W",
+   "solves": 60000
+  },
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "config": "advanced",
+   "tasks": "T3",
+   "solves": 60000
+  },
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "config": "omniscape",
+   "tasks": "T4",
+   "solves": 60000
+  },
+  {
+   "tier": "XL",
+   "family": "real",
+   "config": "points",
+   "tasks": "T1,T2",
+   "solves": 800
+  },
+  {
+   "tier": "XL",
+   "family": "real",
+   "config": "wall_to_wall_NS",
+   "tasks": "T1W",
+   "solves": 800
+  },
+  {
+   "tier": "XL",
+   "family": "real",
+   "config": "wall_to_wall_EW",
+   "tasks": "T1W",
+   "solves": 800
+  },
+  {
+   "tier": "XL",
+   "family": "real",
+   "config": "regions",
+   "tasks": "T1R",
+   "solves": 320
+  },
+  {
+   "tier": "XL",
+   "family": "real",
+   "config": "advanced",
+   "tasks": "T3",
+   "solves": 800
+  },
+  {
+   "tier": "XL",
+   "family": "real",
+   "config": "omniscape",
+   "tasks": "T4",
+   "solves": 800
+  },
+  {
+   "tier": "XL",
+   "family": "synthetic",
+   "config": "points",
+   "tasks": "T1,T2",
+   "solves": 1200
+  },
+  {
+   "tier": "XL",
+   "family": "synthetic",
+   "config": "wall_to_wall_NS",
+   "tasks": "T1W",
+   "solves": 1200
+  },
+  {
+   "tier": "XL",
+   "family": "synthetic",
+   "config": "wall_to_wall_EW",
+   "tasks": "T1W",
+   "solves": 1200
+  },
+  {
+   "tier": "XL",
+   "family": "synthetic",
+   "config": "advanced",
+   "tasks": "T3",
+   "solves": 1200
+  },
+  {
+   "tier": "XL",
+   "family": "synthetic",
+   "config": "omniscape",
+   "tasks": "T4",
+   "solves": 1200
+  },
+  {
+   "tier": "XXL",
+   "family": "real",
+   "config": "points",
+   "tasks": "T1,T2",
+   "solves": 80
+  },
+  {
+   "tier": "XXL",
+   "family": "real",
+   "config": "wall_to_wall_NS",
+   "tasks": "T1W",
+   "solves": 80
+  },
+  {
+   "tier": "XXL",
+   "family": "real",
+   "config": "wall_to_wall_EW",
+   "tasks": "T1W",
+   "solves": 80
+  },
+  {
+   "tier": "XXL",
+   "family": "real",
+   "config": "regions",
+   "tasks": "T1R",
+   "solves": 32
+  },
+  {
+   "tier": "XXL",
+   "family": "real",
+   "config": "advanced",
+   "tasks": "T3",
+   "solves": 80
+  },
+  {
+   "tier": "XXL",
+   "family": "real",
+   "config": "omniscape",
+   "tasks": "T4",
+   "solves": 80
+  },
+  {
+   "tier": "XXL",
+   "family": "synthetic",
+   "config": "points",
+   "tasks": "T1,T2",
+   "solves": 120
+  },
+  {
+   "tier": "XXL",
+   "family": "synthetic",
+   "config": "wall_to_wall_NS",
+   "tasks": "T1W",
+   "solves": 120
+  },
+  {
+   "tier": "XXL",
+   "family": "synthetic",
+   "config": "wall_to_wall_EW",
+   "tasks": "T1W",
+   "solves": 120
+  },
+  {
+   "tier": "XXL",
+   "family": "synthetic",
+   "config": "advanced",
+   "tasks": "T3",
+   "solves": 120
+  },
+  {
+   "tier": "XXL",
+   "family": "synthetic",
+   "config": "omniscape",
+   "tasks": "T4",
+   "solves": 120
+  },
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "config": "points (4-neighbour ablation)",
+   "tasks": "T1,T2",
+   "solves": 3000
+  }
+ ],
+ "cost": [
+  {
+   "tier": "S",
+   "landscapes": 100000,
+   "cpu_s_per_landscape": 7.6,
+   "peak_rss_gb": 1.4,
+   "cpu_hours": 212.0,
+   "storage_gb": 111.8
+  },
+  {
+   "tier": "M",
+   "landscapes": 50000,
+   "cpu_s_per_landscape": 57.8,
+   "peak_rss_gb": 1.4,
+   "cpu_hours": 802.0,
+   "storage_gb": 180.0
+  },
+  {
+   "tier": "L",
+   "landscapes": 10000,
+   "cpu_s_per_landscape": 214.3,
+   "peak_rss_gb": 1.6,
+   "cpu_hours": 595.0,
+   "storage_gb": 130.0
+  },
+  {
+   "tier": "XL",
+   "landscapes": 2000,
+   "cpu_s_per_landscape": 948.0,
+   "peak_rss_gb": 3.3,
+   "cpu_hours": 527.0,
+   "storage_gb": 97.2
+  },
+  {
+   "tier": "XXL",
+   "landscapes": 200,
+   "cpu_s_per_landscape": 5298.1,
+   "peak_rss_gb": 9.5,
+   "cpu_hours": 294.0,
+   "storage_gb": 32.8
+  },
+  {
+   "tier": "total",
+   "landscapes": 162200,
+   "cpu_s_per_landscape": null,
+   "peak_rss_gb": null,
+   "cpu_hours": 2430.0,
+   "storage_gb": 551.8
+  }
+ ],
+ "total_cpu_hours": 2430.0
+}

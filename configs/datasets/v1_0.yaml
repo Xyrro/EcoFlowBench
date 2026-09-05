@@ -1,0 +1,79 @@
+# EcoFlowBench v1.0 — complete, compute-agnostic design (docs/dataset_plan.md is generated from this file
+# by scripts/dataset_plan_tables.py). Counts are LANDSCAPES (one landscape = one resistance raster);
+# every landscape is solved for every applicable source configuration / task, so task counts follow.
+dataset_id: ecoflowbench-v1.0
+tiers:
+  S:   {size: 128,  pixel_m: 100}
+  M:   {size: 256,  pixel_m: 100}
+  L:   {size: 512,  pixel_m: 200}
+  XL:  {size: 1024, pixel_m: 500}
+  XXL: {size: 2048, pixel_m: 1000}
+
+# ---- brief §4.3 baseline (landscapes per tier) and the recommended v1.0 ----
+brief_ladder:       {S: 100000, M: 50000, L: 10000, XL: 2000, XXL: 200}
+recommended_ladder: {S: 100000, M: 50000, L: 20000, XL: 4000, XXL: 400}
+family_share:       {synthetic: 0.6, real: 0.4}          # of landscapes per tier
+# real landscapes = tiles × resistance tables (every tile gets every table); tiles per tier follow
+resistance_tables: [generic_hm, large_mammal, amphibian, forest_bird, random_lm]
+random_tables_per_tile: 1        # one seeded random table per tile (seed = tile hash) -> 5 tables per tile
+
+# ---- synthetic generator mix (fraction of synthetic landscapes per tier; same at every tier) ----
+generator_mix:
+  grf: 0.24
+  fractal: 0.16
+  random_cluster: 0.12
+  planar_gradient: 0.04
+  edge_gradient: 0.04
+  distance_gradient: 0.08
+  mosaic: 0.12
+  hard: 0.20                     # named hard-case stratum, see below
+
+# ---- hard-case stratum (share of the 'hard' synthetic slice) ----
+hard_cases:
+  high_contrast_1e4:   0.30      # contrast 10^4 (also the OOD-contrast test pool)
+  rmax_saturated:      0.15      # > 50 % of pixels at r_max (near-degenerate, train/val-excluded by QC rule)
+  narrow_corridor:     0.30      # barrier wall(s) with 1–3 gaps of 1–3 px  (NEW generator, Phase 6)
+  large_nodata:        0.25      # NoData fraction 0.25–0.45 with single connected component
+
+# ---- source configurations solved per landscape ----
+configs_per_landscape:
+  points:          {tasks: [T1, T2], per_landscape: 1, families: [synthetic, real]}
+  wall_to_wall_NS: {tasks: [T1W],    per_landscape: 1, families: [synthetic, real]}
+  wall_to_wall_EW: {tasks: [T1W],    per_landscape: 1, families: [synthetic, real]}
+  regions:         {tasks: [T1R],    per_landscape: 0.4, families: [real]}        # where ≥ 2 habitat patches exist (pilot: 38 %)
+  advanced:        {tasks: [T3],     per_landscape: 1, families: [synthetic, real]}
+  omniscape:       {tasks: [T4],     per_landscape: 1, families: [synthetic, real]}
+four_neighbour_ablation: {tier: S, fraction_of_synthetic: 0.05}   # extra solves flagged graph_connectivity = 4
+
+# ---- splits (by tile / seed family) ----
+splits:
+  train: 0.8
+  val: 0.1
+  test_id: 0.1
+ood:
+  test_ood_region:  {hold_out_biomes: ["Montane Grasslands & Shrublands", "Mangroves"], hold_out_realms: ["Australasia"]}
+  test_ood_scale:   {tiers: [XL, XXL]}                # never in train/val
+  test_ood_table:   {table: forest_bird}              # never in train/val
+  test_ood_contrast: {contrast: 10000}                # synthetic contrast 1e4 never in train/val
+  test_ood_synth2real: {flag: true}                   # subset flags, no extra samples
+
+# ---- per-tier Omniscape geometry (fidelity study pending; block/radius ratio ≈ 0.13) ----
+omniscape:
+  S:   {radius: 16,  block_size: 3}
+  M:   {radius: 32,  block_size: 5}
+  L:   {radius: 64,  block_size: 9}
+  XL:  {radius: 128, block_size: 17}
+  XXL: {radius: 256, block_size: 33}
+
+# ---- measured costs (Phase 5, CHOLMOD, single-threaded solves; seconds per solve) ----
+cost_measured:
+  points:       {S: 0.171, M: 0.87, L: 4.11, XL: 13.3, XXL: 70.9}
+  wall_to_wall: {S: 0.079}            # scales ∝ pixels (b = 1.00)
+  regions:      {S: 0.214}
+  advanced:     {S: 0.074}            # scales ∝ pixels
+  omniscape:    {S: 6.19, M: 48.3, L: 178, XL: 794, XXL: 4468}   # at the block sizes above
+  overhead_fraction: 0.15             # Julia load/JIT, I/O, QC, finalize
+peak_rss_mb:    {S: 1450, M: 1360, L: 1620, XL: 3290, XXL: 9520}
+storage_mb_per_landscape:              # compressed HDF5, all configs, K ≤ 4 pair maps for ~half the point samples
+  synthetic: {S: 0.93, M: 3.0, L: 11, XL: 41, XXL: 140}
+  real:      {S: 1.4,  M: 4.5, L: 16, XL: 60, XXL: 200}      # + 8 covariate channels

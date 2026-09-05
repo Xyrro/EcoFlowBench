@@ -1,0 +1,29 @@
+# Template cluster profile. Copy to configs/cluster/<name>.yaml, fill in, and pass --profile <name>.
+# All paths/partitions used by scripts/generate.py and scripts/slurm/*.sbatch come from here.
+profile_id: CHANGE_ME
+scheduler: slurm
+account: null
+qos: null
+scratch_root: /path/to/scratch/EcoFlowBench   # clone the repo here; EFB_SCRATCH points at it
+node_tmp: /tmp
+modules: []                                   # e.g. [julia/1.11.3, gdal/3.9]
+python: uv                                    # uv | conda | module
+partitions:
+  cpu: CHANGE_ME
+  cpu_fallback: null
+  gpu: null
+  gpu_gres: null
+limits:
+  max_walltime: "04:00:00"
+  max_array_concurrent: 50
+  max_submit_per_user: 1000
+  cpu_hours_gate: 500
+defaults:
+  S:   {cpus: 1, mem: "6G",  time: "04:00:00", shard_size: 200}
+  M:   {cpus: 1, mem: "6G",  time: "04:00:00", shard_size: 100}
+  L:   {cpus: 2, mem: "8G",  time: "04:00:00", shard_size: 40}
+  XL:  {cpus: 4, mem: "16G", time: "04:00:00", shard_size: 8}
+  XXL: {cpus: 8, mem: "32G", time: "04:00:00", shard_size: 2}
+network:
+  compute_nodes_have_internet: false
+  installs_on: login

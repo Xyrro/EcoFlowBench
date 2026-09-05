@@ -6,12 +6,14 @@
 # One shard per array task. No network is needed: inputs were materialised by `generate.py prepare`
 # on the login node and the Julia depot is precompiled on scratch.
 set -euo pipefail
-source "${EFB_SCRATCH:-/storage/ice1/1/8/yxiao413/EcoFlowBench}/scripts/env.sh"
+# EFB_SCRATCH / EFB_NODE_TMP / EFB_MODULES are exported by scripts/generate.py submit from the cluster profile.
+: "${EFB_SCRATCH:?EFB_SCRATCH must be set (cluster profile scratch_root)}"
+source "$EFB_SCRATCH/scripts/env.sh"
 export JULIA_NUM_THREADS=1                       # one solve at a time; CHOLMOD/BLAS use the allocated cores
 export OPENBLAS_NUM_THREADS="${SLURM_CPUS_PER_TASK:-1}"
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-1}"
 export JULIA_DEPOT_PATH="$EFB_SCRATCH/julia_depot"
-export TMPDIR="${TMPDIR:-/tmp}/efb_${SLURM_JOB_ID}_${SLURM_ARRAY_TASK_ID:-0}"
+export TMPDIR="${EFB_NODE_TMP:-${TMPDIR:-/tmp}}/efb_${SLURM_JOB_ID}_${SLURM_ARRAY_TASK_ID:-0}"
 mkdir -p "$TMPDIR"
 trap 'rm -rf "$TMPDIR"' EXIT
 SHARD="${SLURM_ARRAY_TASK_ID:-0}"

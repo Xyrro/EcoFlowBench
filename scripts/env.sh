@@ -20,6 +20,8 @@ export EFB_ROOT="$EFB_SCRATCH"                 # git repo root == scratch dir
 export EFB_DATA="$EFB_SCRATCH/data"            # generated shards, tiles, caches
 export EFB_TOOLS="$EFB_SCRATCH/tools"          # uv binary, misc. tools
 export EFB_JULIA_VERSION="${EFB_JULIA_VERSION:-1.11.3}"
+# EFB_MODULES (colon-separated) overrides the default module list; set by the cluster profile via generate.py.
+export EFB_MODULES="${EFB_MODULES-julia/$EFB_JULIA_VERSION}"
 
 # ---------------------------------------------------------------------------
 # Isolate from the kneeoa conda env / anaconda3 module
@@ -63,8 +65,8 @@ export JULIA_CPU_TARGET="generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,
 export JULIA_PKG_PRECOMPILE_AUTO=0   # jobs never precompile; scripts/generate.py submit does it on the login node
 export JULIA_PROJECT="$EFB_SCRATCH/julia/EcoFlowBenchSolve.jl"
 export JULIA_PKG_USE_CLI_GIT=true
-if command -v module >/dev/null 2>&1; then
-  module load "julia/$EFB_JULIA_VERSION" 2>/dev/null || true
+if command -v module >/dev/null 2>&1 && [ -n "$EFB_MODULES" ]; then
+  for m in ${EFB_MODULES//:/ }; do module load "$m" 2>/dev/null || true; done
 fi
 
 # ---------------------------------------------------------------------------

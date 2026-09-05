@@ -1,0 +1,31 @@
+# Cluster profile: Georgia Tech PACE-ICE (pipeline development, mini and dev shards only).
+# Selected with `--profile ice` (scripts/generate.py) or EFB_CLUSTER_PROFILE=ice. Nothing in the
+# scripts should hard-code these values; add a new file here for another cluster.
+profile_id: ice
+scheduler: slurm
+account: coc                 # sbatch --account (null = scheduler default)
+qos: null                    # sbatch --qos
+scratch_root: /storage/ice1/1/8/yxiao413/EcoFlowBench     # EFB_SCRATCH; repo lives here
+node_tmp: /tmp               # node-local scratch used for Circuitscape ASCII grids
+modules:                     # `module load` before anything else (empty list = nothing to load)
+  - julia/1.11.3
+python: uv                   # how the Python env is provided: uv | conda | module
+partitions:
+  cpu: coc-cpu               # generation arrays
+  cpu_fallback: ice-cpu
+  gpu: coc-gpu               # baselines (Phase 10)
+  gpu_gres: gpu:l40s:1
+limits:
+  max_walltime: "18:00:00"   # CPU partitions (GPU: 16 h)
+  max_array_concurrent: 20   # %N on the array (be a good citizen on a shared teaching cluster)
+  max_submit_per_user: 500
+  cpu_hours_gate: 500        # ask the owner before launching more than this
+defaults:                    # per-tier resources for solve shards (measured Phase 5: peak RSS S 1.4 GB ... XXL 9.5 GB)
+  S:   {cpus: 1, mem: "6G",  time: "04:00:00", shard_size: 200}
+  M:   {cpus: 1, mem: "6G",  time: "04:00:00", shard_size: 100}
+  L:   {cpus: 2, mem: "8G",  time: "04:00:00", shard_size: 40}
+  XL:  {cpus: 4, mem: "16G", time: "04:00:00", shard_size: 8}
+  XXL: {cpus: 8, mem: "32G", time: "04:00:00", shard_size: 2}
+network:
+  compute_nodes_have_internet: true      # verified 2026-09-05 but never relied upon
+  installs_on: login

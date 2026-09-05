@@ -27,6 +27,17 @@ JULIA_PKG = ROOT / "julia" / "EcoFlowBenchSolve.jl"
 SBATCH_TEMPLATE = ROOT / "scripts" / "slurm" / "solve_shard.sbatch"
 
 
+def load_profile(name: str | None) -> dict:
+    """Cluster profile from configs/cluster/<name>.yaml (name from --profile or EFB_CLUSTER_PROFILE)."""
+    import yaml
+
+    name = name or os.environ.get("EFB_CLUSTER_PROFILE", "ice")
+    p = ROOT / "configs" / "cluster" / f"{name}.yaml"
+    if not p.exists():
+        raise SystemExit(f"cluster profile not found: {p} (copy configs/cluster/template.yaml)")
+    return yaml.safe_load(p.read_text())
+
+
 def load_manifest(build: pathlib.Path) -> pd.DataFrame:
     return pd.read_parquet(build / "manifest.parquet")
 
@@ -121,9 +132,17 @@ def precompile_julia() -> None:
 
 def cmd_submit(a) -> None:
     build = pathlib.Path(a.build).resolve()
+    prof = load_profile(a.profile)
+    df = load_manifest(build)
+    tier = str(df.tier.iloc[0])
+    d = prof.get("defaults", {}).get(tier, {})
+    a.partition = a.partition or prof["partitions"]["cpu"]
+    a.cpus = a.cpus or d.get("cpus", 1)
+    a.mem = a.mem or d.get("mem", "8G")
+    a.time = a.time or d.get("time", prof["limits"]["max_walltime"])
+    a.max_concurrent = a.max_concurrent or prof["limits"].get("max_array_concurrent", 20)
     if not a.skip_precompile:
         precompile_julia()
-    df = load_manifest(build)
     shards = sorted(int(s) for s in df.shard.unique())
     todo = [s for s in shards if not shard_paths(build, s)["final"].exists()] if not a.force else shards
     if not todo:
@@ -132,9 +151,16 @@ def cmd_submit(a) -> None:
     arr = ",".join(str(s) for s in todo)
     (build / "logs").mkdir(exist_ok=True)
     cmd = ["sbatch", f"--array={arr}%{a.max_concurrent}", f"--time={a.time}", f"--cpus-per-task={a.cpus}", f"--mem={a.mem}",
-           f"--partition={a.partition}", f"--job-name=efb-{build.name}", f"--output={build}/logs/%A_%a.out",
+           f"--partition={a.partition}", f"--job-name=efb-{build.name}", f"--output={build}/logs/%A_%a.out"]
+    if prof.get("account"):
+        cmd.append(f"--account={prof['account']}")
+    if prof.get("qos"):
+        cmd.append(f"--qos={prof['qos']}")
+    cmd += [
            f"--export=ALL,EFB_BUILD={build},EFB_SOLVER={a.solver},EFB_FALLBACK={a.fallback},EFB_OSOLVER={a.omniscape_solver},"
-           f"EFB_CONFIGS={a.configs or ''},EFB_FORCE={'1' if a.force_solve else '0'}",
+           f"EFB_CONFIGS={a.configs or ''},EFB_FORCE={'1' if a.force_solve else '0'},"
+           f"EFB_SCRATCH={prof['scratch_root']},EFB_NODE_TMP={prof.get('node_tmp', '/tmp')},"
+           f"EFB_MODULES={':'.join(prof.get('modules', []))}",
            str(SBATCH_TEMPLATE)]
     print(" ".join(cmd))
     if not a.dry_run:
@@ -236,11 +262,12 @@ def main() -> None:
     s.set_defaults(func=cmd_solve)
     b = sub.add_parser("submit")
     b.add_argument("--build", required=True)
-    b.add_argument("--time", default="04:00:00")
-    b.add_argument("--cpus", type=int, default=4)
-    b.add_argument("--mem", default="16G")
-    b.add_argument("--partition", default="coc-cpu")
-    b.add_argument("--max-concurrent", type=int, default=20)
+    b.add_argument("--profile", default=None, help="configs/cluster/<name>.yaml (default: $EFB_CLUSTER_PROFILE or ice)")
+    b.add_argument("--time", default=None, help="override the profile's per-tier default")
+    b.add_argument("--cpus", type=int, default=None)
+    b.add_argument("--mem", default=None)
+    b.add_argument("--partition", default=None)
+    b.add_argument("--max-concurrent", type=int, default=None)
     b.add_argument("--solver", default="cholmod")
     b.add_argument("--fallback", default="cg+amg")
     b.add_argument("--omniscape-solver", default="cholmod")
