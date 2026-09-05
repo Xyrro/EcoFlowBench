@@ -5,7 +5,8 @@ solver_name: Omniscape.jl
 solver_version: "0.6.2"
 julia_version: "1.11.3"
 
-solver: cg+amg                       # Omniscape only supports cg+amg / cholmod; window solves are small
+solver: cholmod                      # reference (2026-09-05): cg+amg aborted a whole T4 solve on a high-contrast
+                                     # landscape (window CG residual 1.4e-4 > Circuitscape's hard-coded 1e-4 limit)
 precision: double
 connect_four_neighbors_only: false
 resistance_is_conductance: false

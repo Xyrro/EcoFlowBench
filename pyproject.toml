@@ -40,6 +40,7 @@ dependencies = [
   "scikit-image==0.26.0",
   "juliacall==0.9.35",
   "numba==0.67.0",
+  "tabulate==0.10.0",
 ]
 
 [project.optional-dependencies]

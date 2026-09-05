@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Phase 5 (in progress) — 2026-09-05
+- `EcoFlowBenchSolve.jl`: `solve_pairwise` / `solve_advanced` / `solve_omniscape` with `SolveStats`, exact-graph
+  residual in Julia, batch `solve_shard` over HDF5 shards (resumable), `scripts/solve_shard.jl`,
+  `examples/solver_comparison.jl`; deps HDF5, JSON, SparseArrays + stdlibs.
+- `ecoflowbench/solve`: manifest (UUID5 sample ids, shards), prepare (inputs HDF5), QC (§7.2 + owner rules),
+  finalize (final shard layout + Parquet index), quicklooks + contact sheet; `scripts/generate.py`
+  (plan/prepare/solve/submit/finalize/status) and `scripts/slurm/solve_shard.sbatch`; `scripts/analyze_build.py`.
+- Omniscape reference solver switched to CHOLMOD (cg+amg aborts on high-contrast windows).
+- Smoke build (5 samples) validated end-to-end through a Slurm array; mini (250) and scaling probes submitted.
+
 ### Phase 4 — 2026-09-05
 - `ecoflowbench/sources`: exact Circuitscape graph reconstruction (`graph.py`), config schema with tier scaling,
   generators for point focal nodes (mixed placement), wall-to-wall strips, habitat-patch regions, T3 source/ground

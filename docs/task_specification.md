@@ -50,7 +50,9 @@ Verified from `Circuitscape.jl 5.17.1/src/raster/pairwise.jl::construct_graph` a
    relative residual `< 1e-4`; neither is exposed as an option, so the brief's ≤ 1e-8 target
    is only reachable with the direct solver. CHOLMOD is exact to round-off and bitwise
    deterministic on one machine. Each sample records the achieved relative residual
-   ‖L v − b‖₂ / ‖b‖₂ recomputed in float64 by our driver (QC threshold 1e-10).
+   ‖L v − b‖₂ / ‖b‖₂ computed in Julia on the exact graph from the full-precision voltages
+   (QC threshold 1e-8; CHOLMOD typically gives ≤ 1e-12); a second residual from the stored float32
+   maps (threshold 1e-3) guards against layout errors.
 5. **Physics.** For a current vector b (injections, Σb = 0 when no ground, or with grounded
    nodes removed), voltages solve L v = b. Branch current i_ij = g_ij (v_i − v_j). Node current
    density (Circuitscape's "current map", `out.jl::get_node_currents`) is the total current
@@ -86,7 +88,7 @@ float64 Reff) exactly as produced by the solver.
 | Tensor | Shape | dtype | Semantics |
 |---|---|---|---|
 | `outputs/cum_current` | H×W | float32 | Σ over all pairs of node current c (Circuitscape `*_cum_curmap`) |
-| `outputs/voltage` | P×H×W (P = K(K−1)/2) | float32 | per-pair voltage map, v_target = 0 (Circuitscape `*_voltmap_i_j`); stored only when K ≤ 4 (P ≤ 6) |
+| `outputs/voltage` | P×H×W (P = K(K−1)/2) | float32 | per-pair voltage map (Circuitscape `*_voltmap_i_j`). **Convention (verified 2026-09-05): for pair (i, j) with i < j, node i is grounded (v = 0) and 1 A is injected at node j (v_j = Reff_ij).** Stored only when K ≤ 4 (P ≤ 6) |
 | `outputs/pairwise_current` | P×H×W | float32 | per-pair node-current maps (`*_curmap_i_j`); stored only when K ≤ 4 |
 | `outputs/pair_index` | P×2 | int16 | (i, j) focal labels for each of the P slices, i < j |
 | `outputs/reff` | K×K | float64 | effective resistance matrix (T2 target; always stored) |

@@ -187,3 +187,66 @@ def test_tier_scaling():
     assert m.points.min_separation_px == 2 * CFG.points.min_separation_px
     assert m.regions.min_patch_px == 4 * CFG.regions.min_patch_px
     assert CFG.for_tier("S") is CFG
+
+
+def test_kirchhoff_residual_exact_solve():
+    """Solve L v = b by hand on a small grid and check the QC residual is ~0 and detects a wrong sink."""
+    import scipy.sparse.linalg as spla
+
+    from ecoflowbench.solve.qc import kirchhoff_residual
+
+    R, nd = _landscape(9, (24, 24))
+    G, idx = build_conductance_graph(R, nd)
+    L = laplacian(G).tocsc()
+    valid = idx >= 0
+    rc = np.argwhere(valid)
+    s_rc, g_rc = tuple(rc[5]), tuple(rc[-5])
+    src = np.zeros(R.shape, bool)
+    src[s_rc] = True
+    gnd = np.zeros(R.shape, bool)
+    gnd[g_rc] = True
+    keep = np.ones(L.shape[0], bool)
+    keep[idx[g_rc]] = False
+    b = np.zeros(L.shape[0])
+    b[idx[s_rc]] = 1.0
+    v = np.zeros(L.shape[0])
+    v[keep] = spla.spsolve(L[keep][:, keep].tocsc(), b[keep])
+    vmap = np.zeros(R.shape)
+    vmap[valid] = v[idx[valid]]
+    inj = src.astype(float)
+    assert kirchhoff_residual(R, nd, vmap, inj, grounded=gnd) < 1e-9
+    assert kirchhoff_residual(R, nd, vmap, gnd.astype(float), grounded=src) > 1.0   # swapped roles are caught
+
+
+def test_kirchhoff_residual_supernode():
+    """A 2-pixel short-circuited source region: rows inside the region are replaced by the net-current equation."""
+
+    from ecoflowbench.solve.qc import kirchhoff_residual
+
+    R = np.ones((16, 16), np.float32)
+    nd = np.zeros((16, 16), bool)
+    G, idx = build_conductance_graph(R, nd)
+    L = laplacian(G).tolil()
+    src = np.zeros(R.shape, bool)
+    src[3, 3] = src[3, 4] = True
+    gnd = np.zeros(R.shape, bool)
+    gnd[12, 12] = True
+    a, b_ = idx[3, 3], idx[3, 4]
+    n = L.shape[0]
+    # short-circuit: merge node b_ into a (sum rows/cols), then solve the reduced system
+    Lm = L.tocsr()
+    keep = np.ones(n, bool)
+    keep[[b_, idx[12, 12]]] = False
+    Ld = Lm.toarray()
+    Ld[a, :] += Ld[b_, :]
+    Ld[:, a] += Ld[:, b_]
+    rhs = np.zeros(n)
+    rhs[a] = 1.0
+    v = np.zeros(n)
+    v[keep] = np.linalg.solve(Ld[np.ix_(keep, keep)], rhs[keep])
+    v[b_] = v[a]
+    vmap = np.zeros(R.shape)
+    vmap[idx >= 0] = v[idx[idx >= 0]]
+    inj = src.astype(float) / 2
+    assert kirchhoff_residual(R, nd, vmap, inj, grounded=gnd, supernode=src) < 1e-9
+    assert kirchhoff_residual(R, nd, vmap, inj, grounded=gnd) > 0.1     # row-wise check would wrongly fail
