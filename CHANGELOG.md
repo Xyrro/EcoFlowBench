@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Phase 2 — 2026-09-05
+- Synthetic generators (`ecoflowbench/landscapes/synthetic.py`) with documented priors and 38 tests; gallery figure.
+- Real-tile pipeline: `real.py` (UTM grids, windowed COG readers, distance rasters, GeoTIFF I/O),
+  `sampling.py` (biome × realm × gHM-tercile stratification), scripts `download_sources.py`,
+  `sample_tiles.py`, `extract_tiles.py`, `plot_tiles.py`; offline + network tests.
+- Pilot: 60 accepted tiles (14 biomes, 5 realms) at tier S with manifest, checksums, quicklooks.
+- `docs/licenses.md` (verified sources), `docs/compute_env.md` §10 storage plan, owner decisions applied.
+- Fixed: NaN-fill merge bug when a tile straddles several DEM source tiles.
+
 ### Phase 0/1 — 2026-09-05
 - Cluster inspection of PACE-ICE recorded in `docs/compute_env.md` (partitions, QoS, GPUs, storage, network).
 - Isolated toolchain on scratch: `scripts/env.sh`, uv-managed Python 3.11.16 (`pyproject.toml`, `uv.lock`),

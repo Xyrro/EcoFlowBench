@@ -73,9 +73,10 @@ export TMPDIR="${TMPDIR:-/tmp}"
 
 # GDAL CLI conda env (optional; created by scripts/setup_gdal_env.sh)
 if [ -d "$EFB_SCRATCH/envs/gdal/bin" ]; then
+  # Appended (not prepended) so the venv's rasterio/pyproj keep their own bundled GDAL/PROJ.
+  # Do NOT export GDAL_DATA / PROJ_LIB here: they would shadow rasterio's PROJ database
+  # (different DATABASE.LAYOUT version) and break CRS lookups in Python.
   export PATH="$PATH:$EFB_SCRATCH/envs/gdal/bin"
-  export GDAL_DATA="$EFB_SCRATCH/envs/gdal/share/gdal"
-  export PROJ_LIB="$EFB_SCRATCH/envs/gdal/share/proj"
 fi
 
 mkdir -p "$EFB_DATA" "$EFB_TOOLS" "$UV_CACHE_DIR" "$JULIA_DEPOT_PATH" "$HF_HOME" "$XDG_CACHE_HOME" 2>/dev/null
