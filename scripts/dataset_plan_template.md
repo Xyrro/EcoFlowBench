@@ -39,25 +39,7 @@ floor of 150 S-tier tiles per biome so that no biome has fewer than 750 real lan
 
 ### 2.2 Recommended ladder: landscapes per tier × family × stratum / table
 
-|                                              |     S |    M |    L |   XL |   XXL |   total |
-|:---------------------------------------------|------:|-----:|-----:|-----:|------:|--------:|
-| ('real', '(distinct tiles)', '-')            |  8000 | 4000 | 1600 |  320 |    32 |   13952 |
-| ('real', 'tile × table', 'amphibian')        |  8000 | 4000 | 1600 |  320 |    32 |   13952 |
-| ('real', 'tile × table', 'forest_bird')      |  8000 | 4000 | 1600 |  320 |    32 |   13952 |
-| ('real', 'tile × table', 'generic_hm')       |  8000 | 4000 | 1600 |  320 |    32 |   13952 |
-| ('real', 'tile × table', 'large_mammal')     |  8000 | 4000 | 1600 |  320 |    32 |   13952 |
-| ('real', 'tile × table', 'random_lm')        |  8000 | 4000 | 1600 |  320 |    32 |   13952 |
-| ('synthetic', 'distance_gradient', '-')      |  4800 | 2400 |  960 |  192 |    19 |    8371 |
-| ('synthetic', 'edge_gradient', '-')          |  2400 | 1200 |  480 |   96 |    10 |    4186 |
-| ('synthetic', 'fractal', '-')                |  9600 | 4800 | 1920 |  384 |    38 |   16742 |
-| ('synthetic', 'grf', '-')                    | 14400 | 7200 | 2880 |  576 |    58 |   25114 |
-| ('synthetic', 'hard:high_contrast_1e4', '-') |  3600 | 1800 |  720 |  144 |    14 |    6278 |
-| ('synthetic', 'hard:large_nodata', '-')      |  3000 | 1500 |  600 |  120 |    12 |    5232 |
-| ('synthetic', 'hard:narrow_corridor', '-')   |  3600 | 1800 |  720 |  144 |    14 |    6278 |
-| ('synthetic', 'hard:rmax_saturated', '-')    |  1800 |  900 |  360 |   72 |     7 |    3139 |
-| ('synthetic', 'mosaic', '-')                 |  7200 | 3600 | 1440 |  288 |    29 |   12557 |
-| ('synthetic', 'planar_gradient', '-')        |  2400 | 1200 |  480 |   96 |    10 |    4186 |
-| ('synthetic', 'random_cluster', '-')         |  7200 | 3600 | 1440 |  288 |    29 |   12557 |
+{land_rec}
 
 The synthetic generator mix (24 % GRF, 16 % fractal, 12 % random cluster, 4 % planar, 4 % edge,
 8 % distance gradient, 12 % mosaic, 20 % hard cases) is fixed across tiers so that every generator
@@ -66,24 +48,9 @@ documented prior on top of every base generator (`DEFAULT_PRIOR`).
 
 ### 2.3 Solves per tier × family × source configuration (task instances)
 
-|                                                         |     S |     M |     L |   XL |   XXL |   total |
-|:--------------------------------------------------------|------:|------:|------:|-----:|------:|--------:|
-| ('real', 'advanced', 'T3')                              | 40000 | 20000 |  8000 | 1600 |   160 |   69760 |
-| ('real', 'omniscape', 'T4')                             | 40000 | 20000 |  8000 | 1600 |   160 |   69760 |
-| ('real', 'points', 'T1,T2')                             | 40000 | 20000 |  8000 | 1600 |   160 |   69760 |
-| ('real', 'regions', 'T1R')                              | 16000 |  8000 |  3200 |  640 |    64 |   27904 |
-| ('real', 'wall_to_wall_EW', 'T1W')                      | 40000 | 20000 |  8000 | 1600 |   160 |   69760 |
-| ('real', 'wall_to_wall_NS', 'T1W')                      | 40000 | 20000 |  8000 | 1600 |   160 |   69760 |
-| ('synthetic', 'advanced', 'T3')                         | 60000 | 30000 | 12000 | 2400 |   240 |  104640 |
-| ('synthetic', 'omniscape', 'T4')                        | 60000 | 30000 | 12000 | 2400 |   240 |  104640 |
-| ('synthetic', 'points', 'T1,T2')                        | 60000 | 30000 | 12000 | 2400 |   240 |  104640 |
-| ('synthetic', 'points (4-neighbour ablation)', 'T1,T2') |  3000 |     0 |     0 |    0 |     0 |    3000 |
-| ('synthetic', 'wall_to_wall_EW', 'T1W')                 | 60000 | 30000 | 12000 | 2400 |   240 |  104640 |
-| ('synthetic', 'wall_to_wall_NS', 'T1W')                 | 60000 | 30000 | 12000 | 2400 |   240 |  104640 |
+{solves_rec}
 
-Total landscapes: 174,400; total solves: 902,904; real tiles: {'S': 8000, 'M': 4000, 'L': 1600, 'XL': 320, 'XXL': 32}
-
-Totals (recommended): **174,400 landscapes, 902,904 solves**; brief baseline: 162,200 landscapes, 839,952 solves.
+Totals (recommended): **{tot_land_r:,} landscapes, {tot_solves_r:,} solves**; brief baseline: {tot_land_b:,} landscapes, {tot_solves_b:,} solves.
 Every landscape gets `points` (T1 + T2, K ∈ [2, 8]), both wall-to-wall strips (T1W), `advanced` (T3)
 and `omniscape` (T4); real tiles with ≥ 2 eligible habitat patches (≈ 40 %) also get `regions` (T1R).
 A 5 % slice of tier-S synthetic landscapes is additionally solved with the 4-neighbour graph and
@@ -91,34 +58,16 @@ flagged `graph_connectivity = 4` (brief §3.2 ablation).
 
 ### 2.4 Brief baseline ladder (for comparison)
 
-|                                              |     S |    M |    L |   XL |   XXL |   total |
-|:---------------------------------------------|------:|-----:|-----:|-----:|------:|--------:|
-| ('real', '(distinct tiles)', '-')            |  8000 | 4000 |  800 |  160 |    16 |   12976 |
-| ('real', 'tile × table', 'amphibian')        |  8000 | 4000 |  800 |  160 |    16 |   12976 |
-| ('real', 'tile × table', 'forest_bird')      |  8000 | 4000 |  800 |  160 |    16 |   12976 |
-| ('real', 'tile × table', 'generic_hm')       |  8000 | 4000 |  800 |  160 |    16 |   12976 |
-| ('real', 'tile × table', 'large_mammal')     |  8000 | 4000 |  800 |  160 |    16 |   12976 |
-| ('real', 'tile × table', 'random_lm')        |  8000 | 4000 |  800 |  160 |    16 |   12976 |
-| ('synthetic', 'distance_gradient', '-')      |  4800 | 2400 |  480 |   96 |    10 |    7786 |
-| ('synthetic', 'edge_gradient', '-')          |  2400 | 1200 |  240 |   48 |     5 |    3893 |
-| ('synthetic', 'fractal', '-')                |  9600 | 4800 |  960 |  192 |    19 |   15571 |
-| ('synthetic', 'grf', '-')                    | 14400 | 7200 | 1440 |  288 |    29 |   23357 |
-| ('synthetic', 'hard:high_contrast_1e4', '-') |  3600 | 1800 |  360 |   72 |     7 |    5839 |
-| ('synthetic', 'hard:large_nodata', '-')      |  3000 | 1500 |  300 |   60 |     6 |    4866 |
-| ('synthetic', 'hard:narrow_corridor', '-')   |  3600 | 1800 |  360 |   72 |     7 |    5839 |
-| ('synthetic', 'hard:rmax_saturated', '-')    |  1800 |  900 |  180 |   36 |     4 |    2920 |
-| ('synthetic', 'mosaic', '-')                 |  7200 | 3600 |  720 |  144 |    14 |   11678 |
-| ('synthetic', 'planar_gradient', '-')        |  2400 | 1200 |  240 |   48 |     5 |    3893 |
-| ('synthetic', 'random_cluster', '-')         |  7200 | 3600 |  720 |  144 |    14 |   11678 |
+{land_brief}
 
 ## 3. Hard-case stratum (named `hard`, 20 % of synthetic landscapes at every tier)
 
 | hard case | share of `hard` | definition | landscapes (recommended, all tiers) |
 |---|---|---|---|
-| `high_contrast_1e4` | 30 % | contrast 10⁴ from any base generator | 6,278 |
-| `rmax_saturated` | 15 % | > 50 % of valid pixels at r_max (near-degenerate); QC-flagged, train/val-excluded, kept in the index | 3,139 |
-| `narrow_corridor` | 30 % | 1–3 barrier walls spanning the raster with 1–3 gaps of 1–3 px each (all flow funnels through the gaps) | 6,278 |
-| `large_nodata` | 25 % | NoData fraction 0.25–0.45, single connected component | 5,232 |
+| `high_contrast_1e4` | 30 % | contrast 10⁴ from any base generator | {hc_high_contrast_1e4} |
+| `rmax_saturated` | 15 % | > 50 % of valid pixels at r_max (near-degenerate); QC-flagged, train/val-excluded, kept in the index | {hc_rmax_saturated} |
+| `narrow_corridor` | 30 % | 1–3 barrier walls spanning the raster with 1–3 gaps of 1–3 px each (all flow funnels through the gaps) | {hc_narrow_corridor} |
+| `large_nodata` | 25 % | NoData fraction 0.25–0.45, single connected component | {hc_large_nodata} |
 
 Real tiles contribute hard cases naturally (coastal tiles with large water bodies, high-Andes
 `forest_bird` saturation); they are identified post hoc by the same criteria and get the same
@@ -161,37 +110,15 @@ Compressed storage per landscape (all configs): synthetic 0.93 / 3.0 / 11 / 41 /
 
 ### 6.1 Recommended ladder
 
-| tier   |   landscapes |   cpu_s_per_landscape |   peak_rss_gb |   cpu_hours |   storage_gb |
-|:-------|-------------:|----------------------:|--------------:|------------:|-------------:|
-| S      |       100000 |                   7.6 |           1.4 |         212 |        111.8 |
-| M      |        50000 |                  57.8 |           1.4 |         802 |        180   |
-| L      |        20000 |                 214.3 |           1.6 |        1191 |        260   |
-| XL     |         4000 |                 948   |           3.3 |        1053 |        194.4 |
-| XXL    |          400 |                5298.1 |           9.5 |         589 |         65.6 |
-| total  |       174400 |                       |               |        3847 |        811.8 |
+{cost_rec}
 
-|   concurrent_cores |   wall_days |
-|-------------------:|------------:|
-|                100 |         1.6 |
-|                500 |         0.3 |
-|               1000 |         0.2 |
+{wall_rec}
 
 ### 6.2 Brief baseline ladder
 
-| tier   |   landscapes |   cpu_s_per_landscape |   peak_rss_gb |   cpu_hours |   storage_gb |
-|:-------|-------------:|----------------------:|--------------:|------------:|-------------:|
-| S      |       100000 |                   7.6 |           1.4 |         212 |        111.8 |
-| M      |        50000 |                  57.8 |           1.4 |         802 |        180   |
-| L      |        10000 |                 214.3 |           1.6 |         595 |        130   |
-| XL     |         2000 |                 948   |           3.3 |         527 |         97.2 |
-| XXL    |          200 |                5298.1 |           9.5 |         294 |         32.8 |
-| total  |       162200 |                       |               |        2430 |        551.8 |
+{cost_brief}
 
-|   concurrent_cores |   wall_days |
-|-------------------:|------------:|
-|                100 |         1   |
-|                500 |         0.2 |
-|               1000 |         0.1 |
+{wall_brief}
 
 CPU-hours are *core-hours of single-threaded solving* (+15 % overhead). Because solves are
 single-threaded, wall-clock at N concurrent cores = CPU-hours / N; memory (not cores) sets the
@@ -202,9 +129,9 @@ fixed on fidelity (§7); if the study supports coarser blocks at XL/XXL the tota
 
 <!-- BLOCK_STUDY -->
 
-*Pending: no block-study results yet.*
+{block_study}
 
-
+{block_verdict}
 
 ## 8. Portability
 

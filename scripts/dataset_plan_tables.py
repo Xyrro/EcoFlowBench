@@ -41,12 +41,14 @@ def landscape_counts(cfg: dict, ladder: dict) -> pd.DataFrame:
             else:
                 rows.append({"tier": t, "family": "synthetic", "stratum": gen, "table": "-", "landscapes": int(round(n_syn * frac))})
         for tab in cfg["resistance_tables"]:
-            rows.append({"tier": t, "family": "real", "stratum": f"tiles={n_tiles}", "table": tab, "landscapes": n_tiles})
+            rows.append({"tier": t, "family": "real", "stratum": "tile × table", "table": tab, "landscapes": n_tiles})
+        rows.append({"tier": t, "family": "real", "stratum": "(distinct tiles)", "table": "-", "landscapes": n_tiles})
     return pd.DataFrame(rows)
 
 
 def config_counts(cfg: dict, land: pd.DataFrame) -> pd.DataFrame:
     rows = []
+    land = land[land.stratum != "(distinct tiles)"]
     for (t, fam), g in land.groupby(["tier", "family"]):
         n = int(g.landscapes.sum())
         for c, spec in cfg["configs_per_landscape"].items():
@@ -62,6 +64,7 @@ def config_counts(cfg: dict, land: pd.DataFrame) -> pd.DataFrame:
 def cost_table(cfg: dict, land: pd.DataFrame, conf: pd.DataFrame, omni_scale: dict | None = None) -> pd.DataFrame:
     oh = 1 + cfg["cost_measured"]["overhead_fraction"]
     rows = []
+    land = land[land.stratum != "(distinct tiles)"]
     for t in TIERS:
         n_syn = int(land[(land.tier == t) & (land.family == "synthetic")].landscapes.sum())
         n_real = int(land[(land.tier == t) & (land.family == "real")].landscapes.sum())
@@ -111,8 +114,9 @@ def main() -> None:
     piv2 = conf.pivot_table(index=["family", "config", "tasks"], columns="tier", values="solves", aggfunc="sum", fill_value=0)[TIERS]
     piv2["total"] = piv2.sum(axis=1)
     print(piv2.to_markdown())
-    print(f"\nTotal landscapes: {int(land.landscapes.sum()):,}; total solves: {int(conf.solves.sum()):,}; "
-          f"real tiles: {land[land.family == 'real'].groupby('tier').landscapes.first().to_dict()}")
+    nl = land[land.stratum != "(distinct tiles)"]
+    print(f"\nTotal landscapes: {int(nl.landscapes.sum()):,}; total solves: {int(conf.solves.sum()):,}; "
+          f"real tiles: {land[land.stratum == '(distinct tiles)'].set_index('tier').landscapes.to_dict()}")
     print("\n### Cost (measured Phase 5, CHOLMOD, single-threaded solves, +15 % overhead)\n")
     print(cost.to_markdown(index=False))
     total_h = float(cost[cost.tier == "total"].cpu_hours.iloc[0])

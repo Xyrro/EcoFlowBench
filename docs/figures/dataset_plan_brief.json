@@ -87,36 +87,43 @@
   {
    "tier": "S",
    "family": "real",
-   "stratum": "tiles=8000",
+   "stratum": "tile \u00d7 table",
    "table": "generic_hm",
    "landscapes": 8000
   },
   {
    "tier": "S",
    "family": "real",
-   "stratum": "tiles=8000",
+   "stratum": "tile \u00d7 table",
    "table": "large_mammal",
    "landscapes": 8000
   },
   {
    "tier": "S",
    "family": "real",
-   "stratum": "tiles=8000",
+   "stratum": "tile \u00d7 table",
    "table": "amphibian",
    "landscapes": 8000
   },
   {
    "tier": "S",
    "family": "real",
-   "stratum": "tiles=8000",
+   "stratum": "tile \u00d7 table",
    "table": "forest_bird",
    "landscapes": 8000
   },
   {
    "tier": "S",
    "family": "real",
-   "stratum": "tiles=8000",
+   "stratum": "tile \u00d7 table",
    "table": "random_lm",
+   "landscapes": 8000
+  },
+  {
+   "tier": "S",
+   "family": "real",
+   "stratum": "(distinct tiles)",
+   "table": "-",
    "landscapes": 8000
   },
   {
@@ -199,36 +206,43 @@
   {
    "tier": "M",
    "family": "real",
-   "stratum": "tiles=4000",
+   "stratum": "tile \u00d7 table",
    "table": "generic_hm",
    "landscapes": 4000
   },
   {
    "tier": "M",
    "family": "real",
-   "stratum": "tiles=4000",
+   "stratum": "tile \u00d7 table",
    "table": "large_mammal",
    "landscapes": 4000
   },
   {
    "tier": "M",
    "family": "real",
-   "stratum": "tiles=4000",
+   "stratum": "tile \u00d7 table",
    "table": "amphibian",
    "landscapes": 4000
   },
   {
    "tier": "M",
    "family": "real",
-   "stratum": "tiles=4000",
+   "stratum": "tile \u00d7 table",
    "table": "forest_bird",
    "landscapes": 4000
   },
   {
    "tier": "M",
    "family": "real",
-   "stratum": "tiles=4000",
+   "stratum": "tile \u00d7 table",
    "table": "random_lm",
+   "landscapes": 4000
+  },
+  {
+   "tier": "M",
+   "family": "real",
+   "stratum": "(distinct tiles)",
+   "table": "-",
    "landscapes": 4000
   },
   {
@@ -311,36 +325,43 @@
   {
    "tier": "L",
    "family": "real",
-   "stratum": "tiles=800",
+   "stratum": "tile \u00d7 table",
    "table": "generic_hm",
    "landscapes": 800
   },
   {
    "tier": "L",
    "family": "real",
-   "stratum": "tiles=800",
+   "stratum": "tile \u00d7 table",
    "table": "large_mammal",
    "landscapes": 800
   },
   {
    "tier": "L",
    "family": "real",
-   "stratum": "tiles=800",
+   "stratum": "tile \u00d7 table",
    "table": "amphibian",
    "landscapes": 800
   },
   {
    "tier": "L",
    "family": "real",
-   "stratum": "tiles=800",
+   "stratum": "tile \u00d7 table",
    "table": "forest_bird",
    "landscapes": 800
   },
   {
    "tier": "L",
    "family": "real",
-   "stratum": "tiles=800",
+   "stratum": "tile \u00d7 table",
    "table": "random_lm",
+   "landscapes": 800
+  },
+  {
+   "tier": "L",
+   "family": "real",
+   "stratum": "(distinct tiles)",
+   "table": "-",
    "landscapes": 800
   },
   {
@@ -423,36 +444,43 @@
   {
    "tier": "XL",
    "family": "real",
-   "stratum": "tiles=160",
+   "stratum": "tile \u00d7 table",
    "table": "generic_hm",
    "landscapes": 160
   },
   {
    "tier": "XL",
    "family": "real",
-   "stratum": "tiles=160",
+   "stratum": "tile \u00d7 table",
    "table": "large_mammal",
    "landscapes": 160
   },
   {
    "tier": "XL",
    "family": "real",
-   "stratum": "tiles=160",
+   "stratum": "tile \u00d7 table",
    "table": "amphibian",
    "landscapes": 160
   },
   {
    "tier": "XL",
    "family": "real",
-   "stratum": "tiles=160",
+   "stratum": "tile \u00d7 table",
    "table": "forest_bird",
    "landscapes": 160
   },
   {
    "tier": "XL",
    "family": "real",
-   "stratum": "tiles=160",
+   "stratum": "tile \u00d7 table",
    "table": "random_lm",
+   "landscapes": 160
+  },
+  {
+   "tier": "XL",
+   "family": "real",
+   "stratum": "(distinct tiles)",
+   "table": "-",
    "landscapes": 160
   },
   {
@@ -535,36 +563,43 @@
   {
    "tier": "XXL",
    "family": "real",
-   "stratum": "tiles=16",
+   "stratum": "tile \u00d7 table",
    "table": "generic_hm",
    "landscapes": 16
   },
   {
    "tier": "XXL",
    "family": "real",
-   "stratum": "tiles=16",
+   "stratum": "tile \u00d7 table",
    "table": "large_mammal",
    "landscapes": 16
   },
   {
    "tier": "XXL",
    "family": "real",
-   "stratum": "tiles=16",
+   "stratum": "tile \u00d7 table",
    "table": "amphibian",
    "landscapes": 16
   },
   {
    "tier": "XXL",
    "family": "real",
-   "stratum": "tiles=16",
+   "stratum": "tile \u00d7 table",
    "table": "forest_bird",
    "landscapes": 16
   },
   {
    "tier": "XXL",
    "family": "real",
-   "stratum": "tiles=16",
+   "stratum": "tile \u00d7 table",
    "table": "random_lm",
+   "landscapes": 16
+  },
+  {
+   "tier": "XXL",
+   "family": "real",
+   "stratum": "(distinct tiles)",
+   "table": "-",
    "landscapes": 16
   }
  ],
