@@ -22,10 +22,14 @@ write_raw_currmap: true
 parallelize: false                   # parallelism is across samples
 parallel_batch_size: 10
 
-# per-tier window geometry, pixels (block_size must be odd)
+# per-tier window geometry, pixels (block_size must be odd). Measured 2026-09-05 (CHOLMOD, 1 process,
+# 4 cores, synthetic landscapes): S 6.2 s median (max 20 s); M 48 s (max 70 s); L 178 s (max 334 s);
+# XL with radius 128 / block 17 took 794 s median (max 1252 s) -> exceeds the 10-minute-per-solve
+# target, so XL uses block 33 (≈ 3.8x fewer windows) and XXL block 65. Cost ∝ (H·W / block²) × window solve.
+# XXL values are provisional until the XXL probe is analysed (docs/phase_05_report.md).
 tiers:
-  S:   {radius: 16,  block_size: 3}
-  M:   {radius: 32,  block_size: 5}
-  L:   {radius: 64,  block_size: 9}
-  XL:  {radius: 128, block_size: 17}
-  XXL: {radius: 256, block_size: 33}
+  S:   {radius: 16,  block_size: 3}     # 1.6 km window at 100 m; 1 764 windows
+  M:   {radius: 32,  block_size: 5}     # 2 601 windows
+  L:   {radius: 64,  block_size: 9}     # 3 249 windows
+  XL:  {radius: 128, block_size: 33}    # 961 windows (was 17 -> 3 600 windows, 13 min median)
+  XXL: {radius: 256, block_size: 65}    # 992 windows (provisional)

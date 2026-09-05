@@ -56,6 +56,11 @@ fi
 # Julia — depot on scratch, module-provided binary
 # ---------------------------------------------------------------------------
 export JULIA_DEPOT_PATH="$EFB_SCRATCH/julia_depot"
+# Portable multi-target pkgimages: the login node (Xeon Gold 6538Y+), the standard CPU nodes (Gold 6226)
+# and the large node (Xeon 6972P) otherwise each rebuild the shared compiled cache and race on its
+# pidfiles (observed hang, 2026-09-05). Same string Julia's own binaries are built with.
+export JULIA_CPU_TARGET="generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1)"
+export JULIA_PKG_PRECOMPILE_AUTO=0   # jobs never precompile; scripts/generate.py submit does it on the login node
 export JULIA_PROJECT="$EFB_SCRATCH/julia/EcoFlowBenchSolve.jl"
 export JULIA_PKG_USE_CLI_GIT=true
 if command -v module >/dev/null 2>&1; then

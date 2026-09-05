@@ -203,6 +203,17 @@ Sizes on scratch after install: `.venv` 6.4 GB, `julia_depot` ~1.5 GB, `envs/gda
   `source_threshold=0`, `correct_artifacts=true`, `mask_nodata=true`.
 
 
+## 8.1 Julia compiled cache on a heterogeneous cluster (finding, 2026-09-05)
+
+Julia 1.11 package images are compiled for the host CPU. With one shared depot on scratch, the login
+node (Xeon Gold 6538Y+), the standard CPU nodes (Gold 6226) and the 192-core node (Xeon 6972P) each
+found the cache stale and rebuilt it; concurrent array tasks then blocked on the depot's
+`*.ji.pidfile` locks (a hang of > 20 min was observed). Fix, in `scripts/env.sh`:
+`JULIA_CPU_TARGET="generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1)"` (the multi-target
+string Julia's own binaries use) and `JULIA_PKG_PRECOMPILE_AUTO=0`; the cache is built **once on the
+login node** (`scripts/generate.py submit` does this before every `sbatch`) and jobs only load it.
+If a hang recurs: `find julia_depot/compiled -name '*.pidfile' -delete` after killing the holders.
+
 ## 9. Slurm conventions for this project
 
 - Generation: job arrays on `coc-cpu` (fallback `ice-cpu`), `--time=04:00:00`, one shard per

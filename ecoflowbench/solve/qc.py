@@ -39,15 +39,19 @@ TRAINVAL_ONLY_FLAGS = {"rmax_saturated"}
 
 
 def kirchhoff_residual(R: np.ndarray, nodata: np.ndarray, voltage: np.ndarray, injection: np.ndarray,
-                       grounded: np.ndarray | None = None, supernode: np.ndarray | None = None) -> float:
+                       grounded: np.ndarray | None = None, supernode: np.ndarray | None = None,
+                       graph: tuple | None = None) -> float:
     """‖L v − b‖₂ / ‖b‖₂ on the exact solver graph (mirror of the Julia implementation).
 
     ``injection`` (H,W) is the current injected per pixel, ``grounded`` marks pixels held at 0 V
     (rows dropped), ``supernode`` marks pixels of one short-circuited focal region whose rows are
     replaced by the single net-current equation Σ_region (L v) = Σ_region b.
     """
-    G, idx = build_conductance_graph(R, nodata)
-    L = laplacian(G)
+    if graph is None:
+        G, idx = build_conductance_graph(R, nodata)
+        L = laplacian(G)
+    else:
+        L, idx = graph
     valid = idx >= 0
     v = voltage[valid].astype(np.float64)
     b = injection[valid].astype(np.float64)
@@ -85,6 +89,8 @@ def qc_pairwise(R, nodata, focal, out: dict, r_max: float | None, residual_tol=1
         flags.append("residual_high")
     if "voltage" in out and stats["converged"] and np.isfinite(out["voltage"]).all():
         pair_index = out["pair_index"]
+        G, idx = build_conductance_graph(R, nodata)      # build the exact graph once per sample
+        graph = (laplacian(G), idx)
         worst = 0.0
         worst_c = 0.0
         for p in range(pair_index.shape[0]):
@@ -94,7 +100,7 @@ def qc_pairwise(R, nodata, focal, out: dict, r_max: float | None, residual_tol=1
             inj = np.zeros(R.shape, np.float64)
             inj[src] = 1.0 / src.sum()
             worst = max(worst, kirchhoff_residual(R, nodata, out["voltage"][p], inj, grounded=gnd,
-                                                  supernode=src if src.sum() > 1 else None))
+                                                  supernode=src if src.sum() > 1 else None, graph=graph))
             c = out["pairwise_current"][p]
             worst_c = max(worst_c, abs(c[src].max() - 1.0), abs(c[gnd].max() - 1.0))
         resid_f32, cons = worst, worst_c   # resid_f32 is informational only (float32 rounding dominates it)

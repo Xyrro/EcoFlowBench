@@ -107,8 +107,22 @@ def cmd_solve(a) -> None:
     sys.exit(subprocess.run(cmd, check=False).returncode)
 
 
+def precompile_julia() -> None:
+    """Precompile EcoFlowBenchSolve on the login node so array tasks never race on the shared depot's
+    precompile pidfiles (observed hang when several nodes started with a stale cache)."""
+    print("precompiling Julia package (login node) ...", end=" ", flush=True)
+    r = subprocess.run(["julia", f"--project={JULIA_PKG}", "-e", "using Pkg; Pkg.precompile(); using EcoFlowBenchSolve"],
+                       capture_output=True, text=True)
+    if r.returncode != 0:
+        print(r.stderr[-2000:])
+        raise SystemExit("Julia precompilation failed; not submitting")
+    print("ok")
+
+
 def cmd_submit(a) -> None:
     build = pathlib.Path(a.build).resolve()
+    if not a.skip_precompile:
+        precompile_julia()
     df = load_manifest(build)
     shards = sorted(int(s) for s in df.shard.unique())
     todo = [s for s in shards if not shard_paths(build, s)["final"].exists()] if not a.force else shards
@@ -234,6 +248,7 @@ def main() -> None:
     b.add_argument("--configs", default=None, help="only (re-)solve these configs inside the job")
     b.add_argument("--force-solve", action="store_true", help="re-solve listed configs even for complete samples")
     b.add_argument("--dry-run", action="store_true")
+    b.add_argument("--skip-precompile", action="store_true")
     b.set_defaults(func=cmd_submit)
     t = sub.add_parser("status")
     t.add_argument("--build", required=True)
