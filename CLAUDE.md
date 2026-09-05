@@ -25,7 +25,7 @@
 - Baseline training uses GPU partitions; keep mini-scale runs short. Full-scale baselines will be scheduled separately after discussion.
 
 ## Gates (must ask the owner before)
-- Downloading more than 5 GB of source data.
+- Downloading source data: any single download > 5 GB, or cumulative source downloads > 20 GB (running total in `data/sources/manifest.json`).
 - Launching more than 500 CPU-hours or 20 GPU-hours of jobs.
 - Pushing anything to Hugging Face or creating any public artifact.
 - Deleting data.

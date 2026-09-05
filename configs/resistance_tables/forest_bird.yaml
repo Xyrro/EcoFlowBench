@@ -1,0 +1,37 @@
+# forest_bird — forest-interior passerine: forest lowest, shrub/wetland low, open land moderate,
+# built-up high, roads mild (birds cross roads but avoid wide gaps), elevation-band effect
+# (lowland/montane species; high elevations less permeable). Compressed dynamic range (r_max 100)
+# because flying dispersers are less constrained than terrestrial ones.
+# Qualitative structure: circuit-theory studies of forest passerines emphasising edge/open-land
+# crossing costs (Landscape Ecology 2014, doi:10.1007/s10980-014-0019-x) and urban bird
+# connectivity (Landscape Ecology 2020, PMC6979508). Numeric values are EcoFlowBench choices.
+table_id: forest_bird
+version: 1
+description: "tree 1, mangrove 2, shrub 5, wetland 6, grass 15, crop 20, bare 30, water 20, built 60; roads 1-20; elevation bands x1/x2/x4"
+citations:
+  - "Circuit theory emphasizes the importance of edge-crossing decisions in dispersal-scale movements of a forest passerine. Landscape Ecology (2014). doi:10.1007/s10980-014-0019-x"
+  - "A bird's eye view: using circuit theory to study urban landscape connectivity for birds. Landscape Ecology (2020). PMC6979508"
+  - "Zeller K.A., McGarigal K., Whiteley A.R. (2012) Estimating landscape resistance to movement: a review. Landscape Ecology 27:777-797. doi:10.1007/s10980-012-9737-0"
+r_max: 100
+base: landcover
+landcover:
+  10: 1
+  20: 5
+  30: 15
+  40: 20
+  50: 60
+  60: 30
+  70: 60
+  80: 20
+  90: 6
+  95: 2
+  100: 20
+roads:
+  by_class: {1: 20, 2: 10, 3: 5, 4: 2, 5: 1}
+  buffer_m: 60
+elevation_bands:
+  - {max_m: 1500, factor: 1.0}
+  - {max_m: 3000, factor: 2.0}
+  - {max_m: 9000, factor: 4.0}
+water: {mode: table}
+nodata_classes: []

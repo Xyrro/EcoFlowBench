@@ -263,6 +263,8 @@ PRO). **Decision needed from the owner** (see status report): (a) PRO account fo
 (b) make the repo public earlier than planned, or (c) cap v1.0 at ≈ 90 GB while private
 (roughly: S 30k, M 8k, L 1.5k, XL 250, XXL 50).
 
+**Owner decision 2026-09-05:** deferred to the Phase 5 gate. Until then only `ecoflowbench-mini` and a small dev subset (< 100 GB total) are planned.
+
 ### 10.3 Shard sizing and HF layout
 
 HF recommends < 100k files per repo, < 10k entries per folder, files well under 200 GB, and

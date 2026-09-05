@@ -1,0 +1,35 @@
+# large_mammal — class table for a forest-associated large mammal (bear/ungulate-like).
+# Ordering: forest lowest, shrub/grass low, cropland moderate, bare/ice high, built-up very high;
+# roads add a penalty that increases with road class; steeper slopes cost more; water is a barrier.
+# Qualitative structure follows Cushman et al. 2006 (black bear gene flow: forest cover, roads,
+# elevation), Koen et al. 2014 (multispecies expert resistance from land cover + roads) and the
+# review by Zeller et al. 2012. Numeric values are EcoFlowBench choices (see README).
+table_id: large_mammal
+version: 1
+description: "forest 1 ... built 500; GRIP4 road penalties 20-600; slope x(1+0.03 deg); water barrier 800; +100*gHM"
+citations:
+  - "Cushman S.A., McKelvey K.S., Hayden J., Schwartz M.K. (2006) Gene flow in complex landscapes: testing multiple hypotheses with causal modeling. American Naturalist 168:486-499. doi:10.1086/506976"
+  - "Koen E.L., Bowman J., Sadowski C., Walpole A.A. (2014) Landscape connectivity for wildlife: development and validation of multispecies linkage maps. Methods in Ecology and Evolution 5:626-633. doi:10.1111/2041-210X.12197"
+  - "Zeller K.A., McGarigal K., Whiteley A.R. (2012) Estimating landscape resistance to movement: a review. Landscape Ecology 27:777-797. doi:10.1007/s10980-012-9737-0"
+  - "Bowman J. et al. (2020) Effects of cost surface uncertainty on current density estimates from circuit theory. PeerJ 8:e9617. doi:10.7717/peerj.9617"
+r_max: 1000
+base: landcover
+landcover:
+  10: 1      # tree cover
+  20: 3      # shrubland
+  30: 5      # grassland
+  40: 20     # cropland
+  50: 500    # built-up
+  60: 30     # bare / sparse vegetation
+  70: 200    # snow and ice
+  80: 800    # permanent water (overridden by the water rule below)
+  90: 15     # herbaceous wetland
+  95: 10     # mangroves
+  100: 20    # moss and lichen
+roads:
+  by_class: {1: 600, 2: 300, 3: 150, 4: 60, 5: 20}
+  buffer_m: 60
+slope: {per_degree: 0.03, cap_degrees: 45}
+ghm_additive: 100
+water: {mode: barrier, value: 800}
+nodata_classes: []

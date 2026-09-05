@@ -1,0 +1,31 @@
+# amphibian — pond-breeding amphibian table: wetlands, water and forest low; dry open land high;
+# built-up and roads extreme (road mortality / desiccation); strong slope penalty.
+# Qualitative structure follows the amphibian landscape-genetics literature summarised in
+# Spear et al. 2010 and Zeller et al. 2012 (moisture and canopy as the dominant permeability
+# axes, roads as near-barriers). Numeric values are EcoFlowBench choices (see README).
+table_id: amphibian
+version: 1
+description: "wetland/water/forest 1-2, grass/shrub 15-20, crop 50, bare 200, built 800; roads 150-900; slope x(1+0.06 deg)"
+citations:
+  - "Spear S.F., Balkenhol N., Fortin M.-J., McRae B.H., Scribner K. (2010) Use of resistance surfaces for landscape genetic studies: considerations for parameterization and analysis. Molecular Ecology 19:3576-3591. doi:10.1111/j.1365-294X.2010.04657.x"
+  - "Zeller K.A., McGarigal K., Whiteley A.R. (2012) Estimating landscape resistance to movement: a review. Landscape Ecology 27:777-797. doi:10.1007/s10980-012-9737-0"
+r_max: 1000
+base: landcover
+landcover:
+  10: 2
+  20: 20
+  30: 15
+  40: 50
+  50: 800
+  60: 200
+  70: 800
+  80: 2
+  90: 1
+  95: 2
+  100: 20
+roads:
+  by_class: {1: 900, 2: 800, 3: 500, 4: 300, 5: 150}
+  buffer_m: 60
+slope: {per_degree: 0.06, cap_degrees: 45}
+water: {mode: table}
+nodata_classes: []

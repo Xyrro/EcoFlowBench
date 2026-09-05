@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Phase 3 — 2026-09-05
+- `ecoflowbench/resistance`: pydantic YAML schema (`ResistanceTable`), `apply_table` mapping, `perturb_table`.
+- Five tables in `configs/resistance_tables/` (generic_hm, large_mammal, amphibian, forest_bird, random_lm_20260905) with citations.
+- `scripts/build_resistance.py`: 300 resistance rasters (60 tiles × 5 tables), manifest, stats, gallery figure; 11 tests.
+- Owner decisions: HF storage deferred to Phase 5; download gate refined (single > 5 GB or cumulative > 20 GB); GRIP4/HydroRIVERS full set downloaded (4.87 GB cumulative).
+
 ### Phase 2 — 2026-09-05
 - Synthetic generators (`ecoflowbench/landscapes/synthetic.py`) with documented priors and 38 tests; gallery figure.
 - Real-tile pipeline: `real.py` (UTM grids, windowed COG readers, distance rasters, GeoTIFF I/O),
