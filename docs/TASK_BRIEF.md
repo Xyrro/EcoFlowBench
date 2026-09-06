@@ -234,7 +234,7 @@ Provide official splits as Parquet lists of sample IDs:
 
 Implement `ampscape/metrics/` and `ampscape/eval/`:
 
-**Pixel-level (maps):** MSE, MAE in log space (log1p), relative L2 error, SSIM, PSNR.
+**Pixel-level (maps):** MSE, MAE in log space (log10(C + ε·max C), ε = 1e-6 — *amended 2026-09-06, replaces log1p*), relative L2 error; SSIM and PSNR as **secondary** metrics.
 
 **Domain-level:**
 - High-flow region IoU: IoU between top-q% pixels (q ∈ {1, 5, 10}) of prediction and ground truth.
@@ -247,6 +247,8 @@ Implement `ampscape/metrics/` and `ampscape/eval/`:
 **Physics consistency:** divergence / current-conservation residual computed from predicted current and known resistance (document the formula); Kirchhoff residual if voltage is predicted.
 
 **Efficiency:** inference time per sample vs. recorded solver time → speed-up factor; memory.
+
+**Solver acceleration track (added 2026-09-06):** CG iterations and wall time to reach the reference residual when warm-started from the predicted voltage map vs. from zero, for T1 and T3 on `test_id` and all OOD splits; zero-start baseline iteration counts are recorded in `SolveStats`.
 
 **Scale extrapolation curve:** metric vs. raster size on `test_ood_scale`.
 
@@ -325,5 +327,6 @@ After each phase, write the phase report and post a concise summary: what was bu
 - ~~Which equal-area CRS convention to adopt for real tiles.~~ Decided 2026-09-05: WGS84/UTM zone of tile centre.
 - ~~Whether to include OSM-derived rasters given ODbL share-alike.~~ Decided 2026-09-05: no OSM; roads from GRIP4.
 - ~~Whether per-pair current maps should be stored for all samples (storage cost) or only for K ≤ 4.~~ Decided 2026-09-05: only for K ≤ 4; K > 4 stores cumulative map + Reff only.
+- **Domain-metric acceptance thresholds are unvalidated** (top-q % IoU, pinch-point recall, corridor Dice): the benchmark reports them without claiming that any value is sufficient for conservation practice; the datasheet says so explicitly (added 2026-09-06).
 
 Begin with Phase 1 and the repository scaffold. Proceed phase by phase, honouring the gates above.

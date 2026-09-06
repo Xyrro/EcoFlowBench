@@ -51,7 +51,8 @@ floor of 150 S-tier tiles per biome so that no biome has fewer than 750 real lan
 | ('synthetic', 'edge_gradient', '-')          |  2400 | 1200 |  480 |   96 |    10 |    4186 |
 | ('synthetic', 'fractal', '-')                |  9600 | 4800 | 1920 |  384 |    38 |   16742 |
 | ('synthetic', 'grf', '-')                    | 14400 | 7200 | 2880 |  576 |    58 |   25114 |
-| ('synthetic', 'hard:high_contrast_1e4', '-') |  3600 | 1800 |  720 |  144 |    14 |    6278 |
+| ('synthetic', 'hard:high_contrast_1e5', '-') |  2400 | 1200 |  480 |   96 |    10 |    4186 |
+| ('synthetic', 'hard:high_contrast_1e6', '-') |  1200 |  600 |  240 |   48 |     5 |    2093 |
 | ('synthetic', 'hard:large_nodata', '-')      |  3000 | 1500 |  600 |  120 |    12 |    5232 |
 | ('synthetic', 'hard:narrow_corridor', '-')   |  3600 | 1800 |  720 |  144 |    14 |    6278 |
 | ('synthetic', 'hard:rmax_saturated', '-')    |  1800 |  900 |  360 |   72 |     7 |    3139 |
@@ -74,16 +75,16 @@ documented prior on top of every base generator (`DEFAULT_PRIOR`).
 | ('real', 'regions', 'T1R')                              | 16000 |  8000 |  3200 |  640 |    64 |   27904 |
 | ('real', 'wall_to_wall_EW', 'T1W')                      | 40000 | 20000 |  8000 | 1600 |   160 |   69760 |
 | ('real', 'wall_to_wall_NS', 'T1W')                      | 40000 | 20000 |  8000 | 1600 |   160 |   69760 |
-| ('synthetic', 'advanced', 'T3')                         | 60000 | 30000 | 12000 | 2400 |   240 |  104640 |
-| ('synthetic', 'omniscape', 'T4')                        | 60000 | 30000 | 12000 | 2400 |   240 |  104640 |
-| ('synthetic', 'points', 'T1,T2')                        | 60000 | 30000 | 12000 | 2400 |   240 |  104640 |
+| ('synthetic', 'advanced', 'T3')                         | 60000 | 30000 | 12000 | 2400 |   241 |  104641 |
+| ('synthetic', 'omniscape', 'T4')                        | 60000 | 30000 | 12000 | 2400 |   241 |  104641 |
+| ('synthetic', 'points', 'T1,T2')                        | 60000 | 30000 | 12000 | 2400 |   241 |  104641 |
 | ('synthetic', 'points (4-neighbour ablation)', 'T1,T2') |  3000 |     0 |     0 |    0 |     0 |    3000 |
-| ('synthetic', 'wall_to_wall_EW', 'T1W')                 | 60000 | 30000 | 12000 | 2400 |   240 |  104640 |
-| ('synthetic', 'wall_to_wall_NS', 'T1W')                 | 60000 | 30000 | 12000 | 2400 |   240 |  104640 |
+| ('synthetic', 'wall_to_wall_EW', 'T1W')                 | 60000 | 30000 | 12000 | 2400 |   241 |  104641 |
+| ('synthetic', 'wall_to_wall_NS', 'T1W')                 | 60000 | 30000 | 12000 | 2400 |   241 |  104641 |
 
-Total landscapes: 174,400; total solves: 902,904; real tiles: {'S': 8000, 'M': 4000, 'L': 1600, 'XL': 320, 'XXL': 32}
+Total landscapes: 174,401; total solves: 902,909; real tiles: {'S': 8000, 'M': 4000, 'L': 1600, 'XL': 320, 'XXL': 32}
 
-Totals (recommended): **174,400 landscapes, 902,904 solves**; brief baseline: 162,200 landscapes, 839,952 solves.
+Totals (recommended): **174,401 landscapes, 902,909 solves**; brief baseline: 162,200 landscapes, 839,952 solves.
 Every landscape gets `points` (T1 + T2, K ∈ [2, 8]), both wall-to-wall strips (T1W), `advanced` (T3)
 and `omniscape` (T4); real tiles with ≥ 2 eligible habitat patches (≈ 40 %) also get `regions` (T1R).
 A 5 % slice of tier-S synthetic landscapes is additionally solved with the 4-neighbour graph and
@@ -103,7 +104,8 @@ flagged `graph_connectivity = 4` (brief §3.2 ablation).
 | ('synthetic', 'edge_gradient', '-')          |  2400 | 1200 |  240 |   48 |     5 |    3893 |
 | ('synthetic', 'fractal', '-')                |  9600 | 4800 |  960 |  192 |    19 |   15571 |
 | ('synthetic', 'grf', '-')                    | 14400 | 7200 | 1440 |  288 |    29 |   23357 |
-| ('synthetic', 'hard:high_contrast_1e4', '-') |  3600 | 1800 |  360 |   72 |     7 |    5839 |
+| ('synthetic', 'hard:high_contrast_1e5', '-') |  2400 | 1200 |  240 |   48 |     5 |    3893 |
+| ('synthetic', 'hard:high_contrast_1e6', '-') |  1200 |  600 |  120 |   24 |     2 |    1946 |
 | ('synthetic', 'hard:large_nodata', '-')      |  3000 | 1500 |  300 |   60 |     6 |    4866 |
 | ('synthetic', 'hard:narrow_corridor', '-')   |  3600 | 1800 |  360 |   72 |     7 |    5839 |
 | ('synthetic', 'hard:rmax_saturated', '-')    |  1800 |  900 |  180 |   36 |     4 |    2920 |
@@ -115,7 +117,8 @@ flagged `graph_connectivity = 4` (brief §3.2 ablation).
 
 | hard case | share of `hard` | definition | landscapes (recommended, all tiers) |
 |---|---|---|---|
-| `high_contrast_1e4` | 30 % | contrast 10⁴ from any base generator | 6,278 |
+| `high_contrast_1e5` | 20 % | contrast 10⁵ from any base generator (in training) | 4,186 |
+| `high_contrast_1e6` | 10 % | contrast 10⁶ from any base generator — **test-only** (`test_ood_contrast`) | 2,093 |
 | `rmax_saturated` | 15 % | > 50 % of valid pixels at r_max (near-degenerate); QC-flagged, train/val-excluded, kept in the index | 3,139 |
 | `narrow_corridor` | 30 % | 1–3 barrier walls spanning the raster with 1–3 gaps of 1–3 px each (all flow funnels through the gaps) | 6,278 |
 | `large_nodata` | 25 % | NoData fraction 0.25–0.45, single connected component | 5,232 |
@@ -132,7 +135,7 @@ Real tiles contribute hard cases naturally (coastal tiles with large water bodie
 | `test_ood_region` | real tiles in biomes *Montane Grasslands & Shrublands* and *Mangroves*, and realm *Australasia* | every table of those tiles; never in train/val; 2 biomes + 1 realm ≈ 12 % of real tiles | ≈ 8 400 real landscapes |
 | `test_ood_scale` | tiers XL and XXL | entire tiers are test-only; train/val use S–L | 4 400 landscapes |
 | `test_ood_table` | resistance table `forest_bird` | all `forest_bird` landscapes (r_max 100, elevation bands: structurally different) are test-only; training sees generic_hm, large_mammal, amphibian, random | ≈ 14 000 real landscapes (S–L) |
-| `test_ood_contrast` | synthetic contrast 10⁴ | all 10⁴-contrast landscapes are test-only; train/val ≤ 10³ | ≈ 6 300 synthetic landscapes (S–L) |
+| `test_ood_contrast` | synthetic contrast 10⁶ | all 10⁶-contrast landscapes are test-only; train/val ≤ 10⁵ | ≈ 6 300 synthetic landscapes (S–L) |
 | `test_ood_synth2real` | flag only | evaluation subset = all real `test_id`; training restricted to `family = synthetic` by a loader flag | no extra samples |
 
 A landscape can belong to several OOD sets (e.g. an XL `forest_bird` tile in Australasia); the index
@@ -219,8 +222,8 @@ Compressed storage per landscape (all configs): synthetic 0.93 / 3.0 / 11 / 41 /
 | M      |        50000 |                 156.3 |           1.4 |        2171 |        180   |
 | L      |        20000 |                 673.2 |           1.6 |        3740 |        260   |
 | XL     |         4000 |                2215.3 |           3.3 |        2461 |        194.4 |
-| XXL    |          400 |               11214.9 |           9.5 |        1246 |         65.6 |
-| total  |       174400 |                       |               |       11309 |        811.8 |
+| XXL    |          401 |               11214.8 |           9.5 |        1249 |         65.7 |
+| total  |       174401 |                       |               |       11312 |        811.9 |
 
 |   concurrent_cores |   wall_days |
 |-------------------:|------------:|
@@ -236,8 +239,8 @@ Compressed storage per landscape (all configs): synthetic 0.93 / 3.0 / 11 / 41 /
 | M      |        50000 |                  57.8 |           1.4 |         802 |        180   |
 | L      |        20000 |                 214.3 |           1.6 |        1191 |        260   |
 | XL     |         4000 |                 948   |           3.3 |        1053 |        194.4 |
-| XXL    |          400 |                6504.5 |           9.5 |         723 |         65.6 |
-| total  |       174400 |                       |               |        3981 |        811.8 |
+| XXL    |          401 |                6504.4 |           9.5 |         725 |         65.7 |
+| total  |       174401 |                       |               |        3983 |        811.9 |
 
 |   concurrent_cores |   wall_days |
 |-------------------:|------------:|

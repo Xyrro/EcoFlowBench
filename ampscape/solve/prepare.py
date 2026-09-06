@@ -36,9 +36,18 @@ def load_landscape(spec: SampleSpec, pilot_root: str | None):
         from ampscape.landscapes.synthetic import sample_landscape
 
         ls = sample_landscape(spec.seed, (spec.size, spec.size))
-        meta = {"generator": ls.generator, "generator_params": ls.params, "contrast": ls.contrast,
+        extra = json.loads(spec.extra or "{}")
+        R, contrast, params = ls.resistance, ls.contrast, ls.params
+        if "contrast_override" in extra:           # probes: re-map the same cost field to a fixed contrast
+            from ampscape.landscapes.synthetic import field_to_resistance
+
+            contrast = float(extra["contrast_override"])
+            R = field_to_resistance(ls.cost_field, contrast, ls.params["mapping"])
+            R[ls.nodata_mask] = 1.0
+            params = dict(ls.params, contrast=contrast, contrast_override=True)
+        meta = {"generator": ls.generator, "generator_params": params, "contrast": contrast,
                 "resistance_table_id": None}
-        return ls.resistance, ls.nodata_mask, None, None, meta
+        return R, ls.nodata_mask, None, None, meta
     import pandas as pd
     import rasterio
 

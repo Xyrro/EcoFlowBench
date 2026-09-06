@@ -51,6 +51,12 @@ table (`forest_bird`), held-out contrast (10⁴), held-out scale (XL/XXL for mod
 synthetic→real flag. **Pilot caveat:** the mini's 50 real tiles over-represent the held-out regions
 (20 of 50) because the Phase 2 pilot sampled those strata for coverage; this is not a v1.0 property.
 
+## Metrics caveat
+
+The domain-level metrics (top-q % high-flow IoU, pinch-point recall, corridor Dice) use thresholds
+that are **not validated against ecological outcomes**; we report them as comparative scores between
+models and make no claim that any level is sufficient for conservation practice.
+
 ## Collection process, preprocessing, uses, limitations, ethics, maintenance
 
 To be completed for the full release from `docs/dataset_plan.md`, `docs/licenses.md` (upstream

@@ -73,7 +73,7 @@ def main() -> None:
     nl = [x for x in jr["landscapes"] if x["stratum"] != "(distinct tiles)"]
     nb = [x for x in jb["landscapes"] if x["stratum"] != "(distinct tiles)"]
     hc = {k: sum(x["landscapes"] for x in nl if x["stratum"] == f"hard:{k}")
-          for k in ("high_contrast_1e4", "rmax_saturated", "narrow_corridor", "large_nodata")}
+          for k in ("high_contrast_1e5", "rmax_saturated", "narrow_corridor", "large_nodata", "high_contrast_1e6")}
     study, verdict = block_study()
     out = TEMPLATE.read_text().format(
         land_rec=sect(rec, "### Landscapes per tier"), solves_rec=sect(rec, "### Solves per tier"),

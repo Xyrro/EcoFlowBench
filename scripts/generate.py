@@ -58,9 +58,14 @@ def cmd_plan(a) -> None:
     from ampscape.solve.manifest import DEFAULT_CONFIGS
 
     specs = plan_synthetic(a.dataset, a.n_synthetic, a.tier, a.seed0, configs=configs or DEFAULT_CONFIGS, shard_size=a.shard_size)
-    if a.k_override:
+    if a.k_override or a.contrast_override:
         for sp in specs:
-            sp.extra = json.dumps({"k_override": a.k_override})
+            e = {}
+            if a.k_override:
+                e["k_override"] = a.k_override
+            if a.contrast_override:
+                e["contrast_override"] = a.contrast_override
+            sp.extra = json.dumps(e)
     n_shards = (len(specs) + a.shard_size - 1) // a.shard_size if specs else 0
     if a.n_real:
         specs += plan_real(a.dataset, str(ROOT / a.pilot / "resistance.parquet"), str(ROOT / a.pilot / "sources.parquet"),
@@ -251,6 +256,7 @@ def main() -> None:
     p.add_argument("--dataset-version", default="0.1.0-mini")
     p.add_argument("--configs", default=None, help="comma-separated subset of configs (default: all)")
     p.add_argument("--k-override", type=int, default=None, help="fix K for the points config (scaling probe)")
+    p.add_argument("--contrast-override", type=float, default=None, help="re-map synthetic landscapes to this contrast (probe)")
     p.set_defaults(func=cmd_plan)
     for name, fn in [("prepare", cmd_prepare), ("finalize", cmd_finalize)]:
         q = sub.add_parser(name)

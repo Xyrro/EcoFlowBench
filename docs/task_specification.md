@@ -229,7 +229,7 @@ constraints in `docs/compute_env.md` (300 GB scratch quota).
 | Axis | Values / range | Split that stresses it |
 |---|---|---|
 | Landscape family | synthetic {GRF, fractal, NLMpy cluster/gradient/mosaic, barriers}, real (biome × continent × gHM tercile strata) | `test_ood_synth2real`, `test_ood_region` |
-| Contrast R_max/R_min | {10, 100, 1000, 10 000} | `test_ood_contrast` (train ≤ 1000, test 10 000) |
+| Contrast R_max/R_min | {10, 10², 10³, 10⁴, 10⁵, 10⁶} | `test_ood_contrast` (train ≤ 10⁵, test 10⁶) |
 | Resistance table (real) | generic_hm, large_mammal, amphibian, forest_bird, random_table | `test_ood_table` |
 | Raster size | tiers S–XXL | `test_ood_scale` (train ≤ L, test XL/XXL) |
 | Source configuration | K ∈ [2,8] points, WDPA regions, edge strips, S/Gnd fields, Omniscape windows | in-distribution |
@@ -239,13 +239,26 @@ constraints in `docs/compute_env.md` (300 GB scratch quota).
 
 | Task | Primary metric | Secondary |
 |---|---|---|
-| T1 / T1W | log1p-MAE of cum_current, relative L2 | top-q% IoU, pinch-point recall, Spearman, SSIM/PSNR, conservation residual |
+| T1 / T1W | MAE in log10(C + ε·max C) space (ε = 1e-6), relative L2 | top-q% IoU, pinch-point recall, Spearman, conservation residual; SSIM/PSNR secondary |
 | T2 | relative error of Reff (pairs), Spearman over pairs | log-MAE, nearest-neighbour rank agreement |
-| T3 | log1p-MAE of current; MAE of voltage | conservation + Kirchhoff residuals |
-| T4 | log1p-MAE of cum_current and normalized | top-q% IoU, corridor Dice |
+| T3 | log10-ε MAE of current; MAE of voltage | conservation + Kirchhoff residuals; **solver acceleration** (CG iterations from predicted voltage vs zero) |
+| T4 | log10-ε MAE of cum_current and normalized | top-q% IoU, corridor Dice; SSIM/PSNR secondary |
 | all | inference time vs `solve_time_s` → speed-up; metric vs size on `test_ood_scale` | |
+| T1, T3 (acceleration track) | CG iterations and wall time to reach the reference residual when warm-started from the predicted voltage map vs from zero (`SolveStats.cg_baseline`), on `test_id` and every OOD split | |
 
 Model inputs are standardised by the loader (log R, M, focal/source channels); targets stay raw.
+Current maps are compared in log10(C + ε·max C) space with ε = 1e-6 (`ampscape.metrics.transforms`);
+log1p was dropped because it is scale-dependent (external review 2026-09-06). **Domain-metric
+thresholds (top-q %, pinch-point detection, corridor masks) are unvalidated against ecological
+outcomes: results are reported without claiming that any threshold is sufficient for practice.**
+
+### 7.1 Supported use case: solver acceleration
+Besides replacing the solver, a surrogate can *warm-start* it: the predicted voltage map is the
+initial guess for the conjugate-gradient solve of the same system, and the benefit is measured as
+the reduction in CG iterations (and wall time) to reach the reference residual relative to a zero
+start. Every T1 (first pair, K ≤ 4) and T3 sample records the zero-start baseline in
+`SolveStats.cg_baseline` (iterations and time to 1e-6 and to the CHOLMOD residual, AMG-preconditioned
+CG as in Circuitscape) so the track is evaluable offline.
 
 ## 8. Reproducibility contract
 

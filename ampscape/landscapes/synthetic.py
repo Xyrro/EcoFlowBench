@@ -16,7 +16,8 @@ Families implemented
 * Overlays: linear barriers (roads/rivers) with density, width, orientation and gaps;
   categorical patch mosaics
 * NoData blobs (masked regions) with a single-connected-component guarantee
-* Contrast control: dynamic range in {10, 100, 1000, 10000}
+* Contrast control: dynamic range in {10, 10², 10³, 10⁴, 10⁵, 10⁶} (10⁶ is reserved for the
+  contrast OOD test set; external review 2026-09-06)
 
 The documented sampling priors live in :data:`DEFAULT_PRIOR` and are consumed by
 :func:`sample_landscape`, which records every drawn parameter in ``params``.
@@ -35,7 +36,7 @@ from scipy import ndimage
 
 Shape = tuple[int, int]
 
-CONTRAST_LEVELS: tuple[int, ...] = (10, 100, 1000, 10_000)
+CONTRAST_LEVELS: tuple[int, ...] = (10, 100, 1000, 10_000, 100_000, 1_000_000)
 GRF_LENGTH_SCALES: tuple[int, ...] = (2, 8, 32, 128)
 FRACTAL_ROUGHNESS: tuple[float, ...] = (0.2, 0.5, 0.8)
 
@@ -330,6 +331,7 @@ DEFAULT_PRIOR: dict = {
     "p_nodata": 0.3,
     "nodata": {"fraction": (0.02, 0.25), "length_scale": (4.0, 32.0)},
     "contrast": CONTRAST_LEVELS,
+    "contrast_weights": (1, 1, 1, 1, 1, 0.5),   # 10^6 is test-only (held out); sampled at half weight
     "mapping": "log",
 }
 
@@ -449,7 +451,8 @@ def sample_landscape(seed: int, shape: Shape, prior: dict | None = None) -> Synt
     else:
         nodata = np.zeros((h, w), dtype=bool)
 
-    contrast = int(rng.choice(prior["contrast"]))
+    cw = np.asarray(prior.get("contrast_weights", [1] * len(prior["contrast"])), dtype=float)
+    contrast = int(rng.choice(prior["contrast"], p=cw / cw.sum()))
     params["contrast"] = contrast
     params["mapping"] = prior["mapping"]
     resistance = field_to_resistance(fld, contrast, prior["mapping"])

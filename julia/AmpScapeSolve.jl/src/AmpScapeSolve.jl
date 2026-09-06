@@ -32,7 +32,7 @@ using JSON
 using Statistics
 using Logging
 
-export solve_pairwise, solve_advanced, solve_omniscape, solve_shard, solver_versions, SolveStats, sanitize_nan
+export solve_pairwise, solve_advanced, solve_omniscape, solve_shard, solver_versions, SolveStats, cg_baseline, graph_laplacian, kirchhoff_residual, sanitize_nan
 
 const NODATA = -9999.0
 
@@ -137,6 +137,7 @@ end
 # Exact solver graph in Julia (mirror of ampscape/sources/graph.py) for residual checks
 # ---------------------------------------------------------------------------
 using SparseArrays
+using AlgebraicMultigrid
 
 """Laplacian of the Circuitscape graph (8-neighbour, NoData removed, average conductance) and node index map."""
 function graph_laplacian(R::AbstractMatrix, nodata::AbstractMatrix{Bool})
@@ -188,6 +189,54 @@ function kirchhoff_residual(L, idx, voltage::AbstractMatrix, injection::Abstract
     return nb > 0 ? sqrt(rr) / nb : NaN
 end
 
+"""
+    cg_baseline(L, idx, injection, grounded; rtol_targets=(1e-6,), x0=nothing, itmax=20_000)
+
+Zero-start (or warm-start `x0`, an (H,W) voltage map) AMG-preconditioned conjugate gradient on the
+reduced system L_ff v_f = b_f (grounded nodes removed), as Circuitscape's cg+amg does. Returns a Dict
+with, for each target relative residual, the iteration count and wall time to reach it, plus the
+final residual. Used to record the solver-acceleration baseline (`SolveStats.cg_baseline`) and, in
+Phase 9, to score warm starts from predicted voltages.
+"""
+function cg_baseline(L, idx, injection::AbstractMatrix, grounded::AbstractMatrix{Bool};
+                     rtol_targets = (1e-6,), x0 = nothing, itmax = 20_000)
+    valid = idx .> 0
+    order = sortperm(vec(idx[valid]))
+    free = .!(vec(grounded[valid])[order])
+    b = Float64.(vec(injection[valid]))[order][free]
+    Lf = L[free, free]
+    nb = norm(b)
+    nb == 0 && return Dict{String,Any}("error" => "zero injection")
+    P = aspreconditioner(ruge_stuben(Lf))
+    x0v = x0 === nothing ? zeros(length(b)) : Float64.(vec(x0[valid]))[order][free]
+    targets = sort(collect(Float64, rtol_targets); rev = true)   # loosest first; one CG run records all
+    out = Dict{String,Any}("warm_start" => x0 !== nothing, "n_free" => length(b),
+                           "residual_start" => norm(Lf * x0v .- b) / nb, "preconditioner" => "ruge_stuben AMG (AlgebraicMultigrid.jl)")
+    # preconditioned conjugate gradient (Circuitscape's cg+amg equivalent), explicit so that iteration
+    # counts to several residual targets come from ONE run
+    x = copy(x0v); r = b .- Lf * x; z = similar(r); ldiv!(z, P, r); pvec = copy(z); rz = dot(r, z)
+    it = 0; t0 = time(); ti = 1
+    rel = norm(r) / nb
+    while ti <= length(targets)
+        if rel <= targets[ti]
+            key = @sprintf("%.0e", targets[ti])
+            out["iters_to_$key"] = it; out["time_to_$key"] = time() - t0; out["converged_$key"] = true; out["residual_$key"] = rel
+            ti += 1; continue
+        end
+        it >= itmax && break
+        Ap = Lf * pvec; alpha = rz / dot(pvec, Ap)
+        x .+= alpha .* pvec; r .-= alpha .* Ap
+        ldiv!(z, P, r); rz2 = dot(r, z); pvec .= z .+ (rz2 / rz) .* pvec; rz = rz2
+        it += 1; rel = norm(r) / nb
+    end
+    for k in ti:length(targets)
+        key = @sprintf("%.0e", targets[k])
+        out["iters_to_$key"] = it; out["time_to_$key"] = time() - t0; out["converged_$key"] = false; out["residual_$key"] = rel
+    end
+    out["iters_total"] = it
+    return out
+end
+
 # ---------------------------------------------------------------------------
 # Pairwise (T1 / T1W / T2)
 # ---------------------------------------------------------------------------
@@ -229,7 +278,7 @@ is set.
 """
 function solve_pairwise(R::AbstractMatrix, nodata::AbstractMatrix{Bool}, focal::AbstractMatrix{<:Integer};
                         solver = "cholmod", fallback = "cg+amg", keep_pair_maps = true,
-                        four_neighbors = false, workdir = mktempdir())
+                        four_neighbors = false, workdir = mktempdir(), cg_baseline_enabled = true)
     H, W = size(R)
     Rw = Float64.(R); Rw[nodata] .= NODATA
     write_asc(joinpath(workdir, "habitat.asc"), Rw)
@@ -286,7 +335,16 @@ function solve_pairwise(R::AbstractMatrix, nodata::AbstractMatrix{Bool}, focal::
             if L === nothing; L, idx = graph_laplacian(R, nodata); end
             src = focal .== j; gnd = focal .== i
             inj = zeros(Float64, size(R)); inj[src] .= 1.0 / count(src)
-            resid = max(resid, kirchhoff_residual(L, idx, v64, inj, gnd; supernode = count(src) > 1 ? src : nothing))
+            r_p = kirchhoff_residual(L, idx, v64, inj, gnd; supernode = count(src) > 1 ? src : nothing)
+            resid = max(resid, r_p)
+            if p == 1 && cg_baseline_enabled && count(src) == 1
+                # solver-acceleration baseline (zero-start AMG-CG on the first pair; point sources only)
+                st.solver_params["cg_baseline"] = try
+                    cg_baseline(L, idx, inj, gnd; rtol_targets = (1e-6, max(r_p, 1e-13)))
+                catch err
+                    Dict{String,Any}("error" => sprint(showerror, err))
+                end
+            end
             push!(pv, Float32.(v64))
         end
     end
@@ -305,7 +363,8 @@ struct AdvancedResult
 end
 
 function solve_advanced(R::AbstractMatrix, nodata::AbstractMatrix{Bool}, S::AbstractMatrix, G::AbstractMatrix;
-                        solver = "cholmod", fallback = "cg+amg", four_neighbors = false, workdir = mktempdir())
+                        solver = "cholmod", fallback = "cg+amg", four_neighbors = false, workdir = mktempdir(),
+                        cg_baseline_enabled = true)
     H, W = size(R)
     Rw = Float64.(R); Rw[nodata] .= NODATA
     write_asc(joinpath(workdir, "habitat.asc"), Rw)
@@ -339,7 +398,15 @@ function solve_advanced(R::AbstractMatrix, nodata::AbstractMatrix{Bool}, S::Abst
     cur = clean_map(read_asc(joinpath(workdir, "out_curmap.asc")))
     v64 = read_asc(joinpath(workdir, "out_voltmap.asc")); v64[v64 .== NODATA] .= 0.0
     L, idx = graph_laplacian(R, nodata)
-    st.solver_params["residual_rel"] = kirchhoff_residual(L, idx, v64, Float64.(S), G .> 0)
+    r_a = kirchhoff_residual(L, idx, v64, Float64.(S), G .> 0)
+    st.solver_params["residual_rel"] = r_a
+    if cg_baseline_enabled
+        st.solver_params["cg_baseline"] = try
+            cg_baseline(L, idx, Float64.(S), G .> 0; rtol_targets = (1e-6, max(r_a, 1e-13)))
+        catch err
+            Dict{String,Any}("error" => sprint(showerror, err))
+        end
+    end
     return AdvancedResult(cur, Float32.(v64), st)
 end
 

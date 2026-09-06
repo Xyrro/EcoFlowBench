@@ -59,9 +59,16 @@
   {
    "tier": "S",
    "family": "synthetic",
-   "stratum": "hard:high_contrast_1e4",
+   "stratum": "hard:high_contrast_1e5",
    "table": "-",
-   "landscapes": 3600
+   "landscapes": 2400
+  },
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "stratum": "hard:high_contrast_1e6",
+   "table": "-",
+   "landscapes": 1200
   },
   {
    "tier": "S",
@@ -178,9 +185,16 @@
   {
    "tier": "M",
    "family": "synthetic",
-   "stratum": "hard:high_contrast_1e4",
+   "stratum": "hard:high_contrast_1e5",
    "table": "-",
-   "landscapes": 1800
+   "landscapes": 1200
+  },
+  {
+   "tier": "M",
+   "family": "synthetic",
+   "stratum": "hard:high_contrast_1e6",
+   "table": "-",
+   "landscapes": 600
   },
   {
    "tier": "M",
@@ -297,9 +311,16 @@
   {
    "tier": "L",
    "family": "synthetic",
-   "stratum": "hard:high_contrast_1e4",
+   "stratum": "hard:high_contrast_1e5",
    "table": "-",
-   "landscapes": 360
+   "landscapes": 240
+  },
+  {
+   "tier": "L",
+   "family": "synthetic",
+   "stratum": "hard:high_contrast_1e6",
+   "table": "-",
+   "landscapes": 120
   },
   {
    "tier": "L",
@@ -416,9 +437,16 @@
   {
    "tier": "XL",
    "family": "synthetic",
-   "stratum": "hard:high_contrast_1e4",
+   "stratum": "hard:high_contrast_1e5",
    "table": "-",
-   "landscapes": 72
+   "landscapes": 48
+  },
+  {
+   "tier": "XL",
+   "family": "synthetic",
+   "stratum": "hard:high_contrast_1e6",
+   "table": "-",
+   "landscapes": 24
   },
   {
    "tier": "XL",
@@ -535,9 +563,16 @@
   {
    "tier": "XXL",
    "family": "synthetic",
-   "stratum": "hard:high_contrast_1e4",
+   "stratum": "hard:high_contrast_1e5",
    "table": "-",
-   "landscapes": 7
+   "landscapes": 5
+  },
+  {
+   "tier": "XXL",
+   "family": "synthetic",
+   "stratum": "hard:high_contrast_1e6",
+   "table": "-",
+   "landscapes": 2
   },
   {
    "tier": "XXL",

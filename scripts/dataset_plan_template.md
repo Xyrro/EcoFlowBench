@@ -64,7 +64,8 @@ flagged `graph_connectivity = 4` (brief §3.2 ablation).
 
 | hard case | share of `hard` | definition | landscapes (recommended, all tiers) |
 |---|---|---|---|
-| `high_contrast_1e4` | 30 % | contrast 10⁴ from any base generator | {hc_high_contrast_1e4} |
+| `high_contrast_1e5` | 20 % | contrast 10⁵ from any base generator (in training) | {hc_high_contrast_1e5} |
+| `high_contrast_1e6` | 10 % | contrast 10⁶ from any base generator — **test-only** (`test_ood_contrast`) | {hc_high_contrast_1e6} |
 | `rmax_saturated` | 15 % | > 50 % of valid pixels at r_max (near-degenerate); QC-flagged, train/val-excluded, kept in the index | {hc_rmax_saturated} |
 | `narrow_corridor` | 30 % | 1–3 barrier walls spanning the raster with 1–3 gaps of 1–3 px each (all flow funnels through the gaps) | {hc_narrow_corridor} |
 | `large_nodata` | 25 % | NoData fraction 0.25–0.45, single connected component | {hc_large_nodata} |
@@ -81,7 +82,7 @@ Real tiles contribute hard cases naturally (coastal tiles with large water bodie
 | `test_ood_region` | real tiles in biomes *Montane Grasslands & Shrublands* and *Mangroves*, and realm *Australasia* | every table of those tiles; never in train/val; 2 biomes + 1 realm ≈ 12 % of real tiles | ≈ 8 400 real landscapes |
 | `test_ood_scale` | tiers XL and XXL | entire tiers are test-only; train/val use S–L | 4 400 landscapes |
 | `test_ood_table` | resistance table `forest_bird` | all `forest_bird` landscapes (r_max 100, elevation bands: structurally different) are test-only; training sees generic_hm, large_mammal, amphibian, random | ≈ 14 000 real landscapes (S–L) |
-| `test_ood_contrast` | synthetic contrast 10⁴ | all 10⁴-contrast landscapes are test-only; train/val ≤ 10³ | ≈ 6 300 synthetic landscapes (S–L) |
+| `test_ood_contrast` | synthetic contrast 10⁶ | all 10⁶-contrast landscapes are test-only; train/val ≤ 10⁵ | ≈ 6 300 synthetic landscapes (S–L) |
 | `test_ood_synth2real` | flag only | evaluation subset = all real `test_id`; training restricted to `family = synthetic` by a loader flag | no extra samples |
 
 A landscape can belong to several OOD sets (e.g. an XL `forest_bird` tile in Australasia); the index

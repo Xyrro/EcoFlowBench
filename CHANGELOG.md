@@ -3,6 +3,10 @@
 ## [Unreleased]
 
 ### Phase 7 — 2026-09-06
+- External review: contrast ladder to 10⁶ (10⁶ test-only) with residual probes at S/XXL; solver-acceleration track
+  (`SolveStats.cg_baseline`, explicit AMG-PCG zero/warm start) documented in the task spec and brief §11;
+  log10(C + ε·max C) transform (`ampscape.metrics.transforms`) replaces log1p, SSIM/PSNR secondary; unvalidated-threshold
+  caveat in brief §17 and the dataset card; `docs/survey_resistance_surfaces.md`.
 - `ampscape/data`: `AmpScapeDataset` (lazy shards, torch adapter, train-only normalisation stats, subsets, OOD filters),
   `load_from_hub`; `ampscape/io/hf_layout.py` (per-tier × task-group shards, index, nested splits); `subsets.py`.
 - `scripts/export_croissant.py` (Croissant 1.0 + RAI, validated), `scripts/push_to_hub.py` (create private repo, verified uploads,

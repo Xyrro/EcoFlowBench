@@ -59,9 +59,16 @@
   {
    "tier": "S",
    "family": "synthetic",
-   "stratum": "hard:high_contrast_1e4",
+   "stratum": "hard:high_contrast_1e5",
    "table": "-",
-   "landscapes": 3600
+   "landscapes": 2400
+  },
+  {
+   "tier": "S",
+   "family": "synthetic",
+   "stratum": "hard:high_contrast_1e6",
+   "table": "-",
+   "landscapes": 1200
   },
   {
    "tier": "S",
@@ -178,9 +185,16 @@
   {
    "tier": "M",
    "family": "synthetic",
-   "stratum": "hard:high_contrast_1e4",
+   "stratum": "hard:high_contrast_1e5",
    "table": "-",
-   "landscapes": 1800
+   "landscapes": 1200
+  },
+  {
+   "tier": "M",
+   "family": "synthetic",
+   "stratum": "hard:high_contrast_1e6",
+   "table": "-",
+   "landscapes": 600
   },
   {
    "tier": "M",
@@ -297,9 +311,16 @@
   {
    "tier": "L",
    "family": "synthetic",
-   "stratum": "hard:high_contrast_1e4",
+   "stratum": "hard:high_contrast_1e5",
    "table": "-",
-   "landscapes": 720
+   "landscapes": 480
+  },
+  {
+   "tier": "L",
+   "family": "synthetic",
+   "stratum": "hard:high_contrast_1e6",
+   "table": "-",
+   "landscapes": 240
   },
   {
    "tier": "L",
@@ -416,9 +437,16 @@
   {
    "tier": "XL",
    "family": "synthetic",
-   "stratum": "hard:high_contrast_1e4",
+   "stratum": "hard:high_contrast_1e5",
    "table": "-",
-   "landscapes": 144
+   "landscapes": 96
+  },
+  {
+   "tier": "XL",
+   "family": "synthetic",
+   "stratum": "hard:high_contrast_1e6",
+   "table": "-",
+   "landscapes": 48
   },
   {
    "tier": "XL",
@@ -535,9 +563,16 @@
   {
    "tier": "XXL",
    "family": "synthetic",
-   "stratum": "hard:high_contrast_1e4",
+   "stratum": "hard:high_contrast_1e5",
    "table": "-",
-   "landscapes": 14
+   "landscapes": 10
+  },
+  {
+   "tier": "XXL",
+   "family": "synthetic",
+   "stratum": "hard:high_contrast_1e6",
+   "table": "-",
+   "landscapes": 5
   },
   {
    "tier": "XXL",
@@ -959,35 +994,35 @@
    "family": "synthetic",
    "config": "points",
    "tasks": "T1,T2",
-   "solves": 240
+   "solves": 241
   },
   {
    "tier": "XXL",
    "family": "synthetic",
    "config": "wall_to_wall_NS",
    "tasks": "T1W",
-   "solves": 240
+   "solves": 241
   },
   {
    "tier": "XXL",
    "family": "synthetic",
    "config": "wall_to_wall_EW",
    "tasks": "T1W",
-   "solves": 240
+   "solves": 241
   },
   {
    "tier": "XXL",
    "family": "synthetic",
    "config": "advanced",
    "tasks": "T3",
-   "solves": 240
+   "solves": 241
   },
   {
    "tier": "XXL",
    "family": "synthetic",
    "config": "omniscape",
    "tasks": "T4",
-   "solves": 240
+   "solves": 241
   },
   {
    "tier": "S",
@@ -1032,20 +1067,20 @@
   },
   {
    "tier": "XXL",
-   "landscapes": 400,
-   "cpu_s_per_landscape": 11214.9,
+   "landscapes": 401,
+   "cpu_s_per_landscape": 11214.8,
    "peak_rss_gb": 9.5,
-   "cpu_hours": 1246.0,
-   "storage_gb": 65.6
+   "cpu_hours": 1249.0,
+   "storage_gb": 65.7
   },
   {
    "tier": "total",
-   "landscapes": 174400,
+   "landscapes": 174401,
    "cpu_s_per_landscape": null,
    "peak_rss_gb": null,
-   "cpu_hours": 11309.0,
-   "storage_gb": 811.8
+   "cpu_hours": 11312.0,
+   "storage_gb": 811.9
   }
  ],
- "total_cpu_hours": 11309.0
+ "total_cpu_hours": 11312.0
 }
