@@ -154,8 +154,8 @@ in-distribution splits contain no held-out biome, realm, table, tier or contrast
 ## 6. Cost table (measured on ICE, Phase 5)
 
 Per-solve medians (CHOLMOD, single-threaded, warm JIT): points K = 4 0.17 / 0.87 / 4.1 / 13.3 / 70.9 s
-(S/M/L/XL/XXL); T4 6.2 / 48 / 178 / 794 / 4 468 s at the Phase-5 block sizes (S b3 … XL b17, XXL b33)
-and 52 / 134 / 577 / 1 896 / 7 784 s at the fidelity blocks (S b1 and M b1 measured, 630–1 548 s for
+(S/M/L/XL/XXL); T4 6.2 / 48 / 178 / 794 / 5 517 s (XXL = median of 4) at the Phase-5 block sizes (S b3 … XL b17, XXL b33)
+and 52 / 134 / 577 / 1 896 / 9 613 s at the fidelity blocks (S b1 and M b1 measured, 630–1 548 s for
 M b1 → b3 scaled; L/XL/XXL scaled by (b_old/b_new)², a law the XL 17→33 pair confirms: predicted
 ×0.265, measured ×0.28);
 T1W 0.08 s, T3 0.07 s, T1R 0.21 s at S, scaling linearly in pixels (exponents 1.00–1.07).
@@ -170,12 +170,12 @@ Compressed storage per landscape (all configs): synthetic 0.93 / 3.0 / 11 / 41 /
 | M      |        50000 |                 156.3 |           1.4 |        2171 |        180   |
 | L      |        20000 |                 673.2 |           1.6 |        3740 |        260   |
 | XL     |         4000 |                2215.3 |           3.3 |        2461 |        194.4 |
-| XXL    |          400 |                9111.5 |           9.5 |        1012 |         65.6 |
-| total  |       174400 |                       |               |       11075 |        811.8 |
+| XXL    |          400 |               11214.9 |           9.5 |        1246 |         65.6 |
+| total  |       174400 |                       |               |       11309 |        811.8 |
 
 |   concurrent_cores |   wall_days |
 |-------------------:|------------:|
-|                100 |         4.6 |
+|                100 |         4.7 |
 |                500 |         0.9 |
 |               1000 |         0.5 |
 
@@ -187,12 +187,12 @@ Compressed storage per landscape (all configs): synthetic 0.93 / 3.0 / 11 / 41 /
 | M      |        50000 |                  57.8 |           1.4 |         802 |        180   |
 | L      |        20000 |                 214.3 |           1.6 |        1191 |        260   |
 | XL     |         4000 |                 948   |           3.3 |        1053 |        194.4 |
-| XXL    |          400 |                5298.1 |           9.5 |         589 |         65.6 |
-| total  |       174400 |                       |               |        3847 |        811.8 |
+| XXL    |          400 |                6504.5 |           9.5 |         723 |         65.6 |
+| total  |       174400 |                       |               |        3981 |        811.8 |
 
 |   concurrent_cores |   wall_days |
 |-------------------:|------------:|
-|                100 |         1.6 |
+|                100 |         1.7 |
 |                500 |         0.3 |
 |               1000 |         0.2 |
 
@@ -204,12 +204,12 @@ Compressed storage per landscape (all configs): synthetic 0.93 / 3.0 / 11 / 41 /
 | M      |        50000 |                 156.3 |           1.4 |        2171 |        180   |
 | L      |        10000 |                 673.2 |           1.6 |        1870 |        130   |
 | XL     |         2000 |                2215.3 |           3.3 |        1231 |         97.2 |
-| XXL    |          200 |                9111.5 |           9.5 |         506 |         32.8 |
-| total  |       162200 |                       |               |        7469 |        551.8 |
+| XXL    |          200 |               11214.9 |           9.5 |         623 |         32.8 |
+| total  |       162200 |                       |               |        7586 |        551.8 |
 
 |   concurrent_cores |   wall_days |
 |-------------------:|------------:|
-|                100 |         3.1 |
+|                100 |         3.2 |
 |                500 |         0.6 |
 |               1000 |         0.3 |
 
@@ -255,7 +255,7 @@ M 5 vs 1). Metrics on valid pixels of `cum_current`: relative L2, max |Δ| / max
 
 **Recommendation (adopted in `configs/datasets/v1_0.yaml`, `omniscape_choice: fidelity`):**
 `block = largest odd integer ≤ radius/10` at every tier → S 1 (exact), M 3, L 5, XL 11, XXL 25
-(b/r 0.06–0.10). Costs per T4 solve: 52 / 134 / 577 / 1 896 / 7 784 s (S/M/L/XL/XXL), i.e. ≈ 3.3× the
+(b/r 0.06–0.10). Costs per T4 solve: 52 / 134 / 577 / 1 896 / 9 613 s (S/M/L/XL/XXL), i.e. ≈ 3.3× the
 Phase-5 blocks overall (§6.1 vs §6.2). The Phase-5 blocks (b/r 0.13–0.19, `phase5`) remain in the
 config as the cheaper alternative if the run location cannot afford the difference; the coarser
 XL 33 / XXL 65 blocks are rejected. Whatever option is run, `block_size` and `radius` are recorded

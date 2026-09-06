@@ -84,8 +84,8 @@ cost_measured:
   regions:      {S: 0.214}
   advanced:     {S: 0.074}            # scales ∝ pixels
   omniscape_by_option:               # seconds per solve; phase5 measured at S/M/L/XL/XXL; fidelity: S b1 and M b1
-    phase5:   {S: 6.19, M: 48.3, L: 178, XL: 794, XXL: 4468}     #   measured, others scaled by (b_phase5/b_fid)^2
-    fidelity: {S: 52.5, M: 134, L: 577, XL: 1896, XXL: 7784}     #   (law confirmed: XL 17->33 predicted x0.265, measured x0.28)
+    phase5:   {S: 6.19, M: 48.3, L: 178, XL: 794, XXL: 5517}     #   measured; XXL = median of 4 solves (4274-7488 s)
+    fidelity: {S: 52.5, M: 134, L: 577, XL: 1896, XXL: 9613}     #   L/XL/XXL scaled by (b_phase5/b_fid)^2 (law confirmed: XL 17->33 predicted x0.265, measured x0.28)
   overhead_fraction: 0.15             # Julia load/JIT, I/O, QC, finalize
 peak_rss_mb:    {S: 1450, M: 1360, L: 1620, XL: 3290, XXL: 9520}
 storage_mb_per_landscape:              # compressed HDF5, all configs, K ≤ 4 pair maps for ~half the point samples

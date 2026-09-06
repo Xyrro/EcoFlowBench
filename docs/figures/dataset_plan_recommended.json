@@ -1033,9 +1033,9 @@
   {
    "tier": "XXL",
    "landscapes": 400,
-   "cpu_s_per_landscape": 9111.5,
+   "cpu_s_per_landscape": 11214.9,
    "peak_rss_gb": 9.5,
-   "cpu_hours": 1012.0,
+   "cpu_hours": 1246.0,
    "storage_gb": 65.6
   },
   {
@@ -1043,9 +1043,9 @@
    "landscapes": 174400,
    "cpu_s_per_landscape": null,
    "peak_rss_gb": null,
-   "cpu_hours": 11075.0,
+   "cpu_hours": 11309.0,
    "storage_gb": 811.8
   }
  ],
- "total_cpu_hours": 11075.0
+ "total_cpu_hours": 11309.0
 }
