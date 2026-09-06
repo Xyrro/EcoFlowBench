@@ -1001,41 +1001,41 @@
   {
    "tier": "S",
    "landscapes": 100000,
-   "cpu_s_per_landscape": 7.6,
+   "cpu_s_per_landscape": 60.9,
    "peak_rss_gb": 1.4,
-   "cpu_hours": 212.0,
+   "cpu_hours": 1691.0,
    "storage_gb": 111.8
   },
   {
    "tier": "M",
    "landscapes": 50000,
-   "cpu_s_per_landscape": 57.8,
+   "cpu_s_per_landscape": 156.3,
    "peak_rss_gb": 1.4,
-   "cpu_hours": 802.0,
+   "cpu_hours": 2171.0,
    "storage_gb": 180.0
   },
   {
    "tier": "L",
    "landscapes": 20000,
-   "cpu_s_per_landscape": 214.3,
+   "cpu_s_per_landscape": 673.2,
    "peak_rss_gb": 1.6,
-   "cpu_hours": 1191.0,
+   "cpu_hours": 3740.0,
    "storage_gb": 260.0
   },
   {
    "tier": "XL",
    "landscapes": 4000,
-   "cpu_s_per_landscape": 948.0,
+   "cpu_s_per_landscape": 2215.3,
    "peak_rss_gb": 3.3,
-   "cpu_hours": 1053.0,
+   "cpu_hours": 2461.0,
    "storage_gb": 194.4
   },
   {
    "tier": "XXL",
    "landscapes": 400,
-   "cpu_s_per_landscape": 5298.1,
+   "cpu_s_per_landscape": 9111.5,
    "peak_rss_gb": 9.5,
-   "cpu_hours": 589.0,
+   "cpu_hours": 1012.0,
    "storage_gb": 65.6
   },
   {
@@ -1043,9 +1043,9 @@
    "landscapes": 174400,
    "cpu_s_per_landscape": null,
    "peak_rss_gb": null,
-   "cpu_hours": 3847.0,
+   "cpu_hours": 11075.0,
    "storage_gb": 811.8
   }
  ],
- "total_cpu_hours": 3847.0
+ "total_cpu_hours": 11075.0
 }

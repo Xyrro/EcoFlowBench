@@ -22,15 +22,16 @@ write_raw_currmap: true
 parallelize: false                   # parallelism is across samples
 parallel_batch_size: 10
 
-# per-tier window geometry, pixels (block_size must be odd). Measured 2026-09-05 (CHOLMOD, 1 process,
-# 4 cores, synthetic landscapes): S 6.2 s median (max 20 s); M 48 s (max 70 s); L 178 s (max 334 s);
-# XL with radius 128 / block 17 took 794 s median (max 1252 s) -> exceeds the 10-minute-per-solve
-# target, so XL uses block 33 (≈ 3.8x fewer windows) and XXL block 65. Cost ∝ (H·W / block²) × window solve.
-# XXL measured with radius 256 / block 33: 4 468 s (74 min) for one solve, 2.4 GB RSS -> block 65 (≈ 4x fewer
-# windows, ≈ 19 min estimated) is adopted so an XXL sample fits comfortably in a 4 h job.
+# per-tier window geometry, pixels (block_size must be odd). Fidelity study 2026-09-05
+# (docs/dataset_plan.md §7, 3 samples per tier, CHOLMOD): coarsening XL 17->33 changes cum_current by
+# 2.5-2.9 % relative L2 and XXL 33->65 by 5.9-11.9 % (rejected, > 1 %); the Phase-5 blocks deviate from
+# the exact block-1 map by 4.5 % (S, b/r 0.19) and 2.0 % (M, b/r 0.16). Adopted rule: block = largest odd
+# integer <= radius/10 (b/r <= 0.10). Measured/estimated seconds per T4 solve in the comments.
 tiers:
-  S:   {radius: 16,  block_size: 3}     # 1.6 km window at 100 m; 1 764 windows
-  M:   {radius: 32,  block_size: 5}     # 2 601 windows
-  L:   {radius: 64,  block_size: 9}     # 3 249 windows
-  XL:  {radius: 128, block_size: 33}    # 961 windows (was 17 -> 3 600 windows, 13 min median)
-  XXL: {radius: 256, block_size: 65}    # 992 windows (b33 measured: 3 844 windows, 74 min)
+  S:   {radius: 16,  block_size: 1}     # exact; 52 s measured
+  M:   {radius: 32,  block_size: 3}     # ~134 s (b1 measured 630-1548 s, b5 48 s)
+  L:   {radius: 64,  block_size: 5}     # ~577 s (b9 measured 178 s)
+  XL:  {radius: 128, block_size: 11}    # ~1 900 s (b17 measured 794 s)
+  XXL: {radius: 256, block_size: 25}    # ~7 800 s (b33 measured 4 468 s) -> one XXL sample per 4 h job
+# Phase-5 alternative (b/r 0.13-0.19, ~3.3x cheaper overall): S 3, M 5, L 9, XL 17, XXL 33 — kept in
+# configs/datasets/v1_0.yaml as `omniscape_options.phase5`; the mini dataset was generated with it.

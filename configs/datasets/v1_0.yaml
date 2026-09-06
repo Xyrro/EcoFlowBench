@@ -57,13 +57,25 @@ ood:
   test_ood_contrast: {contrast: 10000}                # synthetic contrast 1e4 never in train/val
   test_ood_synth2real: {flag: true}                   # subset flags, no extra samples
 
-# ---- per-tier Omniscape geometry (fidelity study pending; block/radius ratio ≈ 0.13) ----
-omniscape:
-  S:   {radius: 16,  block_size: 3}
-  M:   {radius: 32,  block_size: 5}
-  L:   {radius: 64,  block_size: 9}
-  XL:  {radius: 128, block_size: 17}
-  XXL: {radius: 256, block_size: 33}
+# ---- per-tier Omniscape geometry ----
+# Fidelity study (docs/dataset_plan.md §7): coarsening XL 17→33 changes cum_current by 2.5–2.9 % rel. L2,
+# XXL 33→65 by 5.9–11.9 %; the Phase-5 blocks themselves deviate from the exact block-1 solution by
+# 4.5 % (S, b/r 0.19) and 2.0 % (M, b/r 0.16). Recommended rule: block = largest odd integer ≤ radius/10
+# (b/r ≤ 0.10; S is exact). `phase5` is kept for cost comparison.
+omniscape_choice: fidelity
+omniscape_options:
+  phase5:      # b = odd nearest radius/8 (b/r 0.13–0.19)
+    S:   {radius: 16,  block_size: 3}
+    M:   {radius: 32,  block_size: 5}
+    L:   {radius: 64,  block_size: 9}
+    XL:  {radius: 128, block_size: 17}
+    XXL: {radius: 256, block_size: 33}
+  fidelity:    # b = largest odd ≤ radius/10 (b/r 0.06–0.10)
+    S:   {radius: 16,  block_size: 1}
+    M:   {radius: 32,  block_size: 3}
+    L:   {radius: 64,  block_size: 5}
+    XL:  {radius: 128, block_size: 11}
+    XXL: {radius: 256, block_size: 25}
 
 # ---- measured costs (Phase 5, CHOLMOD, single-threaded solves; seconds per solve) ----
 cost_measured:
@@ -71,7 +83,9 @@ cost_measured:
   wall_to_wall: {S: 0.079}            # scales ∝ pixels (b = 1.00)
   regions:      {S: 0.214}
   advanced:     {S: 0.074}            # scales ∝ pixels
-  omniscape:    {S: 6.19, M: 48.3, L: 178, XL: 794, XXL: 4468}   # at the block sizes above
+  omniscape_by_option:               # seconds per solve; phase5 measured at S/M/L/XL/XXL; fidelity: S b1 and M b1
+    phase5:   {S: 6.19, M: 48.3, L: 178, XL: 794, XXL: 4468}     #   measured, others scaled by (b_phase5/b_fid)^2
+    fidelity: {S: 52.5, M: 134, L: 577, XL: 1896, XXL: 7784}     #   (law confirmed: XL 17->33 predicted x0.265, measured x0.28)
   overhead_fraction: 0.15             # Julia load/JIT, I/O, QC, finalize
 peak_rss_mb:    {S: 1450, M: 1360, L: 1620, XL: 3290, XXL: 9520}
 storage_mb_per_landscape:              # compressed HDF5, all configs, K ≤ 4 pair maps for ~half the point samples

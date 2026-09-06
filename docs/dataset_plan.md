@@ -154,12 +154,32 @@ in-distribution splits contain no held-out biome, realm, table, tier or contrast
 ## 6. Cost table (measured on ICE, Phase 5)
 
 Per-solve medians (CHOLMOD, single-threaded, warm JIT): points K = 4 0.17 / 0.87 / 4.1 / 13.3 / 70.9 s
-(S/M/L/XL/XXL); T4 6.2 / 48 / 178 / 794 / 4 468 s at the Phase-5 block sizes (S b3 … XL b17, XXL b33);
+(S/M/L/XL/XXL); T4 6.2 / 48 / 178 / 794 / 4 468 s at the Phase-5 block sizes (S b3 … XL b17, XXL b33)
+and 52 / 134 / 577 / 1 896 / 7 784 s at the fidelity blocks (S b1 and M b1 measured, 630–1 548 s for
+M b1 → b3 scaled; L/XL/XXL scaled by (b_old/b_new)², a law the XL 17→33 pair confirms: predicted
+×0.265, measured ×0.28);
 T1W 0.08 s, T3 0.07 s, T1R 0.21 s at S, scaling linearly in pixels (exponents 1.00–1.07).
 Peak RSS (process high-water incl. ≈ 1 GB Julia baseline): 1.4 / 1.4 / 1.6 / 3.3 / 9.5 GB.
 Compressed storage per landscape (all configs): synthetic 0.93 / 3.0 / 11 / 41 / 140 MB, real ≈ 1.5×.
 
-### 6.1 Recommended ladder
+### 6.1 Recommended ladder, recommended Omniscape blocks (fidelity rule b/r ≤ 0.10, §7)
+
+| tier   |   landscapes |   cpu_s_per_landscape |   peak_rss_gb |   cpu_hours |   storage_gb |
+|:-------|-------------:|----------------------:|--------------:|------------:|-------------:|
+| S      |       100000 |                  60.9 |           1.4 |        1691 |        111.8 |
+| M      |        50000 |                 156.3 |           1.4 |        2171 |        180   |
+| L      |        20000 |                 673.2 |           1.6 |        3740 |        260   |
+| XL     |         4000 |                2215.3 |           3.3 |        2461 |        194.4 |
+| XXL    |          400 |                9111.5 |           9.5 |        1012 |         65.6 |
+| total  |       174400 |                       |               |       11075 |        811.8 |
+
+|   concurrent_cores |   wall_days |
+|-------------------:|------------:|
+|                100 |         4.6 |
+|                500 |         0.9 |
+|               1000 |         0.5 |
+
+### 6.2 Recommended ladder, Phase-5 Omniscape blocks (b/r 0.13–0.19) for comparison
 
 | tier   |   landscapes |   cpu_s_per_landscape |   peak_rss_gb |   cpu_hours |   storage_gb |
 |:-------|-------------:|----------------------:|--------------:|------------:|-------------:|
@@ -176,35 +196,70 @@ Compressed storage per landscape (all configs): synthetic 0.93 / 3.0 / 11 / 41 /
 |                500 |         0.3 |
 |               1000 |         0.2 |
 
-### 6.2 Brief baseline ladder
+### 6.3 Brief baseline ladder (fidelity blocks)
 
 | tier   |   landscapes |   cpu_s_per_landscape |   peak_rss_gb |   cpu_hours |   storage_gb |
 |:-------|-------------:|----------------------:|--------------:|------------:|-------------:|
-| S      |       100000 |                   7.6 |           1.4 |         212 |        111.8 |
-| M      |        50000 |                  57.8 |           1.4 |         802 |        180   |
-| L      |        10000 |                 214.3 |           1.6 |         595 |        130   |
-| XL     |         2000 |                 948   |           3.3 |         527 |         97.2 |
-| XXL    |          200 |                5298.1 |           9.5 |         294 |         32.8 |
-| total  |       162200 |                       |               |        2430 |        551.8 |
+| S      |       100000 |                  60.9 |           1.4 |        1691 |        111.8 |
+| M      |        50000 |                 156.3 |           1.4 |        2171 |        180   |
+| L      |        10000 |                 673.2 |           1.6 |        1870 |        130   |
+| XL     |         2000 |                2215.3 |           3.3 |        1231 |         97.2 |
+| XXL    |          200 |                9111.5 |           9.5 |         506 |         32.8 |
+| total  |       162200 |                       |               |        7469 |        551.8 |
 
 |   concurrent_cores |   wall_days |
 |-------------------:|------------:|
-|                100 |         1   |
-|                500 |         0.2 |
-|               1000 |         0.1 |
+|                100 |         3.1 |
+|                500 |         0.6 |
+|               1000 |         0.3 |
 
 CPU-hours are *core-hours of single-threaded solving* (+15 % overhead). Because solves are
 single-threaded, wall-clock at N concurrent cores = CPU-hours / N; memory (not cores) sets the
 allocation for XL/XXL (9.5 GB per XXL job). T4 is ≈ 90 % of every total. Omniscape block sizes are
-fixed on fidelity (§7); if the study supports coarser blocks at XL/XXL the totals fall by ≈ 25 %.
+fixed on fidelity (§7): XL keeps block 17 (coarser blocks change the maps by > 2 %), so the XL/XXL costs
+above are the ones to plan with.
 
 ## 7. Omniscape block size (fidelity study)
 
+Omniscape's `block_size` is part of the method definition (targets are block centres; cost ∝
+1/block²), so the benchmark must fix it explicitly and consistently. Two kinds of runs, 3 samples each,
+same radius, CHOLMOD: **coarsening tests** (standard block vs the cheaper block proposed in the Phase 5
+report: XL 17 vs 33, XXL 33 vs 65) and **anchors** against the exact block-1 Omniscape (S 3 vs 1,
+M 5 vs 1). Metrics on valid pixels of `cum_current`: relative L2, max |Δ| / max, Pearson r.
+
 <!-- BLOCK_STUDY -->
 
-*Pending: no block-study results yet.*
+| tier   |   radius | blocks   | b/r            | sample   |   rel_L2_cum |   max_diff/max_cum |   pearson_cum |   rel_L2_normalized |   t_fine_s |   t_coarse_s |
+|:-------|---------:|:---------|:---------------|:---------|-------------:|-------------------:|--------------:|--------------------:|-----------:|-------------:|
+| S      |       16 | 3 vs 1   | 0.188 vs 0.062 | 0012f547 |       0.0292 |             0.0525 |        0.9995 |              0.0427 |          8 |           52 |
+| S      |       16 | 3 vs 1   | 0.188 vs 0.062 | 04a5dd84 |       0.076  |             0.3004 |        0.9951 |              0.0318 |          9 |           55 |
+| S      |       16 | 3 vs 1   | 0.188 vs 0.062 | 04e6bec1 |       0.0294 |             0.0721 |        0.9995 |              0.0361 |          8 |           52 |
+| M      |       32 | 5 vs 1   | 0.156 vs 0.031 | 231ba336 |       0.0172 |             0.0923 |        0.9998 |              0.0275 |         37 |          810 |
+| M      |       32 | 5 vs 1   | 0.156 vs 0.031 | 23f6aecc |       0.0245 |             0.1573 |        0.9874 |              0.0041 |         67 |         1548 |
+| M      |       32 | 5 vs 1   | 0.156 vs 0.031 | 253f5565 |       0.0184 |             0.1257 |        0.9998 |              0.1373 |         28 |          630 |
+| XL     |      128 | 17 vs 33 | 0.133 vs 0.258 | 21041fe6 |       0.0223 |             0.1404 |        0.9996 |              0.0646 |        917 |          257 |
+| XL     |      128 | 17 vs 33 | 0.133 vs 0.258 | b26cfabc |       0.0293 |             0.1598 |        0.9992 |              0.0752 |        998 |          286 |
+| XL     |      128 | 17 vs 33 | 0.133 vs 0.258 | efc8cecf |       0.0225 |             0.1657 |        0.9788 |              0.0063 |       1692 |          447 |
+| XXL    |      256 | 33 vs 65 | 0.129 vs 0.254 | 3e481cda |       0.1061 |             0.1369 |        0.9921 |              0.0522 |       7488 |         1975 |
+| XXL    |      256 | 33 vs 65 | 0.129 vs 0.254 | a2818d9e |       0.1185 |             0.2391 |        0.9559 |              0.0922 |       6565 |         1657 |
+| XXL    |      256 | 33 vs 65 | 0.129 vs 0.254 | a64b2605 |       0.0591 |             0.2435 |        0.9972 |              0.065  |       4274 |         1143 |
 
+- **S anchor, block 3 vs 1 (radius 16, b/r 0.19 vs 0.06)**: the standard block 3 deviates from block 1 by 4.49% mean / 7.60% max relative L2 (Pearson ≥ 0.9951); block 1 costs 6.4× more.
+- **M anchor, block 5 vs 1 (radius 32, b/r 0.16 vs 0.03)**: the standard block 5 deviates from block 1 by 2.00% mean / 2.45% max relative L2 (Pearson ≥ 0.9874); block 1 costs 22.6× more.
+- **XL coarsening, block 17 vs 33 (radius 128, b/r 0.13 vs 0.26)**: relative L2 2.47% mean / 2.93% max (Pearson ≥ 0.9788); block 33 is 3.6× cheaper → NOT negligible (≥ 1 %): rejected.
+- **XXL coarsening, block 33 vs 65 (radius 256, b/r 0.13 vs 0.25)**: relative L2 9.46% mean / 11.85% max (Pearson ≥ 0.9559); block 65 is 3.8× cheaper → NOT negligible (≥ 1 %): rejected.
 
+**Reading.** Error grows monotonically with the block/radius ratio: b/r 0.19 → 4.5 % from exact (S),
+0.16 → 2.0 % (M), and doubling b/r from 0.13 to 0.26 changes `cum_current` by 2.5 % (XL) to 9.5 %
+(XXL). Extrapolating the anchors, staying within ≈ 1 % of the exact block-1 map needs **b/r ≤ 0.10**.
+
+**Recommendation (adopted in `configs/datasets/v1_0.yaml`, `omniscape_choice: fidelity`):**
+`block = largest odd integer ≤ radius/10` at every tier → S 1 (exact), M 3, L 5, XL 11, XXL 25
+(b/r 0.06–0.10). Costs per T4 solve: 52 / 134 / 577 / 1 896 / 7 784 s (S/M/L/XL/XXL), i.e. ≈ 3.3× the
+Phase-5 blocks overall (§6.1 vs §6.2). The Phase-5 blocks (b/r 0.13–0.19, `phase5`) remain in the
+config as the cheaper alternative if the run location cannot afford the difference; the coarser
+XL 33 / XXL 65 blocks are rejected. Whatever option is run, `block_size` and `radius` are recorded
+per sample and must be identical across all samples of a tier.
 
 ## 8. Portability
 

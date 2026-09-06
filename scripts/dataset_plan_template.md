@@ -103,18 +103,27 @@ in-distribution splits contain no held-out biome, realm, table, tier or contrast
 ## 6. Cost table (measured on ICE, Phase 5)
 
 Per-solve medians (CHOLMOD, single-threaded, warm JIT): points K = 4 0.17 / 0.87 / 4.1 / 13.3 / 70.9 s
-(S/M/L/XL/XXL); T4 6.2 / 48 / 178 / 794 / 4 468 s at the Phase-5 block sizes (S b3 … XL b17, XXL b33);
+(S/M/L/XL/XXL); T4 6.2 / 48 / 178 / 794 / 4 468 s at the Phase-5 block sizes (S b3 … XL b17, XXL b33)
+and 52 / 134 / 577 / 1 896 / 7 784 s at the fidelity blocks (S b1 and M b1 measured, 630–1 548 s for
+M b1 → b3 scaled; L/XL/XXL scaled by (b_old/b_new)², a law the XL 17→33 pair confirms: predicted
+×0.265, measured ×0.28);
 T1W 0.08 s, T3 0.07 s, T1R 0.21 s at S, scaling linearly in pixels (exponents 1.00–1.07).
 Peak RSS (process high-water incl. ≈ 1 GB Julia baseline): 1.4 / 1.4 / 1.6 / 3.3 / 9.5 GB.
 Compressed storage per landscape (all configs): synthetic 0.93 / 3.0 / 11 / 41 / 140 MB, real ≈ 1.5×.
 
-### 6.1 Recommended ladder
+### 6.1 Recommended ladder, recommended Omniscape blocks (fidelity rule b/r ≤ 0.10, §7)
 
 {cost_rec}
 
 {wall_rec}
 
-### 6.2 Brief baseline ladder
+### 6.2 Recommended ladder, Phase-5 Omniscape blocks (b/r 0.13–0.19) for comparison
+
+{cost_rec_p5}
+
+{wall_rec_p5}
+
+### 6.3 Brief baseline ladder (fidelity blocks)
 
 {cost_brief}
 
@@ -123,15 +132,34 @@ Compressed storage per landscape (all configs): synthetic 0.93 / 3.0 / 11 / 41 /
 CPU-hours are *core-hours of single-threaded solving* (+15 % overhead). Because solves are
 single-threaded, wall-clock at N concurrent cores = CPU-hours / N; memory (not cores) sets the
 allocation for XL/XXL (9.5 GB per XXL job). T4 is ≈ 90 % of every total. Omniscape block sizes are
-fixed on fidelity (§7); if the study supports coarser blocks at XL/XXL the totals fall by ≈ 25 %.
+fixed on fidelity (§7): XL keeps block 17 (coarser blocks change the maps by > 2 %), so the XL/XXL costs
+above are the ones to plan with.
 
 ## 7. Omniscape block size (fidelity study)
+
+Omniscape's `block_size` is part of the method definition (targets are block centres; cost ∝
+1/block²), so the benchmark must fix it explicitly and consistently. Two kinds of runs, 3 samples each,
+same radius, CHOLMOD: **coarsening tests** (standard block vs the cheaper block proposed in the Phase 5
+report: XL 17 vs 33, XXL 33 vs 65) and **anchors** against the exact block-1 Omniscape (S 3 vs 1,
+M 5 vs 1). Metrics on valid pixels of `cum_current`: relative L2, max |Δ| / max, Pearson r.
 
 <!-- BLOCK_STUDY -->
 
 {block_study}
 
 {block_verdict}
+
+**Reading.** Error grows monotonically with the block/radius ratio: b/r 0.19 → 4.5 % from exact (S),
+0.16 → 2.0 % (M), and doubling b/r from 0.13 to 0.26 changes `cum_current` by 2.5 % (XL) to 9.5 %
+(XXL). Extrapolating the anchors, staying within ≈ 1 % of the exact block-1 map needs **b/r ≤ 0.10**.
+
+**Recommendation (adopted in `configs/datasets/v1_0.yaml`, `omniscape_choice: fidelity`):**
+`block = largest odd integer ≤ radius/10` at every tier → S 1 (exact), M 3, L 5, XL 11, XXL 25
+(b/r 0.06–0.10). Costs per T4 solve: 52 / 134 / 577 / 1 896 / 7 784 s (S/M/L/XL/XXL), i.e. ≈ 3.3× the
+Phase-5 blocks overall (§6.1 vs §6.2). The Phase-5 blocks (b/r 0.13–0.19, `phase5`) remain in the
+config as the cheaper alternative if the run location cannot afford the difference; the coarser
+XL 33 / XXL 65 blocks are rejected. Whatever option is run, `block_size` and `radius` are recorded
+per sample and must be identical across all samples of a tier.
 
 ## 8. Portability
 

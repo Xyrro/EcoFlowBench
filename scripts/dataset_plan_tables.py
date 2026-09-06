@@ -17,8 +17,11 @@ TIERS = ["S", "M", "L", "XL", "XXL"]
 PIX = {"S": 128**2, "M": 256**2, "L": 512**2, "XL": 1024**2, "XXL": 2048**2}
 
 
-def per_solve_seconds(cfg: dict, config: str, tier: str) -> float:
-    m = cfg["cost_measured"][config]
+def per_solve_seconds(cfg: dict, config: str, tier: str, omni_option: str | None = None) -> float:
+    if config == "omniscape":
+        m = cfg["cost_measured"]["omniscape_by_option"][omni_option or cfg["omniscape_choice"]]
+    else:
+        m = cfg["cost_measured"][config]
     if tier in m:
         return float(m[tier])
     # scale from S linearly in pixels (measured exponents 1.00–1.07 for these configs)
@@ -61,7 +64,8 @@ def config_counts(cfg: dict, land: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def cost_table(cfg: dict, land: pd.DataFrame, conf: pd.DataFrame, omni_scale: dict | None = None) -> pd.DataFrame:
+def cost_table(cfg: dict, land: pd.DataFrame, conf: pd.DataFrame, omni_scale: dict | None = None,
+               omni_option: str | None = None) -> pd.DataFrame:
     oh = 1 + cfg["cost_measured"]["overhead_fraction"]
     rows = []
     land = land[land.stratum != "(distinct tiles)"]
@@ -71,7 +75,7 @@ def cost_table(cfg: dict, land: pd.DataFrame, conf: pd.DataFrame, omni_scale: di
         sec = 0.0
         for r in conf[conf.tier == t].itertuples():
             key = "points" if r.config.startswith("points") else ("wall_to_wall" if r.config.startswith("wall") else r.config)
-            s = per_solve_seconds(cfg, key, t)
+            s = per_solve_seconds(cfg, key, t, omni_option)
             if key == "omniscape" and omni_scale and t in omni_scale:
                 s *= omni_scale[t]
             sec += s * r.solves
@@ -98,14 +102,16 @@ def main() -> None:
     ap.add_argument("--ladder", default="recommended", choices=["recommended", "brief"])
     ap.add_argument("--omniscape-scale", default="", help="e.g. XL=0.265,XXL=0.258 to price a coarser block")
     ap.add_argument("--json", default=None)
+    ap.add_argument("--omniscape-option", default=None, help="phase5 | fidelity (default: omniscape_choice in the config)")
     args = ap.parse_args()
     cfg = yaml.safe_load(open(args.config))
     ladder = cfg[f"{args.ladder}_ladder"]
     land = landscape_counts(cfg, ladder)
     conf = config_counts(cfg, land)
     oscale = {kv.split("=")[0]: float(kv.split("=")[1]) for kv in args.omniscape_scale.split(",") if kv}
-    cost = cost_table(cfg, land, conf, oscale or None)
-    print(f"## Ladder: {args.ladder} {ladder}\n")
+    opt = args.omniscape_option or cfg["omniscape_choice"]
+    cost = cost_table(cfg, land, conf, oscale or None, opt)
+    print(f"## Ladder: {args.ladder} {ladder}; Omniscape option: {opt} {cfg['omniscape_options'][opt]}\n")
     print("### Landscapes per tier × family × stratum/table\n")
     piv = land.pivot_table(index=["family", "stratum", "table"], columns="tier", values="landscapes", aggfunc="sum", fill_value=0)[TIERS]
     piv["total"] = piv.sum(axis=1)
@@ -117,7 +123,7 @@ def main() -> None:
     nl = land[land.stratum != "(distinct tiles)"]
     print(f"\nTotal landscapes: {int(nl.landscapes.sum()):,}; total solves: {int(conf.solves.sum()):,}; "
           f"real tiles: {land[land.stratum == '(distinct tiles)'].set_index('tier').landscapes.to_dict()}")
-    print("\n### Cost (measured Phase 5, CHOLMOD, single-threaded solves, +15 % overhead)\n")
+    print(f"\n### Cost (measured Phase 5, CHOLMOD, single-threaded solves, +15 % overhead; Omniscape option '{opt}')\n")
     print(cost.to_markdown(index=False))
     total_h = float(cost[cost.tier == "total"].cpu_hours.iloc[0])
     print("\n### Wall-clock for the full ladder\n")
