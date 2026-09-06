@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Phase 6 — 2026-09-06
+- `ampscape/io/schema.py`: HDF5 shard schema v0.2 (`MetaModel`, `validate_shard`, `docs/schema.md`); `zarr_export.py`.
+- `ampscape/io/sync.py` + `scripts/sync_shards.py`: validate → upload → sha256-verify → delete (dry-run default, pushes gated).
+- `ampscape/splits`: 20° macro-cell assignment shared across tiers, straddling exclusion, footprint safety net, seed-family
+  splits, OOD flags/holdouts, `splits/*.parquet` written by `generate.py finalize`; cross-tier overlap test.
+- Plan amendments C1–C5 in `configs/datasets/v1_0.yaml` and `docs/dataset_plan.md`; mini regenerated under the radius/10
+  rule (S block 1, version 0.2.0-mini); old mini kept as `mini_phase5blocks`.
+
 ### Rename — 2026-09-06
 - EcoFlowBench → **AmpScape**: package `ampscape`, `AmpScapeSolve.jl`, `Xirro/AmpScape`, `AMPSCAPE_*` env vars, CLI `ampscape`;
   scratch path and history unchanged. `CITATION.cff` and `docs/dataset_card.md` (draft) added under the new name.

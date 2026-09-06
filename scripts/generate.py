@@ -111,7 +111,10 @@ def cmd_solve(a) -> None:
     build = pathlib.Path(a.build)
     p = shard_paths(build, a.shard)
     p["outputs"].parent.mkdir(parents=True, exist_ok=True)
-    tmp = os.environ.get("TMPDIR", "/tmp")
+    # per-job working directory: node-local $TMPDIR when the job sets it, else $AMPSCAPE_SCRATCH/cache/<job>
+    job = os.environ.get("SLURM_JOB_ID", f"local-{os.getpid()}")
+    tmp = os.environ.get("TMPDIR") or str(pathlib.Path(os.environ.get("AMPSCAPE_SCRATCH", ROOT)) / "cache" / job)
+    pathlib.Path(tmp).mkdir(parents=True, exist_ok=True)
     cmd = julia_cmd(p["inputs"], p["outputs"], tmp, a.solver, a.fallback, a.omniscape_solver, a.max,
                     configs=a.configs, force=a.force)
     print(" ".join(cmd))

@@ -355,14 +355,18 @@ end
 
 function solve_omniscape(R::AbstractMatrix, nodata::AbstractMatrix{Bool}, S::AbstractMatrix;
                          radius::Int, block_size::Int, solver = "cg+amg", precision = "double",
-                         source_threshold = 0.0, four_neighbors = false, correct_artifacts = true)
+                         source_threshold = 0.0, four_neighbors = false, correct_artifacts = true,
+                         workdir = mktempdir())
+    # Omniscape creates `project_name` in the CURRENT DIRECTORY even with write_outputs = false (and
+    # suffixes _1, _2, ... when it exists). Point it at a per-solve temp dir and remove it afterwards.
+    project = joinpath(workdir, "omniscape_project")
     H, W = size(R)
     Rw = Float64.(R); Rw[nodata] .= NODATA
     Sw = Float64.(S); Sw[nodata] .= NODATA
     Rm = missingarray(Rw, Float64, NODATA)
     Sm = missingarray(Sw, Float64, NODATA)
     cfg = Dict{String,String}(
-        "radius" => string(radius), "block_size" => string(block_size), "project_name" => "ampscape",
+        "radius" => string(radius), "block_size" => string(block_size), "project_name" => project,
         "source_threshold" => string(source_threshold), "source_from_resistance" => "false",
         "resistance_is_conductance" => "false", "r_cutoff" => "Inf", "buffer" => "0",
         "calc_flow_potential" => "true", "calc_normalized_current" => "true",
@@ -387,6 +391,7 @@ function solve_omniscape(R::AbstractMatrix, nodata::AbstractMatrix{Bool}, S::Abs
     st.wall_s = t
     st.maxrss_mb = Sys.maxrss() / 2^20
     st.converged = res !== nothing
+    rm(project; recursive = true, force = true)
     res === nothing && return OmniscapeResult(zeros(Float32, H, W), zeros(Float32, H, W), zeros(Float32, H, W), st)
     tofloat(a) = clean_map(missingarray_to_array(a, NODATA))
     return OmniscapeResult(tofloat(res[1]), tofloat(res[2]), tofloat(res[3]), st)
@@ -421,7 +426,7 @@ function warmup(; tmproot = tempdir())
         for sol in ("cholmod", "cg+amg")
             solve_pairwise(R, nd, focal; solver = sol, fallback = nothing, workdir = mktempdir(tmproot))
             solve_advanced(R, nd, S, G; solver = sol, fallback = nothing, workdir = mktempdir(tmproot))
-            solve_omniscape(R, nd, S; radius = 3, block_size = 1, solver = sol)
+            solve_omniscape(R, nd, S; radius = 3, block_size = 1, solver = sol, workdir = mktempdir(tmproot))
         end
     end
     @info @sprintf("warm-up (JIT) done in %.1f s", t)
@@ -504,7 +509,7 @@ function solve_shard(inputs_h5::AbstractString, outputs_h5::AbstractString; solv
                     S = h5_hw(gc, "source_strength")
                     radius = Int(attrs(gin)["omni_radius"]); bs = Int(attrs(gin)["omni_block_size"])
                     thr = haskey(attrs(gc), "source_threshold") ? Float64(attrs(gc)["source_threshold"]) : 0.0
-                    res = solve_omniscape(R, nodata, S; radius, block_size = bs, solver = omniscape_solver, source_threshold = thr)
+                    res = solve_omniscape(R, nodata, S; radius, block_size = bs, solver = omniscape_solver, source_threshold = thr, workdir = wd)
                     h5_hw!(og, "cum_current", res.cum_current)
                     h5_hw!(og, "flow_potential", res.flow_potential)
                     h5_hw!(og, "normalized", res.normalized)
