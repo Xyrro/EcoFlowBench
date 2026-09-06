@@ -40,22 +40,53 @@ configs_per_landscape:
   points:          {tasks: [T1, T2], per_landscape: 1, families: [synthetic, real]}
   wall_to_wall_NS: {tasks: [T1W],    per_landscape: 1, families: [synthetic, real]}
   wall_to_wall_EW: {tasks: [T1W],    per_landscape: 1, families: [synthetic, real]}
-  regions:         {tasks: [T1R],    per_landscape: 0.4, families: [real]}        # where ≥ 2 habitat patches exist (pilot: 38 %)
+  regions:         {tasks: [T1R],    per_landscape: 0.4, families: [real, synthetic_mosaic]}   # real: where ≥ 2 habitat patches (pilot 38 %);
+                                                                                        # synthetic: patch-mosaic landscapes (C5), patches = lowest-cost class
   advanced:        {tasks: [T3],     per_landscape: 1, families: [synthetic, real]}
   omniscape:       {tasks: [T4],     per_landscape: 1, families: [synthetic, real]}
 four_neighbour_ablation: {tier: S, fraction_of_synthetic: 0.05}   # extra solves flagged graph_connectivity = 4
 
-# ---- splits (by tile / seed family) ----
+# ---- splits ----
+# Real landscapes: the globe is partitioned into spatial blocks; each block gets ONE assignment
+# (train / val / test_id / ood_region) from the dataset seed, applied at every tier, so a test region at
+# any resolution never overlaps a training region at any other resolution (amendment C1, 2026-09-06).
+# Synthetic landscapes: by seed family (base seed + derived variants share the split).
 splits:
   train: 0.8
   val: 0.1
   test_id: 0.1
+  spatial_block: {kind: "lonlat_grid", size_deg: 20.0}  # 20°×20° macro-cells (≈ 2 200 km at the equator, larger than an XXL
+                                                        # tile); tiles straddling cells with different assignments are
+                                                        # excluded (resampled by the sampler); footprint rule as safety net
+  seed: 20260906
+  xl_trainval_share: 0.25            # C3: 25 % of XL landscapes are train/val (in-distribution), 75 % test
+  tier_disjoint_seeds: true          # synthetic seed ranges never overlap across tiers
 ood:
-  test_ood_region:  {hold_out_biomes: ["Montane Grasslands & Shrublands", "Mangroves"], hold_out_realms: ["Australasia"]}
-  test_ood_scale:   {tiers: [XL, XXL]}                # never in train/val
+  test_ood_region:  {hold_out_biomes: ["Montane Grasslands & Shrublands", "Mangroves"], hold_out_biome_nums: [10, 14], hold_out_realms: ["Australasia"]}
+  test_ood_scale:   {tiers: [XL, XXL], definition: "XL/XXL test landscapes evaluated by models trained on tiers ≤ L only; the 25 % XL train/val slice exists for models that do train at XL (in-distribution XL test = test_id at XL)"}
   test_ood_table:   {table: forest_bird}              # never in train/val
   test_ood_contrast: {contrast: 10000}                # synthetic contrast 1e4 never in train/val
   test_ood_synth2real: {flag: true}                   # subset flags, no extra samples
+
+# ---- resampling rules per source layer per tier (C2; recorded in every sample's provenance as `resampling`) ----
+resampling:
+  landcover:      {source_res_m: 10,   rule: majority}     # WorldCover class: modal class over the target pixel footprint
+  elevation:      {source_res_m: 30,   rule: mean}         # Copernicus DEM: area mean (bilinear at S where 100 m ≈ 3 source px)
+  slope:          {source_res_m: 30,   rule: derived_after}  # computed from the resampled elevation on the target grid
+  road_distance:  {source_res_m: vector, rule: min}        # rasterise roads at the target grid with all_touched, then EDT (= min distance)
+  road_class:     {source_res_m: vector, rule: nearest_feature}
+  river_distance: {source_res_m: vector, rule: min}
+  river_order:    {source_res_m: vector, rule: nearest_feature}
+  ghm:            {source_res_m: 1000, rule: mean}         # bilinear when target ≤ 1 km, area mean when target > 1 km
+  notes: "majority for categorical, mean for continuous fields, min for distances; S tier (100 m) uses bilinear for continuous
+          30 m/1 km sources; M–XXL use GDAL average/mode resampling over the exact footprint"
+
+# ---- download subsets (C4; PGLearn-style, nested: mini ⊂ core ⊂ full, fixed splits) ----
+subsets:
+  mini: {target_gb: 0.5, tiers: [S], landscapes: 500, description: "quick start; all tasks and families"}
+  core: {target_gb: 50, tiers: [S, M, L], description: "all tasks and families, S–L, stratified subsample with all OOD sets"}
+  full: {target_gb: 810, tiers: [S, M, L, XL, XXL]}
+hf_layout: "data/{tier}/{task_group}/shard-NNNNN.h5 + index/{tier}.parquet + splits/{subset}/{split}.parquet, so any tier or task group downloads alone"
 
 # ---- per-tier Omniscape geometry ----
 # Fidelity study (docs/dataset_plan.md §7): coarsening XL 17→33 changes cum_current by 2.5–2.9 % rel. L2,

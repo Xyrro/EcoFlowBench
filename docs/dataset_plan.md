@@ -141,15 +141,63 @@ in-distribution splits contain no held-out biome, realm, table, tier or contrast
 
 ## 5. Split design and leakage rules
 
-- **Unit for real landscapes = tile.** All 5 tables and all source configurations of a tile share one
-  split. Tiles of the same 3° WorldCover cell that overlap spatially are merged into one unit.
+- **Spatial macro-cells shared across tiers (owner amendment C1).** Tiers are multi-resolution, so S/M
+  tiles physically sit inside XL/XXL tiles. The globe is partitioned into 20° × 20° lon/lat macro-cells
+  (≈ 2 200 km, larger than an XXL tile so every tile of every tier can lie inside one cell); each cell
+  receives exactly one assignment — `train`, `val`, `test_id`, or `ood_region` — from the dataset seed
+  (`splits.seed = 20260906`), stratified by realm so that every realm contributes to every split. The
+  assignment is applied **at every tier**: a landscape belongs to the split of the cell containing its
+  tile. Tiles whose footprint straddles cells with different assignments are **excluded and resampled**
+  by the tile sampler (a sampler constraint, not a cascade); as a safety net the footprint rule (the
+  test-most assignment among touched cells wins, propagated to a fixed point) is still applied, so a
+  test region at any resolution never overlaps a training region at any other resolution. Held-out
+  biomes / realms (`test_ood_region`) are whole cells. A 5°-cell variant was tried first and rejected:
+  with straddling XL/XXL tiles the footprint cascade turned most of the globe into test.
+  `ampscape/splits` implements this; `tests/test_splits.py` checks zero cross-tier overlap on 1 640
+  random tiles over five tiers and that the kept proportions stay near 80/10/10.
 - **Unit for synthetic landscapes = seed family.** A base seed defines the landscape; its 4-neighbour
-  ablation duplicate and any hard-case variant derived from the same base seed inherit the split.
-- **No cross-tier leakage of real tiles:** a real tile centre used at tier S is not re-used at M/L
-  (tiles are sampled independently per tier with a 50 km exclusion radius around every existing centre).
-- **Synthetic seeds are tier-disjoint** (seed ranges partitioned per tier).
-- Split assignment is a deterministic hash of the unit key with the dataset seed, so re-planning
-  reproduces the same splits; the lists are shipped as Parquet (`splits/*.parquet`).
+  ablation duplicate and any hard-case variant derived from it inherit the split. Seed ranges are
+  tier-disjoint.
+- **XL (owner amendment C3):** 25 % of XL landscapes (by block assignment) are train/val so that models
+  can be trained at XL; `test_ood_scale` is defined as the XL/XXL test landscapes evaluated by models
+  trained on tiers ≤ L only, while the in-distribution XL test for XL-trained models is `test_id` at XL.
+  XXL remains test-only.
+- Split assignment is a deterministic function of (block id, dataset seed), so re-planning reproduces
+  the same splits; the lists ship as Parquet (`splits/<subset>/<split>.parquet`), nested so that the
+  mini splits are subsets of core, and core of full (owner amendment C4).
+
+### 5.1 Resampling rules per source layer (owner amendment C2)
+
+Recorded in every sample's provenance (`meta.resampling`) with the source resolution:
+
+| channel | source | rule |
+|---|---|---|
+| landcover | WorldCover 10 m | **majority** class over the target pixel footprint |
+| elevation | Copernicus DEM 30 m | **mean** (bilinear at 100 m, area mean at ≥ 200 m); slope derived on the target grid |
+| road_distance / river_distance | GRIP4 / HydroRIVERS vectors | rasterise at the target grid (all touched) then Euclidean distance = **min** distance |
+| road_class / river_order | vectors | attribute of the **nearest feature** |
+| ghm | gHM 1 km | **mean** (bilinear at ≤ 1 km, area mean above) |
+
+The Phase 2 extractor implements the S-tier (100 m) rules; majority/area-mean resampling for
+M–XXL is a Phase 6 change to `landscapes/real.py` (GDAL mode/average).
+
+### 5.2 Download subsets (owner amendment C4)
+
+| subset | tiers | size | content |
+|---|---|---|---|
+| `mini` | S | ≈ 0.5 GB | ≈ 500 landscapes, all tasks and families, every split represented |
+| `core` | S, M, L | ≈ 50 GB | stratified subsample, all tasks/families/tables/generators, all OOD sets |
+| `full` | S–XXL | ≈ 810 GB | everything |
+
+Splits are fixed and nested (mini ⊂ core ⊂ full). HF layout: `data/<tier>/<task_group>/shard-NNNNN.h5`,
+`index/<tier>.parquet`, `splits/<subset>/<split>.parquet`, so any single tier or task group can be
+downloaded alone (`load_dataset("Xirro/AmpScape", "T1_S")`).
+
+### 5.3 T1R on synthetic landscapes (owner amendment C5)
+
+Focal regions are also generated on synthetic **patch-mosaic** landscapes (the `mosaic` generator and
+`patch_mosaic` overlays): patches of the lowest-cost class ≥ `min_patch_px` act as habitat patches,
+using the same `sample_regions` code path as real tiles.
 
 ## 6. Cost table (measured on ICE, Phase 5)
 

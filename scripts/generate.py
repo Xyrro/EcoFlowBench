@@ -193,14 +193,21 @@ def cmd_finalize(a) -> None:
         p["index"].parent.mkdir(parents=True, exist_ok=True)
         idx.to_parquet(p["index"], index=False)
         n_fail = int((~idx.qc_pass).sum())
+        from ampscape.io.sync import validate as validate_and_mark
+
+        valid = validate_and_mark(p["final"])
         print(f"shard {sh}: {idx.sample_id.nunique()} samples, {len(idx)} configs, {n_fail} QC failures, "
-              f"{p['final'].stat().st_size/1e6:.1f} MB")
+              f"{p['final'].stat().st_size/1e6:.1f} MB, schema {'OK' if valid else 'INVALID (see .invalid)'}")
         if a.quicklooks:
             shard_quicklooks(str(p["final"]), str(p["quicklooks"]))
     parts = sorted((build / "index").glob("shard-*.parquet"))
     if parts:
         full = pd.concat([pd.read_parquet(x) for x in parts], ignore_index=True)
+        from ampscape.splits.assign import add_splits
+
+        full = add_splits(full, build)
         full.to_parquet(build / "index.parquet", index=False)
+        print("splits:", full.groupby("split").sample_id.nunique().to_dict())
         (build / "stats").mkdir(exist_ok=True)
         full[["sample_id", "config", "kind", "family", "tier", "H", "W", "K", "solver", "solve_time_s", "maxrss_mb"]].to_parquet(
             build / "stats" / "solve_times.parquet", index=False)
