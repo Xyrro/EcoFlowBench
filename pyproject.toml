@@ -41,6 +41,7 @@ dependencies = [
   "juliacall==0.9.35",
   "numba==0.67.0",
   "tabulate==0.10.0",
+  "mlcroissant>=1.1.0",
 ]
 
 [project.optional-dependencies]

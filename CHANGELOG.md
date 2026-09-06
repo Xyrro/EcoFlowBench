@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Phase 7 — 2026-09-06
+- `ampscape/data`: `AmpScapeDataset` (lazy shards, torch adapter, train-only normalisation stats, subsets, OOD filters),
+  `load_from_hub`; `ampscape/io/hf_layout.py` (per-tier × task-group shards, index, nested splits); `subsets.py`.
+- `scripts/export_croissant.py` (Croissant 1.0 + RAI, validated), `scripts/push_to_hub.py` (create private repo, verified uploads,
+  dry-run default), `docs/dataset_card.md` draft; mini staged in `data/hf/AmpScape` (38 files, 300 MB).
+- Splits revised to hierarchical regions (equal-width 20° grid + XXL footprints); ICE feasibility note; paper note on mini skew.
+
 ### Phase 6 — 2026-09-06
 - `ampscape/io/schema.py`: HDF5 shard schema v0.2 (`MetaModel`, `validate_shard`, `docs/schema.md`); `zarr_export.py`.
 - `ampscape/io/sync.py` + `scripts/sync_shards.py`: validate → upload → sha256-verify → delete (dry-run default, pushes gated).

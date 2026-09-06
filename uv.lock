@@ -8,6 +8,15 @@ resolution-markers = [
 ]
 
 [[package]]
+name = "absl-py"
+version = "2.5.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d0/4f/d79676ab82f2e42fc3611618139f13a9c4c31d0cff4b486982047679a802/absl_py-2.5.0.tar.gz", hash = "sha256:0c996f25c0490700fadabe6351630f6111534fa0ae252cc6d2014ea3b141135f", size = 118119, upload-time = "2026-07-03T10:57:48.157Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/58/0a/a10b45aab35b175aded078a462dc8d0c698f5b13946e7cb0869097b78bb6/absl_py-2.5.0-py3-none-any.whl", hash = "sha256:0f17b89f2a4eaaedc4f28c622998aa690564b3012a396a4ffad0821007fe03ba", size = 137410, upload-time = "2026-07-03T10:57:46.735Z" },
+]
+
+[[package]]
 name = "affine"
 version = "3.0.1"
 source = { registry = "https://pypi.org/simple" }
@@ -76,6 +85,92 @@ sdist = { url = "https://files.pythonhosted.org/packages/61/62/06741b57915636024
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fb/76/641ae371508676492379f16e2fa48f4e2c11741bd63c48be4b12a6b09cba/aiosignal-1.4.0-py3-none-any.whl", hash = "sha256:053243f8b92b990551949e63930a839ff0cf0b0ebbe0597b0f3fb19e1a0fe82e", size = 7490, upload-time = "2025-07-03T22:54:42.156Z" },
 ]
+
+[[package]]
+name = "ampscape"
+version = "0.0.1"
+source = { editable = "." }
+dependencies = [
+    { name = "datasets" },
+    { name = "geopandas" },
+    { name = "h5py" },
+    { name = "huggingface-hub" },
+    { name = "joblib" },
+    { name = "juliacall" },
+    { name = "lightning" },
+    { name = "matplotlib" },
+    { name = "mlcroissant" },
+    { name = "neuraloperator" },
+    { name = "nlmpy" },
+    { name = "numba" },
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "pyarrow" },
+    { name = "pydantic" },
+    { name = "pyproj" },
+    { name = "pyyaml" },
+    { name = "rasterio" },
+    { name = "scikit-image" },
+    { name = "scipy" },
+    { name = "shapely" },
+    { name = "tabulate" },
+    { name = "torch" },
+    { name = "torch-geometric" },
+    { name = "torchvision" },
+    { name = "tqdm" },
+    { name = "xarray" },
+    { name = "zarr" },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "ipykernel" },
+    { name = "jupyter" },
+    { name = "pre-commit" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "datasets", specifier = "==5.0.1" },
+    { name = "geopandas", specifier = "==1.1.4" },
+    { name = "h5py", specifier = "==3.16.0" },
+    { name = "huggingface-hub", specifier = "==1.30.0" },
+    { name = "ipykernel", marker = "extra == 'dev'", specifier = "==7.3.0" },
+    { name = "joblib", specifier = "==1.6.0" },
+    { name = "juliacall", specifier = "==0.9.35" },
+    { name = "jupyter", marker = "extra == 'dev'", specifier = "==1.1.1" },
+    { name = "lightning", specifier = "==2.6.5" },
+    { name = "matplotlib", specifier = "==3.11.1" },
+    { name = "mlcroissant", specifier = ">=1.1.0" },
+    { name = "neuraloperator", specifier = "==2.0.0" },
+    { name = "nlmpy", specifier = "==1.2.0" },
+    { name = "numba", specifier = "==0.67.0" },
+    { name = "numpy", specifier = "==2.4.6" },
+    { name = "pandas", specifier = "==3.0.5" },
+    { name = "pre-commit", marker = "extra == 'dev'", specifier = "==4.6.2" },
+    { name = "pyarrow", specifier = "==25.0.1" },
+    { name = "pydantic", specifier = "==2.13.5" },
+    { name = "pyproj", specifier = "==3.7.2" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = "==9.1.1" },
+    { name = "pytest-cov", marker = "extra == 'dev'", specifier = "==7.1.0" },
+    { name = "pyyaml", specifier = "==6.0.3" },
+    { name = "rasterio", specifier = "==1.4.4" },
+    { name = "ruff", marker = "extra == 'dev'", specifier = "==0.16.6" },
+    { name = "scikit-image", specifier = "==0.26.0" },
+    { name = "scipy", specifier = "==1.17.1" },
+    { name = "shapely", specifier = "==2.1.2" },
+    { name = "tabulate", specifier = "==0.10.0" },
+    { name = "torch", specifier = "==2.14.0" },
+    { name = "torch-geometric", specifier = "==2.8.0.post1" },
+    { name = "torchvision", specifier = "==0.29.0" },
+    { name = "tqdm", specifier = "==4.70.0" },
+    { name = "xarray", specifier = "==2026.7.0" },
+    { name = "zarr", specifier = "==3.1.6" },
+]
+provides-extras = ["dev"]
 
 [[package]]
 name = "annotated-types"
@@ -554,6 +649,15 @@ wheels = [
 ]
 
 [[package]]
+name = "decorator"
+version = "5.3.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/60/8b/32f9823da46cde7df2087faa08cd98d01b908f8dcab982cdba9c84e85355/decorator-5.3.1.tar.gz", hash = "sha256:4cbcdd55a6efadb9dbea26b858f4fb3264567b52d69ca0d25b721b553f60ea82", size = 58084, upload-time = "2026-05-18T06:03:28.057Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/05/7f/798705f5296a58ca505d600456748d1be48078eac8a7050d8a98bc9edb89/decorator-5.3.1-py3-none-any.whl", hash = "sha256:f47fe6fdbd2edd623ecfe36875d37aba411624e2670dd395dddae1358689bb3c", size = 10365, upload-time = "2026-05-18T06:03:26.517Z" },
+]
+
+[[package]]
 name = "defusedxml"
 version = "0.7.1"
 source = { registry = "https://pypi.org/simple" }
@@ -593,88 +697,20 @@ wheels = [
 ]
 
 [[package]]
-name = "ampscape"
-version = "0.0.1"
-source = { editable = "." }
-dependencies = [
-    { name = "datasets" },
-    { name = "geopandas" },
-    { name = "h5py" },
-    { name = "huggingface-hub" },
-    { name = "joblib" },
-    { name = "juliacall" },
-    { name = "lightning" },
-    { name = "matplotlib" },
-    { name = "neuraloperator" },
-    { name = "nlmpy" },
-    { name = "numba" },
-    { name = "numpy" },
-    { name = "pandas" },
-    { name = "pyarrow" },
-    { name = "pydantic" },
-    { name = "pyproj" },
-    { name = "pyyaml" },
-    { name = "rasterio" },
-    { name = "scikit-image" },
-    { name = "scipy" },
-    { name = "shapely" },
-    { name = "tabulate" },
-    { name = "torch" },
-    { name = "torch-geometric" },
-    { name = "torchvision" },
-    { name = "tqdm" },
-    { name = "xarray" },
-    { name = "zarr" },
+name = "etils"
+version = "1.14.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/26/ce/6e067242fde898841922ac6fc82b0bb2fe35c38e995880bdffdfbe30182a/etils-1.14.0.tar.gz", hash = "sha256:8136e7f4c4173cd0af0ca5481c4475152f0b8686192951eefa60ee8711e1ede4", size = 108127, upload-time = "2026-03-04T17:41:36.291Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5a/3d/589663aeeacd59bb2f3e8596bfd3e81cf0fb18d70bb433199041f469771b/etils-1.14.0-py3-none-any.whl", hash = "sha256:b5df7341f54dbe1405a4450b2741207b4a8c279780402b45f87202b94dfc52b4", size = 172934, upload-time = "2026-03-04T17:41:35.01Z" },
 ]
 
 [package.optional-dependencies]
-dev = [
-    { name = "ipykernel" },
-    { name = "jupyter" },
-    { name = "pre-commit" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "ruff" },
+epath = [
+    { name = "fsspec" },
+    { name = "typing-extensions" },
+    { name = "zipp" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "datasets", specifier = "==5.0.1" },
-    { name = "geopandas", specifier = "==1.1.4" },
-    { name = "h5py", specifier = "==3.16.0" },
-    { name = "huggingface-hub", specifier = "==1.30.0" },
-    { name = "ipykernel", marker = "extra == 'dev'", specifier = "==7.3.0" },
-    { name = "joblib", specifier = "==1.6.0" },
-    { name = "juliacall", specifier = "==0.9.35" },
-    { name = "jupyter", marker = "extra == 'dev'", specifier = "==1.1.1" },
-    { name = "lightning", specifier = "==2.6.5" },
-    { name = "matplotlib", specifier = "==3.11.1" },
-    { name = "neuraloperator", specifier = "==2.0.0" },
-    { name = "nlmpy", specifier = "==1.2.0" },
-    { name = "numba", specifier = "==0.67.0" },
-    { name = "numpy", specifier = "==2.4.6" },
-    { name = "pandas", specifier = "==3.0.5" },
-    { name = "pre-commit", marker = "extra == 'dev'", specifier = "==4.6.2" },
-    { name = "pyarrow", specifier = "==25.0.1" },
-    { name = "pydantic", specifier = "==2.13.5" },
-    { name = "pyproj", specifier = "==3.7.2" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = "==9.1.1" },
-    { name = "pytest-cov", marker = "extra == 'dev'", specifier = "==7.1.0" },
-    { name = "pyyaml", specifier = "==6.0.3" },
-    { name = "rasterio", specifier = "==1.4.4" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = "==0.16.6" },
-    { name = "scikit-image", specifier = "==0.26.0" },
-    { name = "scipy", specifier = "==1.17.1" },
-    { name = "shapely", specifier = "==2.1.2" },
-    { name = "tabulate", specifier = "==0.10.0" },
-    { name = "torch", specifier = "==2.14.0" },
-    { name = "torch-geometric", specifier = "==2.8.0.post1" },
-    { name = "torchvision", specifier = "==0.29.0" },
-    { name = "tqdm", specifier = "==4.70.0" },
-    { name = "xarray", specifier = "==2026.7.0" },
-    { name = "zarr", specifier = "==3.1.6" },
-]
-provides-extras = ["dev"]
 
 [[package]]
 name = "executing"
@@ -1062,6 +1098,17 @@ sdist = { url = "https://files.pythonhosted.org/packages/e4/7d/05c46a96a78147ae3
 wheels = [
     { url = "https://files.pythonhosted.org/packages/eb/be/59527c99478aade6bb33a68d72e6e18dd4e6ff6eacfc7d01bdb15bc76912/json5-0.15.0-py3-none-any.whl", hash = "sha256:56636a30c0e8a4665fe2179c0212f32eae3796dea89ea6f649b9436ecdb39618", size = 36570, upload-time = "2026-06-19T20:08:26.748Z" },
 ]
+
+[[package]]
+name = "jsonpath-rw"
+version = "1.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "decorator" },
+    { name = "ply" },
+    { name = "six" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/71/7c/45001b1f19af8c4478489fbae4fc657b21c4c669d7a5a036a86882581d85/jsonpath-rw-1.4.0.tar.gz", hash = "sha256:05c471281c45ae113f6103d1268ec7a4831a2e96aa80de45edc89b11fac4fbec", size = 13814, upload-time = "2015-04-19T01:47:15.06Z" }
 
 [[package]]
 name = "jsonpointer"
@@ -1514,6 +1561,28 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/7b/92/328a294a6de83bacb95bed01f04e0eaff4e3616ee359fc821a5dfc539b02/mistune-3.3.4.tar.gz", hash = "sha256:58b5c96d6fcb61190dfe5fae498d2b2065f99cf61e9649418fd54cf1ada86dfe", size = 121426, upload-time = "2026-07-22T05:22:30.89Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/77/e4/288365afae98953bc01de09f686f40d8ee84578135aa7767d5d4e60b5278/mistune-3.3.4-py3-none-any.whl", hash = "sha256:ee015381e955e370962968befe1d729ab60fafb6a715ac6751763fbce38c8d4a", size = 66862, upload-time = "2026-07-22T05:22:29.419Z" },
+]
+
+[[package]]
+name = "mlcroissant"
+version = "1.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "absl-py" },
+    { name = "etils", extra = ["epath"] },
+    { name = "jsonpath-rw" },
+    { name = "networkx" },
+    { name = "pandas" },
+    { name = "pandas-stubs" },
+    { name = "python-dateutil" },
+    { name = "rdflib" },
+    { name = "requests" },
+    { name = "scipy" },
+    { name = "tqdm" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ad/94/67287557ad889c85d37700bed09b33f1be8b7a272a5d0dbb84f4a697e7b0/mlcroissant-1.1.0.tar.gz", hash = "sha256:fd4a5fc875fa1531fabe4c131acdf8aaf9428fd69583cc51a7a5c23262b48259", size = 111643, upload-time = "2026-04-16T13:18:44.302Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/dd/f9/9d4602e4346e4d6625e67ddcfd1ebd8d7d13860025bde43c8ed8149758e5/mlcroissant-1.1.0-py2.py3-none-any.whl", hash = "sha256:46f9ab72fc193e1e3730dbbd872eb8cdf07ca16e854578c5c30c2aad2854423a", size = 155405, upload-time = "2026-04-16T13:18:42.718Z" },
 ]
 
 [[package]]
@@ -1982,6 +2051,18 @@ wheels = [
 ]
 
 [[package]]
+name = "pandas-stubs"
+version = "3.0.5.260730"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c2/d2/dea4a3a56b7b5f69c5fbca9f14625fcf28e1a39a657e9833d4a10bcac593/pandas_stubs-3.0.5.260730.tar.gz", hash = "sha256:f70a232c57d93a5a2c81f8a53953e10891a5374bc92652277deb325e2e4d0ff3", size = 114631, upload-time = "2026-07-30T14:31:42.271Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/60/c2/959caec5c46f484b5f8bb6def4b0cf7a45ba6acda26f12b75142d98cc5ae/pandas_stubs-3.0.5.260730-py3-none-any.whl", hash = "sha256:60e90e3e1eda6937e337e243cbe6217e151c11137cd7eddf832af537c7310bfd", size = 174807, upload-time = "2026-07-30T14:31:41.17Z" },
+]
+
+[[package]]
 name = "pandocfilters"
 version = "1.5.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2049,6 +2130,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f9/e2/3e91f31a7d2b083fe6ef3fa267035b518369d9511ffab804f839851d2779/pluggy-1.6.0.tar.gz", hash = "sha256:7dcc130b76258d33b90f61b658791dede3486c3e6bfb003ee5c9bfb396dd22f3", size = 69412, upload-time = "2025-05-15T12:30:07.975Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/54/20/4d324d65cc6d9205fabedc306948156824eb9f0ee1633355a8f7ec5c66bf/pluggy-1.6.0-py3-none-any.whl", hash = "sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746", size = 20538, upload-time = "2025-05-15T12:30:06.134Z" },
+]
+
+[[package]]
+name = "ply"
+version = "3.11"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e5/69/882ee5c9d017149285cab114ebeab373308ef0f874fcdac9beb90e0ac4da/ply-3.11.tar.gz", hash = "sha256:00c7c1aaa88358b9c765b6d3000c6eec0ba42abca5351b095321aef446081da3", size = 159130, upload-time = "2018-02-15T19:01:31.097Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a3/58/35da89ee790598a0700ea49b2a66594140f44dec458c07e8e3d4979137fc/ply-3.11-py2.py3-none-any.whl", hash = "sha256:096f9b8350b65ebd2fd1346b12452efe5b9607f7482813ffca50c22722a807ce", size = 49567, upload-time = "2018-02-15T19:01:27.172Z" },
 ]
 
 [[package]]
@@ -2478,6 +2568,18 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/f9/77/3869a426f6e752dde13f3868cdf16253ca0214f92107db79c1583c9aa07b/rasterio-1.4.4-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:e24b7b8c2df801dde2a1dffb44c58902bd76b5cab740dc11de4ff9963992a71a", size = 35881871, upload-time = "2025-12-12T17:59:09.779Z" },
     { url = "https://files.pythonhosted.org/packages/66/d0/3818859ddbd3750d0ef5a6580a3272e81764286d943c689dd41e49b8b786/rasterio-1.4.4-cp311-cp311-win_amd64.whl", hash = "sha256:0718630f607be2f5742d8e4b34b434746fd788a192d77eefc9bb924399fea802", size = 25716477, upload-time = "2025-12-12T17:59:13.519Z" },
     { url = "https://files.pythonhosted.org/packages/4b/02/039eb4970c93aaef4c9eb1ee159abad18e6e7f932c2eed575c95f78d94f6/rasterio-1.4.4-cp311-cp311-win_arm64.whl", hash = "sha256:0308ff4762ae9eb40a991f12d758626b59af4376b13675480391dd7295d17bbf", size = 24075993, upload-time = "2025-12-12T17:59:16.407Z" },
+]
+
+[[package]]
+name = "rdflib"
+version = "7.6.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyparsing" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/98/f5/18bb77b7af9526add0c727a3b2048959847dc5fb030913e2918bf384fec3/rdflib-7.6.0.tar.gz", hash = "sha256:6c831288d5e4a5a7ece85d0ccde9877d512a3d0f02d7c06455d00d6d0ea379df", size = 4943826, upload-time = "2026-02-13T07:15:55.938Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/10/c2/6604a71269e0c1bd75656d5a001432d16f2cc5b8c057140ec797155c295e/rdflib-7.6.0-py3-none-any.whl", hash = "sha256:30c0a3ebf4c0e09215f066be7246794b6492e054e782d7ac2a34c9f70a15e0dd", size = 615416, upload-time = "2026-02-13T07:15:46.487Z" },
 ]
 
 [[package]]
@@ -3228,4 +3330,13 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b9/5a/6b2b80e9ae7e6ee50deab6e9c10dfaa62350da2dfb483c428b582d975a72/zencfg-1.0.0.tar.gz", hash = "sha256:6444d176cbd936436ca4941672313b29ff331a8da187d2d5375f4ef8a5fb349a", size = 35565, upload-time = "2026-08-26T02:46:33.639Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/cc/a0/6ab8e9beaa4aad4c1b089d3f037be89ef45c7d8606314a9bbbde1210dd82/zencfg-1.0.0-py3-none-any.whl", hash = "sha256:4de6210dc32f2a6b2bec7f44b66ca5318f9899d0bd3f9806840707afd86bf29e", size = 37730, upload-time = "2026-08-26T02:46:32.38Z" },
+]
+
+[[package]]
+name = "zipp"
+version = "4.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b9/d8/eab98a517c14134c0b2eb4e2387bc5f457334293ec5d2dd3857ec2966802/zipp-4.1.0.tar.gz", hash = "sha256:4cb57381f544315db7688e976e922a2b18cdb513d21cc194eb42232ba2a3e602", size = 26214, upload-time = "2026-05-18T20:08:57.967Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3a/13/547360d81e6d88d58492968ffda9f9542854f11310ee556fef14260cc886/zipp-4.1.0-py3-none-any.whl", hash = "sha256:25ad4e16390cd314347dd8f1de67a2ac538ae658ed4ab9db16029c07c188e97f", size = 10238, upload-time = "2026-05-18T20:08:57.045Z" },
 ]
