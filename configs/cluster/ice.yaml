@@ -1,11 +1,11 @@
 # Cluster profile: Georgia Tech PACE-ICE (pipeline development, mini and dev shards only).
-# Selected with `--profile ice` (scripts/generate.py) or EFB_CLUSTER_PROFILE=ice. Nothing in the
+# Selected with `--profile ice` (scripts/generate.py) or AMPSCAPE_CLUSTER_PROFILE=ice. Nothing in the
 # scripts should hard-code these values; add a new file here for another cluster.
 profile_id: ice
 scheduler: slurm
 account: coc                 # sbatch --account (null = scheduler default)
 qos: null                    # sbatch --qos
-scratch_root: /storage/ice1/1/8/yxiao413/EcoFlowBench     # EFB_SCRATCH; repo lives here
+scratch_root: /storage/ice1/1/8/yxiao413/EcoFlowBench     # AMPSCAPE_SCRATCH; repo lives here
 node_tmp: /tmp               # node-local scratch used for Circuitscape ASCII grids
 modules:                     # `module load` before anything else (empty list = nothing to load)
   - julia/1.11.3

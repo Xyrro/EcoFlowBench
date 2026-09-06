@@ -1,4 +1,4 @@
-"""Merge an inputs shard and its Julia outputs into the final EcoFlowBench HDF5 shard + index rows.
+"""Merge an inputs shard and its Julia outputs into the final AmpScape HDF5 shard + index rows.
 
 Final layout follows docs/task_specification.md §4: one group per sample::
 
@@ -22,7 +22,7 @@ import h5py
 import numpy as np
 import pandas as pd
 
-from ecoflowbench.solve.qc import qc_advanced, qc_omniscape, qc_pairwise, qc_pass
+from ampscape.solve.qc import qc_advanced, qc_omniscape, qc_pairwise, qc_pass
 
 KIND_TASK = {"points": "T1,T2", "wall_to_wall": "T1W", "regions": "T1R", "advanced": "T3", "omniscape": "T4"}
 GZIP = {"compression": "gzip", "compression_opts": 4, "shuffle": True}

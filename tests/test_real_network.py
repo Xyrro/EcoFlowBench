@@ -1,4 +1,4 @@
-"""Network tests for the real-tile pipeline; run with EFB_NETWORK_TESTS=1 on the login node."""
+"""Network tests for the real-tile pipeline; run with AMPSCAPE_NETWORK_TESTS=1 on the login node."""
 
 from __future__ import annotations
 
@@ -7,10 +7,10 @@ import os
 import numpy as np
 import pytest
 
-from ecoflowbench.landscapes import real
+from ampscape.landscapes import real
 
-pytestmark = pytest.mark.skipif(os.environ.get("EFB_NETWORK_TESTS") != "1",
-                                reason="set EFB_NETWORK_TESTS=1 to run tests that read public COGs")
+pytestmark = pytest.mark.skipif(os.environ.get("AMPSCAPE_NETWORK_TESTS") != "1",
+                                reason="set AMPSCAPE_NETWORK_TESTS=1 to run tests that read public COGs")
 
 
 @pytest.mark.network

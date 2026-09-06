@@ -1,7 +1,7 @@
 # Resistance tables
 
-YAML tables consumed by `ecoflowbench.resistance` (schema: `tables.py::ResistanceTable`).
-Values are **EcoFlowBench's own expert-style parameterisations**: the *ordering* of classes and
+YAML tables consumed by `ampscape.resistance` (schema: `tables.py::ResistanceTable`).
+Values are **AmpScape's own expert-style parameterisations**: the *ordering* of classes and
 the *form* of each term follow the cited literature, but the numeric values are not copied
 from any single study (published tables are species- and region-specific). Bowman et al. (2020)
 show current-density maps are robust to the magnitudes as long as ranks are preserved, which

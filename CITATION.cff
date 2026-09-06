@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use AmpScape, please cite it as below."
+title: "AmpScape: a benchmark for learned surrogates of circuit-theoretic landscape connectivity"
+type: dataset
+authors:
+  - family-names: Xiao
+    given-names: Yao
+version: 0.1.0-mini
+date-released: "2026-09-06"
+repository-code: "https://github.com/Xyrro/AmpScape"
+url: "https://huggingface.co/datasets/Xirro/AmpScape"
+license: CC-BY-4.0
+keywords: [landscape connectivity, Circuitscape, Omniscape, surrogate models, neural operators, benchmark]

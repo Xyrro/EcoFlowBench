@@ -1,7 +1,7 @@
-# EcoFlowBench v1.0 — complete, compute-agnostic design (docs/dataset_plan.md is generated from this file
+# AmpScape v1.0 — complete, compute-agnostic design (docs/dataset_plan.md is generated from this file
 # by scripts/dataset_plan_tables.py). Counts are LANDSCAPES (one landscape = one resistance raster);
 # every landscape is solved for every applicable source configuration / task, so task counts follow.
-dataset_id: ecoflowbench-v1.0
+dataset_id: ampscape-v1.0
 tiers:
   S:   {size: 128,  pixel_m: 100}
   M:   {size: 256,  pixel_m: 100}

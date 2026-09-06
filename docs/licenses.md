@@ -1,7 +1,7 @@
 # Upstream data sources: availability, licences, redistribution
 
 Verified 2026-09-05 from the primary download pages / bucket manifests (Phase 2 pilot scope).
-"Derived rasters" = per-tile covariate channels EcoFlowBench stores (class codes, elevation,
+"Derived rasters" = per-tile covariate channels AmpScape stores (class codes, elevation,
 slope, distance-to-road, distance-to-river, gHM) — never the original source tiles.
 
 | Layer | Version / year | Access (verified) | Licence (verified) | Redistribute derived rasters? | Notes |

@@ -1,7 +1,7 @@
 # generic_hm — continuous human-modification transform: R = 1 + a * gHM^b
 # Form follows the practice of deriving mammal movement resistance from the global Human
 # Modification index (Brennan et al. 2022, Science 376:1101, doi:10.1126/science.abl8974, used
-# gHM-based resistance with Omniscape); the exponent/scale here are EcoFlowBench choices so that
+# gHM-based resistance with Omniscape); the exponent/scale here are AmpScape choices so that
 # gHM = 0 -> 1 and gHM = 1 -> 1000 (a convex transform emphasising heavily modified land).
 # gHM source: Kennedy et al. 2019, Global Change Biology 25:811, doi:10.1111/gcb.14549.
 table_id: generic_hm

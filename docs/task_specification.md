@@ -1,4 +1,4 @@
-# EcoFlowBench task specification (v0.1, Phase 1)
+# AmpScape task specification (v0.1, Phase 1)
 
 Status: **v0.2, owner-reviewed 2026-09-05**. Remaining ⚠ items are Phase 5 measurements (Omniscape
 window sizes and solver), see §9.
@@ -61,7 +61,7 @@ Verified from `Circuitscape.jl 5.17.1/src/raster/pairwise.jl::construct_graph` a
    c_i = max( Σ_j max(i_ji, 0), Σ_j max(i_ij, 0) ), which for non-source nodes equals
    ½ Σ_j |i_ij| and at a unit source/ground equals 1.
 6. **Disconnected components.** If a focal node lies in a component without any other focal
-   node, Circuitscape reports Reff = −1. EcoFlowBench forbids this: source generators resample
+   node, Circuitscape reports Reff = −1. AmpScape forbids this: source generators resample
    until all K focal nodes share one connected component (Phase 4); samples violating this fail QC.
 7. **Raster geometry.** Rasters are stored north-up, row-major (C order), with CRS, affine
    transform and pixel size recorded in metadata. Synthetic samples carry a nominal CRS
@@ -256,7 +256,7 @@ CG+AMG is deterministic single-threaded, which is why `parallelize = false` insi
 
 ## 9. Open questions — resolved by the owner on 2026-09-05
 
-1. **Storage/compute.** Off-cluster destination = private HF dataset repo `Xirro/EcoFlowBench`;
+1. **Storage/compute.** Off-cluster destination = private HF dataset repo `Xirro/AmpScape`;
    shards are validated → uploaded → checksum-verified → deleted locally; local working set
    < 150 GB. Per-tier storage estimate and feasible v1.0 ladder: `docs/compute_env.md` §10.
 2. **Per-pair maps:** stored only for K ≤ 4 (P ≤ 6). K > 4 samples store `cum_current` and

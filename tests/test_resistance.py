@@ -8,8 +8,8 @@ import numpy as np
 import pytest
 import yaml
 
-from ecoflowbench.landscapes.real import CHANNELS, WORLDCOVER_CLASSES
-from ecoflowbench.resistance import ResistanceTable, apply_table, load_tables, perturb_table
+from ampscape.landscapes.real import CHANNELS, WORLDCOVER_CLASSES
+from ampscape.resistance import ResistanceTable, apply_table, load_tables, perturb_table
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 TABLE_DIR = ROOT / "configs" / "resistance_tables"
@@ -159,7 +159,7 @@ def test_random_table_reproducible(tables):
 def test_all_tables_on_all_pilot_tiles(tables):
     import pandas as pd
 
-    from ecoflowbench.landscapes.real import read_tile
+    from ampscape.landscapes.real import read_tile
 
     df = pd.read_parquet(PILOT / "tiles.parquet")
     df = df[df["qc_accept"]]

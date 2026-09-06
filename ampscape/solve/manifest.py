@@ -51,7 +51,7 @@ def sample_uuid(dataset_id: str, family: str, key: str) -> str:
 def plan_synthetic(dataset_id: str, n: int, tier: str, seed0: int, configs=DEFAULT_CONFIGS,
                    shard_size: int = 50, shard0: int = 0) -> list[SampleSpec]:
     """n synthetic landscapes from the documented prior (seeds seed0..seed0+n-1)."""
-    from ecoflowbench.landscapes.synthetic import sample_landscape
+    from ampscape.landscapes.synthetic import sample_landscape
 
     out = []
     for i in range(n):

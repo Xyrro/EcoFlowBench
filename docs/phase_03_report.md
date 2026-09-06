@@ -7,8 +7,8 @@ source configurations). Same summary in `docs/status/latest.md`.
 
 | Item | Location |
 |---|---|
-| YAML resistance-table schema (pydantic), covariates → resistance mapping with a fixed combination order, NoData handling | `ecoflowbench/resistance/tables.py` |
-| Random perturbed tables (log-normal jitter, seeded, provenance recorded) | `ecoflowbench/resistance/random_table.py` |
+| YAML resistance-table schema (pydantic), covariates → resistance mapping with a fixed combination order, NoData handling | `ampscape/resistance/tables.py` |
+| Random perturbed tables (log-normal jitter, seeded, provenance recorded) | `ampscape/resistance/random_table.py` |
 | Five tables with literature citations in the headers | `configs/resistance_tables/{generic_hm,large_mammal,amphibian,forest_bird,random_lm_20260905}.yaml` + `README.md` |
 | Build script: all tables × all accepted tiles → 2-band GeoTIFFs, `resistance.parquet` (stats + table sha256), summary JSON, gallery | `scripts/build_resistance.py` |
 | Tests (11): schema validation and rejection, value ranges, mask consistency, determinism, each term's behaviour (roads, slope, water, elevation bands, gHM curve), random-table reproducibility, all tables on all pilot tiles | `tests/test_resistance.py` |
@@ -50,7 +50,7 @@ source configurations). Same summary in `docs/status/latest.md`.
    landscapes (mean r_min ≈ 15). The dynamic range across tables (log10 contrast 1.5–2.5 on
    average, up to 3) already spans two of the four contrast levels; synthetic landscapes cover
    the rest.
-3. All table values are EcoFlowBench's own choices with literature-based ordering (README in the
+3. All table values are AmpScape's own choices with literature-based ordering (README in the
    table directory states this explicitly, as does `DECISIONS.md`), to avoid implying that
    any published species table was reproduced.
 
@@ -65,6 +65,6 @@ source configurations). Same summary in `docs/status/latest.md`.
 
 ## Next step (Phase 4, on confirmation)
 
-`ecoflowbench/sources/`: point pairs (K ∈ [2,8], min separation), wall-to-wall strips, habitat-
+`ampscape/sources/`: point pairs (K ∈ [2,8], min separation), wall-to-wall strips, habitat-
 patch focal regions (WDPA-free default), advanced-mode source/ground rasters, Omniscape source
 rasters, connectivity check against the resistance graph; tests on synthetic + pilot resistance.

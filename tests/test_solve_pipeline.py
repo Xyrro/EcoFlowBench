@@ -9,16 +9,16 @@ import h5py
 import numpy as np
 import pytest
 
-from ecoflowbench.solve.manifest import (
+from ampscape.solve.manifest import (
     DEFAULT_CONFIGS,
     from_frame,
     plan_synthetic,
     sample_uuid,
     to_frame,
 )
-from ecoflowbench.solve.prepare import omni_params, prepare_shard
-from ecoflowbench.solve.qc import qc_advanced, qc_omniscape, qc_pairwise, qc_pass
-from ecoflowbench.sources import SourceConfig
+from ampscape.solve.prepare import omni_params, prepare_shard
+from ampscape.solve.qc import qc_advanced, qc_omniscape, qc_pairwise, qc_pass
+from ampscape.sources import SourceConfig
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 CFG = SourceConfig.from_yaml(ROOT / "configs" / "tasks" / "sources_default.yaml")
@@ -112,7 +112,7 @@ def test_qc_advanced_and_omniscape():
 
 @pytest.mark.skipif(not (ROOT / "data" / "devtest" / "shard-00000.outputs.h5").exists(), reason="dev outputs not present")
 def test_finalize_dev_shard(tmp_path):
-    from ecoflowbench.solve.finalize import finalize_shard
+    from ampscape.solve.finalize import finalize_shard
 
     idx = finalize_shard(str(ROOT / "data/devtest/shard-00000.inputs.h5"), str(ROOT / "data/devtest/shard-00000.outputs.h5"),
                          str(tmp_path / "final.h5"), "test", {"solver": "cholmod"})

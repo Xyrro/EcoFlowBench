@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
-from ecoflowbench.landscapes import real  # noqa: E402
+from ampscape.landscapes import real  # noqa: E402
 
 
 def main() -> None:
@@ -50,7 +50,7 @@ def main() -> None:
     ax.set_ylim(-60, 80)
     ax.set_xlabel("lon")
     ax.set_ylabel("lat")
-    ax.set_title(f"EcoFlowBench {args.prefix} tiles: {len(ok)} accepted, {ok['biome_num'].nunique()} biomes, "
+    ax.set_title(f"AmpScape {args.prefix} tiles: {len(ok)} accepted, {ok['biome_num'].nunique()} biomes, "
                  f"{ok['realm'].nunique()} realms, {ok['stratum'].nunique()} strata")
     ax.legend(fontsize=6, loc="lower left", ncol=2, framealpha=0.9)
     fig.tight_layout()

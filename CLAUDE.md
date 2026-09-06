@@ -1,7 +1,7 @@
-# EcoFlowBench — project conventions for Claude Code
+# AmpScape — project conventions for Claude Code
 
 ## Identity
-- Project name: **EcoFlowBench**. Python package `ecoflowbench`, Julia package `EcoFlowBenchSolve.jl`, Hugging Face dataset `Xirro/EcoFlowBench` (private during development).
+- Project name: **AmpScape**. Python package `ampscape`, Julia package `AmpScapeSolve.jl`, Hugging Face dataset `Xirro/AmpScape` (private during development).
 - Master specification: `docs/TASK_BRIEF.md`. Read it fully before doing anything. It is the source of truth for scope, tasks, formats, and acceptance criteria.
 - Owner: the user. Communicate in English. Be concise in chat; be thorough in files.
 
@@ -18,7 +18,7 @@
 ## Compute environment: Georgia Tech PACE-ICE (Slurm)
 - Before writing any job script, inspect the cluster (`sinfo`, `scontrol show partition`, `sacctmgr show qos`, `module avail`, `pace-quota`, `nvidia-smi` on a GPU node if available) and record findings in `docs/compute_env.md`.
 - Home directory quota is small. Put all data, the Julia depot (`JULIA_DEPOT_PATH`), package caches, and Python environments under the scratch directory. Never write large files to `$HOME`.
-- Scratch may be purged periodically and is capped at 300 GB. Finished shards are synced to the private HF dataset repo `Xirro/EcoFlowBench` (validate → upload → checksum-verify → delete locally); keep the local working set under 150 GB.
+- Scratch may be purged periodically and is capped at 300 GB. Finished shards are synced to the private HF dataset repo `Xirro/AmpScape` (validate → upload → checksum-verify → delete locally); keep the local working set under 150 GB.
 - Assume compute nodes have **no internet access**. Downloads, package installs, and Hugging Face pushes run on the login node only, never inside `sbatch` jobs.
 - Login nodes are shared: do not run heavy computation on them. Anything more than a few minutes of CPU goes through Slurm.
 - Generation jobs must be resumable: Slurm job arrays, ≤ 4 hours per job, one shard per job, skip shards that already exist and validate.
@@ -32,5 +32,5 @@
 - Deleting data.
 
 ## Environment variables (owner fills in)
-- `EFB_SCRATCH=/storage/ice1/1/8/yxiao413/EcoFlowBench` path to the scratch working directory
+- `AMPSCAPE_SCRATCH=/storage/ice1/1/8/yxiao413/EcoFlowBench` path to the scratch working directory
 - `HF_ORG=Xirro` Hugging Face organization or username

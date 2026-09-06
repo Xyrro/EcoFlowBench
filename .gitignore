@@ -45,7 +45,7 @@ logs/
 .env
 *.token
 
-# EcoFlowBench scratch-local tooling (never commit)
+# AmpScape scratch-local tooling (never commit)
 tools/
 .uv_cache/
 .pip_cache/

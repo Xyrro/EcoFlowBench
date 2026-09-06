@@ -19,7 +19,7 @@ import subprocess
 
 import numpy as np
 
-from ecoflowbench.landscapes import real
+from ampscape.landscapes import real
 
 for k, v in real.env_gdal().items():
     os.environ.setdefault(k, v)

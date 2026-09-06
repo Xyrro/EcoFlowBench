@@ -19,7 +19,7 @@ import pathlib
 import geopandas as gpd
 import numpy as np
 
-from ecoflowbench.landscapes import sampling
+from ampscape.landscapes import sampling
 
 
 def main() -> None:

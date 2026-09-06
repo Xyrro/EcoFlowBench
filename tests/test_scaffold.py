@@ -15,17 +15,17 @@ SUBPACKAGES = [
 
 
 def test_package_imports():
-    import ecoflowbench
+    import ampscape
 
-    assert ecoflowbench.__version__ == "0.0.1"
+    assert ampscape.__version__ == "0.0.1"
     for name in SUBPACKAGES:
-        mod = importlib.import_module(f"ecoflowbench.{name}")
-        assert mod.__doc__, f"ecoflowbench.{name} has no docstring"
+        mod = importlib.import_module(f"ampscape.{name}")
+        assert mod.__doc__, f"ampscape.{name} has no docstring"
 
 
 def test_layout_matches_brief():
     for d in ["configs/tasks", "configs/landscapes", "configs/resistance_tables",
-              "configs/solver", "configs/datasets", "julia/EcoFlowBenchSolve.jl/src",
+              "configs/solver", "configs/datasets", "julia/AmpScapeSolve.jl/src",
               "scripts", "tests", "docs", "notebooks", "paper"]:
         assert (ROOT / d).is_dir(), d
 
@@ -38,9 +38,9 @@ def test_dependencies_are_pinned():
 
 
 def test_julia_project_pins_solvers():
-    proj = tomllib.loads((ROOT / "julia/EcoFlowBenchSolve.jl/Project.toml").read_text())
+    proj = tomllib.loads((ROOT / "julia/AmpScapeSolve.jl/Project.toml").read_text())
     assert {"Circuitscape", "Omniscape"} <= set(proj["deps"])
-    manifest = (ROOT / "julia/EcoFlowBenchSolve.jl/Manifest.toml").read_text()
+    manifest = (ROOT / "julia/AmpScapeSolve.jl/Manifest.toml").read_text()
     assert "[[deps.Circuitscape]]" in manifest and "[[deps.Omniscape]]" in manifest
 
 

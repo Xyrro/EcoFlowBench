@@ -4,7 +4,7 @@
 # because flying dispersers are less constrained than terrestrial ones.
 # Qualitative structure: circuit-theory studies of forest passerines emphasising edge/open-land
 # crossing costs (Landscape Ecology 2014, doi:10.1007/s10980-014-0019-x) and urban bird
-# connectivity (Landscape Ecology 2020, PMC6979508). Numeric values are EcoFlowBench choices.
+# connectivity (Landscape Ecology 2020, PMC6979508). Numeric values are AmpScape choices.
 table_id: forest_bird
 version: 1
 description: "tree 1, mangrove 2, shrub 5, wetland 6, grass 15, crop 20, bare 30, water 20, built 60; roads 1-20; elevation bands x1/x2/x4"

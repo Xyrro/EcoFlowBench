@@ -1,8 +1,8 @@
 using Test
-using EcoFlowBenchSolve
+using AmpScapeSolve
 
-@testset "EcoFlowBenchSolve skeleton" begin
-    v = EcoFlowBenchSolve.solver_versions()
+@testset "AmpScapeSolve skeleton" begin
+    v = AmpScapeSolve.solver_versions()
     @test v.julia == string(VERSION)
     @test v.circuitscape != "unknown"
     @test v.omniscape != "unknown"

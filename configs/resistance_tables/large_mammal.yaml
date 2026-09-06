@@ -3,7 +3,7 @@
 # roads add a penalty that increases with road class; steeper slopes cost more; water is a barrier.
 # Qualitative structure follows Cushman et al. 2006 (black bear gene flow: forest cover, roads,
 # elevation), Koen et al. 2014 (multispecies expert resistance from land cover + roads) and the
-# review by Zeller et al. 2012. Numeric values are EcoFlowBench choices (see README).
+# review by Zeller et al. 2012. Numeric values are AmpScape choices (see README).
 table_id: large_mammal
 version: 1
 description: "forest 1 ... built 500; GRIP4 road penalties 20-600; slope x(1+0.03 deg); water barrier 800; +100*gHM"

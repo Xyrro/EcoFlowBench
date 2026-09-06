@@ -29,7 +29,7 @@ import numpy as np
 import yaml
 from pydantic import BaseModel, Field, model_validator
 
-from ecoflowbench.landscapes.real import WORLDCOVER_CLASSES, WORLDCOVER_NODATA
+from ampscape.landscapes.real import WORLDCOVER_CLASSES, WORLDCOVER_NODATA
 
 WATER_CLASS = 80
 

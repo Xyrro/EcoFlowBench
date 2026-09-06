@@ -8,10 +8,10 @@ Date: 2026-09-05. Status: **complete, awaiting owner confirmation** before Phase
 |---|---|
 | Cluster inspection (partitions, QoS, GPUs, storage, network, modules) | `docs/compute_env.md` |
 | Isolated toolchain on scratch: env bootstrap, uv venv, Julia depot, GDAL env | `scripts/env.sh`, `scripts/setup_gdal_env.sh`, `scripts/print_versions.sh`, `scripts/inspect_cluster.sh` |
-| Repository scaffold (brief §2.2): 11 Python subpackages, config dirs, Julia package skeleton, tests | `ecoflowbench/`, `configs/`, `julia/EcoFlowBenchSolve.jl/`, `tests/` |
-| Pinned dependencies | `pyproject.toml` + `uv.lock` (Python), `julia/EcoFlowBenchSolve.jl/{Project,Manifest}.toml` |
+| Repository scaffold (brief §2.2): 11 Python subpackages, config dirs, Julia package skeleton, tests | `ampscape/`, `configs/`, `julia/AmpScapeSolve.jl/`, `tests/` |
+| Pinned dependencies | `pyproject.toml` + `uv.lock` (Python), `julia/AmpScapeSolve.jl/{Project,Manifest}.toml` |
 | Reference solver presets | `configs/solver/circuitscape_reference.yaml`, `configs/solver/omniscape_reference.yaml` |
-| Solver smoke test | `julia/EcoFlowBenchSolve.jl/examples/smoke_test.jl` |
+| Solver smoke test | `julia/AmpScapeSolve.jl/examples/smoke_test.jl` |
 | Prior-art survey (42 verified references) | `docs/prior_art.md` |
 | Task specification (T1, T1W, T2, T3, T4, T5-stretch; tensors, dtypes, units, conventions) | `docs/task_specification.md` |
 | Decision log / changelog | `DECISIONS.md`, `CHANGELOG.md` |
@@ -67,7 +67,7 @@ Date: 2026-09-05. Status: **complete, awaiting owner confirmation** before Phase
 
 ## Next step (Phase 2, on confirmation)
 
-Synthetic landscape generators (`ecoflowbench/landscapes/synthetic.py`) with tests, then the
+Synthetic landscape generators (`ampscape/landscapes/synthetic.py`) with tests, then the
 real-data source verification (URLs, licences, versions) and the ≥ 50-tile mini download
 (< 5 GB, otherwise a gate). No data download will start before the owner answers the storage
 question above.

@@ -1,4 +1,4 @@
-"""Tests for ecoflowbench.sources: exact graph, connectivity, points/strips/regions, T3/T4 fields."""
+"""Tests for ampscape.sources: exact graph, connectivity, points/strips/regions, T3/T4 fields."""
 
 from __future__ import annotations
 
@@ -7,8 +7,8 @@ import pathlib
 import numpy as np
 import pytest
 
-from ecoflowbench.landscapes.synthetic import sample_landscape
-from ecoflowbench.sources import (
+from ampscape.landscapes.synthetic import sample_landscape
+from ampscape.sources import (
     SourceConfig,
     build_conductance_graph,
     component_labels,
@@ -193,7 +193,7 @@ def test_kirchhoff_residual_exact_solve():
     """Solve L v = b by hand on a small grid and check the QC residual is ~0 and detects a wrong sink."""
     import scipy.sparse.linalg as spla
 
-    from ecoflowbench.solve.qc import kirchhoff_residual
+    from ampscape.solve.qc import kirchhoff_residual
 
     R, nd = _landscape(9, (24, 24))
     G, idx = build_conductance_graph(R, nd)
@@ -221,7 +221,7 @@ def test_kirchhoff_residual_exact_solve():
 def test_kirchhoff_residual_supernode():
     """A 2-pixel short-circuited source region: rows inside the region are replaced by the net-current equation."""
 
-    from ecoflowbench.solve.qc import kirchhoff_residual
+    from ampscape.solve.qc import kirchhoff_residual
 
     R = np.ones((16, 16), np.float32)
     nd = np.zeros((16, 16), bool)

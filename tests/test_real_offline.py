@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 import rasterio
 
-from ecoflowbench.landscapes import real, sampling
+from ampscape.landscapes import real, sampling
 
 
 @pytest.mark.parametrize("lat,lon,epsg", [

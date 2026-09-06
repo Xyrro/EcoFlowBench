@@ -1,4 +1,4 @@
-# Focal-node / source-configuration parameters (brief §6). Consumed by ecoflowbench.sources.
+# Focal-node / source-configuration parameters (brief §6). Consumed by ampscape.sources.
 # Every value here is recorded in each sample's `source_config` metadata. Units are pixels
 # unless stated. Per-tier overrides scale with raster size.
 config_id: sources_default_v1

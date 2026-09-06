@@ -6,9 +6,9 @@
 # Run on the login node (needs network). Idempotent.
 set -euo pipefail
 source "$(dirname "$0")/env.sh"
-ENV_DIR="$EFB_SCRATCH/envs/gdal"
-export CONDA_PKGS_DIRS="$EFB_SCRATCH/.conda_pkgs"
-export CONDA_ENVS_PATH="$EFB_SCRATCH/envs"
+ENV_DIR="$AMPSCAPE_SCRATCH/envs/gdal"
+export CONDA_PKGS_DIRS="$AMPSCAPE_SCRATCH/.conda_pkgs"
+export CONDA_ENVS_PATH="$AMPSCAPE_SCRATCH/envs"
 mkdir -p "$CONDA_PKGS_DIRS"
 module load mamba/1.4.9
 if [ -x "$ENV_DIR/bin/gdalinfo" ]; then

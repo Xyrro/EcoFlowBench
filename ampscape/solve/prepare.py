@@ -1,6 +1,6 @@
 """Materialise the inputs of one shard into an HDF5 file the Julia batch solver understands.
 
-Layout (see EcoFlowBenchSolve.solve_shard): /samples/<sid>/inputs/{resistance, nodata_mask,
+Layout (see AmpScapeSolve.solve_shard): /samples/<sid>/inputs/{resistance, nodata_mask,
 covariates?, focal tables...}, /samples/<sid>/configs/<cname>/{focal_mask | source_strength [+ ground]}
 with attrs ``kind``; per-sample attrs ``meta`` (JSON) carrying everything needed for the final
 metadata (generator params, table provenance, source config provenance, focal tables).
@@ -15,9 +15,9 @@ import h5py
 import numpy as np
 import yaml
 
-from ecoflowbench.landscapes.real import CHANNELS
-from ecoflowbench.solve.manifest import SampleSpec
-from ecoflowbench.sources import SourceConfig, generate_all
+from ampscape.landscapes.real import CHANNELS
+from ampscape.solve.manifest import SampleSpec
+from ampscape.sources import SourceConfig, generate_all
 
 OMNI_TIERS = {"S": (16, 3), "M": (32, 5), "L": (64, 9), "XL": (128, 17), "XXL": (256, 33)}
 
@@ -33,7 +33,7 @@ def omni_params(tier: str, solver_yaml: str = "configs/solver/omniscape_referenc
 def load_landscape(spec: SampleSpec, pilot_root: str | None):
     """Return (R float32, nodata bool, landcover int16|None, covariates dict|None, meta dict)."""
     if spec.family == "synthetic":
-        from ecoflowbench.landscapes.synthetic import sample_landscape
+        from ampscape.landscapes.synthetic import sample_landscape
 
         ls = sample_landscape(spec.seed, (spec.size, spec.size))
         meta = {"generator": ls.generator, "generator_params": ls.params, "contrast": ls.contrast,
@@ -42,7 +42,7 @@ def load_landscape(spec: SampleSpec, pilot_root: str | None):
     import pandas as pd
     import rasterio
 
-    from ecoflowbench.landscapes.real import read_tile
+    from ampscape.landscapes.real import read_tile
 
     root = pathlib.Path(pilot_root)
     res = pd.read_parquet(root / "resistance.parquet")
@@ -82,7 +82,7 @@ def prepare_shard(specs: list[SampleSpec], out_h5: str, source_cfg: SourceConfig
             samples = generate_all(R, nd, cfg, spec.seed, landcover=lc)
             wanted = spec.config_list()
             if "k_override" in extra:
-                from ecoflowbench.sources import sample_points
+                from ampscape.sources import sample_points
 
                 samples["points"] = sample_points(R, nd, cfg, np.random.default_rng(spec.seed), k=int(extra["k_override"]))
             g = g_all.create_group(spec.sample_id)

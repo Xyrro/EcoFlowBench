@@ -1,7 +1,7 @@
 # Batch entry point used by the Python driver / Slurm jobs.
 # julia --project=<pkg> scripts/solve_shard.jl <inputs.h5> <outputs.h5> [--solver cholmod] [--fallback cg+amg]
 #        [--omniscape-solver cg+amg] [--tmp /tmp] [--max N]
-using EcoFlowBenchSolve
+using AmpScapeSolve
 args = copy(ARGS)
 function popopt!(a, name, default)
     i = findfirst(==(name), a)

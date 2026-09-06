@@ -27,7 +27,7 @@ import json
 
 import numpy as np
 
-from ecoflowbench.sources.graph import build_conductance_graph, laplacian
+from ampscape.sources.graph import build_conductance_graph, laplacian
 
 INFO_FLAGS = {"fallback_solver"}
 

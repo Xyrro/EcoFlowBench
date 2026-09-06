@@ -19,9 +19,9 @@ import numpy as np
 import pandas as pd
 import rasterio
 
-from ecoflowbench.landscapes.real import read_tile
-from ecoflowbench.landscapes.synthetic import sample_landscape
-from ecoflowbench.sources import SourceConfig, generate_all
+from ampscape.landscapes.real import read_tile
+from ampscape.landscapes.synthetic import sample_landscape
+from ampscape.sources import SourceConfig, generate_all
 
 
 def flatten(rows, tile_id, table_id, family, samples):

@@ -1,4 +1,4 @@
-"""Tests for ecoflowbench.landscapes.synthetic: shapes, ranges, determinism, overlays."""
+"""Tests for ampscape.landscapes.synthetic: shapes, ranges, determinism, overlays."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 from scipy import ndimage
 
-from ecoflowbench.landscapes import synthetic as syn
+from ampscape.landscapes import synthetic as syn
 
 SHAPES = [(64, 64), (128, 128), (48, 96)]
 GENERATORS = {

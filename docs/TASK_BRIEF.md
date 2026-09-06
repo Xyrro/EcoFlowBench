@@ -1,6 +1,6 @@
 # TASK BRIEF: Building a Benchmark Dataset for Learned Surrogates of Circuit-Theoretic Landscape Connectivity
 
-**Project name:** `EcoFlowBench` (fixed; use this name consistently across repo, packages, HF dataset, and paper)
+**Project name:** `AmpScape` (fixed; use this name consistently across repo, packages, HF dataset, and paper)
 **Audience of this document:** an autonomous coding agent (Claude Code) executing the project end-to-end
 **Target outcomes:** (1) a public dataset on Hugging Face, (2) an open-source generation + evaluation codebase, (3) baseline results and figures for a Datasets & Benchmarks paper
 
@@ -37,7 +37,7 @@ Model this after **PGLearn** (power-grid OPF dataset): fixed reference solver, s
 
 ### 2.2 Repository layout (create this)
 ```
-ecoflowbench/
+ampscape/
 ├── README.md
 ├── LICENSE                      # code: MIT or Apache-2.0; data: CC BY 4.0 (see §10)
 ├── CHANGELOG.md
@@ -49,8 +49,8 @@ ecoflowbench/
 │   ├── resistance_tables/       # YAML resistance tables (§5)
 │   ├── solver/                  # Circuitscape/Omniscape parameter presets
 │   └── datasets/                # full dataset build configs (mini, v1.0, ...)
-├── julia/EcoFlowBenchSolve.jl/  # Julia package wrapping Circuitscape/Omniscape
-├── ecoflowbench/                # Python package
+├── julia/AmpScapeSolve.jl/  # Julia package wrapping Circuitscape/Omniscape
+├── ampscape/                # Python package
 │   ├── landscapes/              # synthetic generators, real-data tiling
 │   ├── resistance/              # covariates → resistance surfaces
 │   ├── sources/                 # focal node / source-strength generators
@@ -105,7 +105,7 @@ Additionally define a **wall-to-wall** variant of T1 (strip sources on opposite 
 Produce two families plus a resolution/size ladder.
 
 ### 4.1 Synthetic landscapes (fully controllable)
-Implement generators in `ecoflowbench/landscapes/synthetic.py`:
+Implement generators in `ampscape/landscapes/synthetic.py`:
 - Gaussian random fields (variable correlation length ℓ ∈ {2, 8, 32, 128} px, anisotropy).
 - Midpoint-displacement fractals (roughness H ∈ {0.2, 0.5, 0.8}).
 - NLMpy models: random cluster, planar gradient, edge gradient, distance gradient, mosaic.
@@ -114,7 +114,7 @@ Implement generators in `ecoflowbench/landscapes/synthetic.py`:
 - Each generator exposes all parameters; parameters are sampled from documented priors and stored in metadata.
 
 ### 4.2 Real landscapes (the main scientific value)
-Implement `ecoflowbench/landscapes/real.py`:
+Implement `ampscape/landscapes/real.py`:
 - Source layers (verify current URLs/licenses before downloading; record version/year):
   - Land cover: ESA WorldCover (10 m) and/or Copernicus Global Land Cover (100 m).
   - Elevation: Copernicus DEM GLO-30 or GLO-90.
@@ -142,7 +142,7 @@ Adjust numbers after measuring actual solve times in the mini run. Report the co
 
 ## 5. Phase 3 — Resistance surface construction
 
-Implement `ecoflowbench/resistance/` with a YAML-driven mapping from covariates to resistance.
+Implement `ampscape/resistance/` with a YAML-driven mapping from covariates to resistance.
 
 - Provide **at least four resistance tables** in `configs/resistance_tables/`, each sourced from literature (cite in the YAML header):
   1. `generic_hm`: resistance = 1 + a·gHM^b (continuous human modification transform).
@@ -158,7 +158,7 @@ Implement `ecoflowbench/resistance/` with a YAML-driven mapping from covariates 
 
 ## 6. Phase 4 — Focal nodes and source configurations
 
-Implement `ecoflowbench/sources/`:
+Implement `ampscape/sources/`:
 - **Point pairs** (T1/T2): 2–8 random focal nodes with minimum separation constraints; also protected-area polygons (WDPA) as focal regions on real tiles.
 - **Wall-to-wall** (T1 variant): opposite edge strips, N–S and E–W.
 - **Advanced mode** (T3): source-strength raster from habitat suitability proxy (e.g., inverse of resistance, thresholded, or a random smooth field); ground nodes at edges or at random patches.
@@ -170,13 +170,13 @@ Implement `ecoflowbench/sources/`:
 
 ## 7. Phase 5 — Solver pipeline (Julia + Python driver)
 
-### 7.1 Julia package `EcoFlowBenchSolve.jl`
+### 7.1 Julia package `AmpScapeSolve.jl`
 - Functions: `solve_pairwise`, `solve_advanced`, `solve_omniscape`, each taking in-memory arrays + parameter struct, returning outputs + a `SolveStats` struct (wall time, iterations if available, peak memory, solver version, thread count, converged flag).
 - Write temp INI/config files only if the API requires them; prefer the programmatic API.
 - Multithreading via `Threads.@threads` over samples; a batch mode that reads a manifest, solves, and writes results to shard files.
 - Deterministic: same input → bitwise-identical output on the same machine; record machine info.
 
-### 7.2 Python driver `ecoflowbench/solve/`
+### 7.2 Python driver `ampscape/solve/`
 - Orchestrates: read sample manifest → dispatch batches to Julia (via `juliacall` or subprocess) → collect outputs → run QC → write shards.
 - Parallelism across nodes via `joblib` locally and a SLURM template in `scripts/slurm/`.
 - **QC checks** (fail → flag and exclude, keep log): non-convergence, NaN/Inf in outputs, current conservation residual above threshold, isolated focal nodes, Omniscape edge artifacts, output all-zeros.
@@ -195,7 +195,7 @@ Implement `ecoflowbench/sources/`:
   - `inputs/resistance` (float32, H×W), `inputs/nodata_mask` (bool), `inputs/covariates` (float32, C×H×W, real tiles only, channel names in attrs), `inputs/focal_mask` (int32), `inputs/source_strength` (float32, T3/T4), `inputs/ground` (int32, T3)
   - `outputs/cum_current` (float32), `outputs/voltage` (float32, optional), `outputs/pairwise_current` (float32, P×H×W, only if K ≤ 4), `outputs/reff` (float64, K×K), `outputs/omniscape/{cum_current, flow_potential, normalized}` (float32)
   - `meta/` attrs: `sample_id` (UUID), `task_ids`, `family` (synthetic/real), `generator` + params (JSON), `tile_id`, `lat`, `lon`, `crs`, `pixel_size_m`, `tier`, `resistance_table_id`, `source_config`, `solver_name`, `solver_version`, `solver_params` (JSON), `solve_time_s`, `converged`, `qc_flags`, `seed`, `created_at`, `pipeline_git_sha`, `dataset_version`.
-- Validate every shard against a JSON Schema / pydantic model in `ecoflowbench/io/schema.py`; ship the schema in `docs/schema.md`.
+- Validate every shard against a JSON Schema / pydantic model in `ampscape/io/schema.py`; ship the schema in `docs/schema.md`.
 
 ### 8.2 Splits
 Provide official splits as Parquet lists of sample IDs:
@@ -209,14 +209,14 @@ Provide official splits as Parquet lists of sample IDs:
 - Splits are by **tile**, not by sample, to avoid leakage between resistance tables of the same tile.
 
 ### 8.3 Sizes
-- Ship `ecoflowbench-mini` (~500 MB) for quick experiments and `ecoflowbench-v1.0` (full). Report the total size.
+- Ship `ampscape-mini` (~500 MB) for quick experiments and `ampscape-v1.0` (full). Report the total size.
 
 ---
 
 ## 9. Phase 7 — Python loaders and Hugging Face integration
 
-- `ecoflowbench.data.EcoFlowBenchDataset(task, split, tier, root)` → returns dict tensors; supports lazy shard loading, optional log-transform helper, normalization statistics computed on train only (`stats/norm_stats.json`).
-- Hugging Face: build a `datasets` loading script or use the Parquet + shard file convention so `load_dataset("Xirro/EcoFlowBench", "T1_S")` works; implement `scripts/push_to_hub.py` with dry-run mode. **Do not push without confirmation.** The dataset repo is **private** during development (`Xirro/EcoFlowBench`) and doubles as the off-cluster sync destination: every finished shard is validated → uploaded → checksum-verified → deleted from scratch, keeping the local working set under 150 GB (see `docs/compute_env.md` §10).
+- `ampscape.data.AmpScapeDataset(task, split, tier, root)` → returns dict tensors; supports lazy shard loading, optional log-transform helper, normalization statistics computed on train only (`stats/norm_stats.json`).
+- Hugging Face: build a `datasets` loading script or use the Parquet + shard file convention so `load_dataset("Xirro/AmpScape", "T1_S")` works; implement `scripts/push_to_hub.py` with dry-run mode. **Do not push without confirmation.** The dataset repo is **private** during development (`Xirro/AmpScape`) and doubles as the off-cluster sync destination: every finished shard is validated → uploaded → checksum-verified → deleted from scratch, keeping the local working set under 150 GB (see `docs/compute_env.md` §10).
 - Generate **Croissant** metadata (`scripts/export_croissant.py`) and validate it; ship `croissant.json` in the HF repo.
 - Dataset card (`README.md` on HF) following the Datasheets for Datasets template: motivation, composition, collection process, preprocessing, uses, distribution, maintenance, licenses of upstream sources, known limitations, ethical considerations (sensitivity of protected-area locations; do not include any non-public data).
 
@@ -232,7 +232,7 @@ Provide official splits as Parquet lists of sample IDs:
 
 ## 11. Phase 9 — Metrics and evaluation harness
 
-Implement `ecoflowbench/metrics/` and `ecoflowbench/eval/`:
+Implement `ampscape/metrics/` and `ampscape/eval/`:
 
 **Pixel-level (maps):** MSE, MAE in log space (log1p), relative L2 error, SSIM, PSNR.
 
@@ -256,7 +256,7 @@ Provide `scripts/evaluate.py --predictions <dir> --split <name>` producing a JSO
 
 ## 12. Phase 10 — Baselines
 
-Implement in `ecoflowbench/models/` with a shared training script (`scripts/train.py --model unet --task T1 --tier S`):
+Implement in `ampscape/models/` with a shared training script (`scripts/train.py --model unet --task T1 --tier S`):
 1. **Non-learned baseline**: coarsen resistance ×4 → solve → upsample (measures what a cheap approximation achieves).
 2. **U-Net** (input channels: log-resistance, nodata mask, focal/source channels).
 3. **FNO** (2D Fourier Neural Operator) — tests long-range/global behaviour and resolution transfer.
@@ -286,7 +286,7 @@ Produce in `paper/`:
 - `dataset_statistics.md`: sample counts per task/tier/family/stratum, resistance distribution plots, solve-time distributions, map of tile centres, biome coverage chart.
 - `baselines.md`: full results tables with mean ± std.
 - `ood_analysis.md`: per-OOD-split degradation plots.
-- `figures/`: publication-quality PDFs/PNGs generated by `ecoflowbench/viz/`.
+- `figures/`: publication-quality PDFs/PNGs generated by `ampscape/viz/`.
 - `outline.md`: a suggested manuscript outline (Introduction/motivation, Related work, Task definitions, Dataset construction, Statistics, Baselines, OOD results, Limitations & ethics, Maintenance plan).
 
 Target venue: **NeurIPS 2027 Datasets & Benchmarks track** (primary; the 2026 deadline has passed); ecological venue as secondary. Follow the D&B checklist (hosting, license, maintenance, datasheet, DOI). **Croissant metadata (core + RAI fields) is mandatory for the track and is a Phase 7 deliverable (`scripts/export_croissant.py`, validated with the Hugging Face Croissant validator).** Obtain a DOI via Zenodo mirror in addition to Hugging Face.
@@ -303,7 +303,7 @@ Target venue: **NeurIPS 2027 Datasets & Benchmarks track** (primary; the 2026 de
 | 4 | All source configurations generate connected focal nodes; tests pass |
 | 5 | Mini run (≈250 samples) solved for all tasks; quicklooks verified; timings and full-budget estimate reported; **user confirmation obtained** |
 | 6 | Schema + validator implemented; mini shards validate; splits produced by tile with all OOD sets |
-| 7 | `EcoFlowBenchDataset` works; HF dry-run succeeds; dataset card drafted |
+| 7 | `AmpScapeDataset` works; HF dry-run succeeds; dataset card drafted |
 | 8 | `licenses.md` complete; any non-redistributable layers handled |
 | 9 | All metrics unit-tested; `evaluate.py` runs on mini predictions |
 | 10 | All baselines train on mini; full results on v1.0 after scaling (3 seeds) |
@@ -321,7 +321,7 @@ After each phase, write the phase report and post a concise summary: what was bu
 ## 17. Open questions to flag early (do not silently decide)
 
 - Compute budget available (CPU-hours, node count, storage) — needed to fix v1.0 sample counts.
-- ~~Hugging Face organization / repository name and whether the repo should be gated during review.~~ Decided 2026-09-05: `Xirro/EcoFlowBench`, private during development.
+- ~~Hugging Face organization / repository name and whether the repo should be gated during review.~~ Decided 2026-09-05: `Xirro/AmpScape`, private during development.
 - ~~Which equal-area CRS convention to adopt for real tiles.~~ Decided 2026-09-05: WGS84/UTM zone of tile centre.
 - ~~Whether to include OSM-derived rasters given ODbL share-alike.~~ Decided 2026-09-05: no OSM; roads from GRIP4.
 - ~~Whether per-pair current maps should be stored for all samples (storage cost) or only for K ≤ 4.~~ Decided 2026-09-05: only for K ≤ 4; K > 4 stores cumulative map + Reff only.

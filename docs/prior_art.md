@@ -1,6 +1,6 @@
 # Prior art survey — learned surrogates for circuit-theoretic landscape connectivity
 
-Phase 1 deliverable (2026-09-05). Purpose: establish what already exists, what EcoFlowBench
+Phase 1 deliverable (2026-09-05). Purpose: establish what already exists, what AmpScape
 must be compared against, and where the novelty lies. Only references whose existence and
 bibliographic details were verified during this survey are listed; each carries a DOI, arXiv
 ID, or persistent URL. Items I looked for but could **not** find are listed explicitly in §7.
@@ -56,7 +56,7 @@ requires repeated resistance-distance computations [18]. Bowman et al. (2020) sh
 density is robust to the *magnitude* of cost values as long as their *rank order* is preserved
 [19]. All three points motivate a fast surrogate: inverse/optimisation loops need many forward
 solves, and the input-space uncertainty means a surrogate must generalise across resistance
-tables, which is why EcoFlowBench includes multiple tables and an OOD-table split.
+tables, which is why AmpScape includes multiple tables and an OOD-table split.
 
 ## 2. Machine learning *for* connectivity (adjacent, not surrogate)
 
@@ -90,7 +90,7 @@ and PDE-emulator literature:
 - **Learned preconditioners / neural solvers** for Poisson systems (Lan et al. 2024, ICML,
   neural-preconditioned solver for mixed BCs [30]; "Learning preconditioners for conjugate
   gradient PDE solvers", ICML 2023 [31]) are the complementary route: accelerate, rather than
-  replace, the solver. EcoFlowBench's stored ground truth and solve-time statistics support
+  replace, the solver. AmpScape's stored ground truth and solve-time statistics support
   evaluating that route too.
 - Effective resistance is also an object of interest in graph ML as a **positional encoding**
   (e.g. Wang et al. ICLR 2022 [32]); a fast learned approximation of Reff on grid graphs is of
@@ -98,7 +98,7 @@ and PDE-emulator literature:
 
 ## 4. Benchmark datasets we model ourselves on
 
-| Dataset | Domain | Design features EcoFlowBench adopts |
+| Dataset | Domain | Design features AmpScape adopts |
 |---|---|---|
 | **PGLearn** (Klamkin, Tanneau, Van Hentenryck 2025, arXiv:2505.22825) [33] | AC/DC optimal power flow | fixed reference solver; standardised instance families; multiple formulations per instance; complete primal/dual solution data; generation code released as a package; official splits; baseline table; HF hosting |
 | OPFData (Lovett et al. 2024, arXiv:2406.07234) [34] | AC-OPF with topological perturbations | large scale, structural (graph) perturbations, HF-style distribution |
@@ -119,7 +119,7 @@ cycle or another venue; flagged in the phase report.)
 
 Neutral landscape models are the standard way to create controllable synthetic landscapes:
 *NLMpy* (Etherington, Holland & O'Sullivan 2015, MEE) implements random clusters, planar and
-distance gradients, midpoint-displacement fractals and mosaics in NumPy [42]. EcoFlowBench
+distance gradients, midpoint-displacement fractals and mosaics in NumPy [42]. AmpScape
 uses it directly (pinned) plus Gaussian random fields and barrier overlays.
 
 ## 6. Novelty assessment
@@ -134,7 +134,7 @@ Verified gaps (as of 2026-09-05; see §7 for the searches performed):
    items are (a) Darcy-flow neural operators (same PDE, but smooth log-normal coefficients,
    no point sources, no NoData, no 8-neighbour graph semantics, no effective-resistance target)
    and (b) generic Poisson neural preconditioners.
-3. Distinctive elements EcoFlowBench adds beyond Darcy-style benchmarks: point-source /
+3. Distinctive elements AmpScape adds beyond Darcy-style benchmarks: point-source /
    grounded configurations and pairwise cumulative maps (T1), an effective-resistance matrix
    target (T2), source-strength/ground rasters (T3), the windowed Omniscape operator (T4),
    real-world covariate stacks with multiple resistance tables, NoData masks, extreme

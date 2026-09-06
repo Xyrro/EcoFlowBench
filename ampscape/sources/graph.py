@@ -1,6 +1,6 @@
 """Exact reconstruction of the Circuitscape raster graph (for connectivity checks and residuals).
 
-Mirrors ``Circuitscape.jl 5.17.1/src/raster/pairwise.jl::construct_graph`` with the EcoFlowBench
+Mirrors ``Circuitscape.jl 5.17.1/src/raster/pairwise.jl::construct_graph`` with the AmpScape
 solver conventions (``docs/task_specification.md`` §2):
 
 * nodes = pixels that are not NoData (NoData = infinite resistance = no node)

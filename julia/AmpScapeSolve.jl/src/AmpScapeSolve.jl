@@ -1,7 +1,7 @@
 """
-    EcoFlowBenchSolve
+    AmpScapeSolve
 
-Wrapper around Circuitscape.jl and Omniscape.jl for EcoFlowBench dataset generation.
+Wrapper around Circuitscape.jl and Omniscape.jl for AmpScape dataset generation.
 
 Array convention: every raster is a Julia `Matrix` indexed `[row, col]` = `(H, W)`, matching the
 Python (C-order) layout. HDF5 datasets written by h5py with shape (H, W) are read here as
@@ -19,7 +19,7 @@ to a scratch directory (node-local `/tmp` in jobs) and call `Circuitscape.comput
 Omniscape is called in memory. Every solve records `SolveStats` (wall time, max RSS, solver,
 precision, thread counts, versions, converged flag, error text).
 """
-module EcoFlowBenchSolve
+module AmpScapeSolve
 
 using Circuitscape
 using Omniscape
@@ -134,7 +134,7 @@ end
 
 
 # ---------------------------------------------------------------------------
-# Exact solver graph in Julia (mirror of ecoflowbench/sources/graph.py) for residual checks
+# Exact solver graph in Julia (mirror of ampscape/sources/graph.py) for residual checks
 # ---------------------------------------------------------------------------
 using SparseArrays
 
@@ -362,7 +362,7 @@ function solve_omniscape(R::AbstractMatrix, nodata::AbstractMatrix{Bool}, S::Abs
     Rm = missingarray(Rw, Float64, NODATA)
     Sm = missingarray(Sw, Float64, NODATA)
     cfg = Dict{String,String}(
-        "radius" => string(radius), "block_size" => string(block_size), "project_name" => "efb",
+        "radius" => string(radius), "block_size" => string(block_size), "project_name" => "ampscape",
         "source_threshold" => string(source_threshold), "source_from_resistance" => "false",
         "resistance_is_conductance" => "false", "r_cutoff" => "Inf", "buffer" => "0",
         "calc_flow_potential" => "true", "calc_normalized_current" => "true",
@@ -435,7 +435,7 @@ end
     solve_shard(inputs_h5, outputs_h5; solver="cholmod", fallback="cg+amg", omniscape_solver="cholmod",
                 tmproot=tempdir(), keep_pair_maps_max_k=4, omni=(radius, block_size), only=nothing)
 
-Inputs layout (written by `ecoflowbench.solve.prepare`):
+Inputs layout (written by `ampscape.solve.prepare`):
     /samples/<sid>/inputs/{resistance (H,W) f32, nodata_mask (H,W) u8}
     /samples/<sid>/configs/<cname>/  attrs kind ∈ {points, wall_to_wall, regions, advanced, omniscape}
                                      datasets focal_mask | source_strength [+ ground]

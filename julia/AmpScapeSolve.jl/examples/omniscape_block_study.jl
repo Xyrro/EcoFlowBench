@@ -1,8 +1,8 @@
 # Omniscape block-size fidelity study: solve one sample with two block sizes (same radius) and
 # compare cum_current / flow_potential / normalized maps.
 # julia --project=. examples/omniscape_block_study.jl <inputs.h5> <sample_id|first> <block_a> <block_b> <out.json>
-using EcoFlowBenchSolve, HDF5, JSON, Statistics, LinearAlgebra
-const E = EcoFlowBenchSolve
+using AmpScapeSolve, HDF5, JSON, Statistics, LinearAlgebra
+const E = AmpScapeSolve
 inputs, sid_arg, ba, bb, outjson = ARGS[1], ARGS[2], parse(Int, ARGS[3]), parse(Int, ARGS[4]), ARGS[5]
 f = h5open(inputs, "r")
 sid = sid_arg == "first" ? first(keys(f["samples"])) : sid_arg

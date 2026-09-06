@@ -7,11 +7,11 @@ Same summary in `docs/status/latest.md`.
 
 | Item | Location |
 |---|---|
-| Exact solver-graph reconstruction (8-neighbour, NoData removed, average conductance, diagonal /√2), Laplacian, component labels | `ecoflowbench/sources/graph.py` |
-| Config schema with documented defaults and per-tier pixel scaling | `ecoflowbench/sources/config.py`, `configs/tasks/sources_default.yaml` |
-| Generators: point focal nodes (K ∈ [2,8], min separation, per-node mixed placement), wall-to-wall strips (NS/EW), habitat-patch focal regions, T3 source + ground rasters, T4 Omniscape sources; `generate_all` (sub-seeded per kind) | `ecoflowbench/sources/generators.py` |
+| Exact solver-graph reconstruction (8-neighbour, NoData removed, average conductance, diagonal /√2), Laplacian, component labels | `ampscape/sources/graph.py` |
+| Config schema with documented defaults and per-tier pixel scaling | `ampscape/sources/config.py`, `configs/tasks/sources_default.yaml` |
+| Generators: point focal nodes (K ∈ [2,8], min separation, per-node mixed placement), wall-to-wall strips (NS/EW), habitat-patch focal regions, T3 source + ground rasters, T4 Omniscape sources; `generate_all` (sub-seeded per kind) | `ampscape/sources/generators.py` |
 | Build script over every (tile, table) resistance raster + 50 synthetic landscapes; NPZ per landscape (int32 masks, float32 sources, int8 grounds, JSON tables), `sources.parquet`, gallery | `scripts/build_sources.py` |
-| Circuitscape check that repeated point labels act as one short-circuited region | `julia/EcoFlowBenchSolve.jl/examples/region_check.jl` |
+| Circuitscape check that repeated point labels act as one short-circuited region | `julia/AmpScapeSolve.jl/examples/region_check.jl` |
 | Tests (21): graph formulas vs Circuitscape source, NoData/components/diagonal contact, point contract (range, separation, placement bookkeeping, low-R threshold), placement fraction ≈ 0.3, determinism, split-landscape safety, strips, regions (min size, trimming, absence), T3/T4 contracts, provenance, tier scaling | `tests/test_sources.py` |
 
 ## Owner requirements
@@ -65,7 +65,7 @@ no placement was ever forced away from the full raster. Build time: 25 s; NPZ to
 
 ## Next step (Phase 5, on confirmation)
 
-`EcoFlowBenchSolve.jl` solve functions (pairwise / advanced / omniscape with `SolveStats`),
+`AmpScapeSolve.jl` solve functions (pairwise / advanced / omniscape with `SolveStats`),
 Python driver with QC and Slurm array template, then the **mandatory mini run** (200 synthetic +
 50 real at tier S, all tasks) with quicklooks, timings and the full-budget estimate — stopping
 at the gate before any scaling.

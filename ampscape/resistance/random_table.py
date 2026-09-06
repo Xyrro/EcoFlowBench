@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from ecoflowbench.resistance.tables import ResistanceTable
+from ampscape.resistance.tables import ResistanceTable
 
 
 def perturb_table(base: ResistanceTable, seed: int, log_sd: float = 0.5,

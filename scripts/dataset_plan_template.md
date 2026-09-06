@@ -1,4 +1,4 @@
-# EcoFlowBench v1.0 dataset plan (compute-agnostic)
+# AmpScape v1.0 dataset plan (compute-agnostic)
 
 Date: 2026-09-05. Source of truth for counts: `configs/datasets/v1_0.yaml`; every table below is
 produced by `scripts/dataset_plan_tables.py` from that file and from the Phase 5 measurements.
@@ -168,7 +168,7 @@ Everything cluster-specific lives in `configs/cluster/<profile>.yaml` (`ice.yaml
 cpus/memory/walltime/shard size, concurrency limits. `scripts/generate.py submit --profile <name>`
 reads it, precompiles on the login node and exports the values to the array job; `scripts/env.sh`
 sets `JULIA_DEPOT_PATH`, `JULIA_CPU_TARGET`, `JULIA_PKG_PRECOMPILE_AUTO=0` and the Python/uv caches
-under `EFB_SCRATCH`. The step-by-step guide for a new Slurm system is `docs/run_guide.md`.
+under `AMPSCAPE_SCRATCH`. The step-by-step guide for a new Slurm system is `docs/run_guide.md`.
 
 ## 9. Gap analysis (what Phases 2–5 cannot yet deliver)
 

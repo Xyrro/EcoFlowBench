@@ -4,7 +4,7 @@ profile_id: CHANGE_ME
 scheduler: slurm
 account: null
 qos: null
-scratch_root: /path/to/scratch/EcoFlowBench   # clone the repo here; EFB_SCRATCH points at it
+scratch_root: /path/to/scratch/AmpScape   # clone the repo here; AMPSCAPE_SCRATCH points at it
 node_tmp: /tmp
 modules: []                                   # e.g. [julia/1.11.3, gdal/3.9]
 python: uv                                    # uv | conda | module

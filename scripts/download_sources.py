@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Download upstream source archives to $EFB_DATA/sources with a sha256 manifest.
+"""Download upstream source archives to $AMPSCAPE_DATA/sources with a sha256 manifest.
 
 Login node only (network). Idempotent: existing files with matching size are skipped.
 Every download is recorded in sources/manifest.json (url, bytes, sha256, utc timestamp) so the
@@ -53,7 +53,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--set", default="pilot", choices=["pilot", "full"])
     ap.add_argument("--only", nargs="*", help="subset of source keys")
-    ap.add_argument("--dest", default=os.path.join(os.environ.get("EFB_DATA", "data"), "sources"))
+    ap.add_argument("--dest", default=os.path.join(os.environ.get("AMPSCAPE_DATA", "data"), "sources"))
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
     dest = pathlib.Path(args.dest)
@@ -74,7 +74,7 @@ def main() -> None:
             continue
         tmp = out.with_suffix(out.suffix + ".part")
         cmd = ["curl", "-L", "--fail", "--retry", "5", "--retry-delay", "10", "-C", "-",
-               "-A", "Mozilla/5.0 (EcoFlowBench downloader)", "-o", str(tmp), src["url"]]
+               "-A", "Mozilla/5.0 (AmpScape downloader)", "-o", str(tmp), src["url"]]
         subprocess.run(cmd, check=True)
         shutil.move(tmp, out)
         manifest[k] = {

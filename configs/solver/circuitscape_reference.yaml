@@ -1,9 +1,9 @@
-# Reference Circuitscape.jl settings used for ALL EcoFlowBench ground truth.
+# Reference Circuitscape.jl settings used for ALL AmpScape ground truth.
 # Verified against Circuitscape.jl 5.17.1 (src/config.jl). See docs/task_specification.md §2
 # and DECISIONS.md (2026-09-05) for the rationale. Keys map 1:1 onto Circuitscape INI keys.
 preset_id: circuitscape_reference_v1
 solver_name: Circuitscape.jl
-solver_version: "5.17.1"            # pinned in julia/EcoFlowBenchSolve.jl/Manifest.toml
+solver_version: "5.17.1"            # pinned in julia/AmpScapeSolve.jl/Manifest.toml
 julia_version: "1.11.3"
 
 # --- graph construction (identical for every task) ---

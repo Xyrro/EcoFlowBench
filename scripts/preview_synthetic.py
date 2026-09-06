@@ -13,7 +13,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 
-from ecoflowbench.landscapes import synthetic as syn  # noqa: E402
+from ampscape.landscapes import synthetic as syn  # noqa: E402
 
 
 def main() -> None:
@@ -43,7 +43,7 @@ def main() -> None:
         if "nodata" in ls.params:
             tags.append("nodata")
         ax.set_title(f"{'+'.join(tags)}\ncontrast {ls.contrast}", fontsize=7)
-    fig.suptitle("EcoFlowBench synthetic landscapes: log10 resistance (white = NoData)", fontsize=10)
+    fig.suptitle("AmpScape synthetic landscapes: log10 resistance (white = NoData)", fontsize=10)
     fig.tight_layout()
     fig.savefig(args.out, dpi=110)
     print("wrote", args.out)

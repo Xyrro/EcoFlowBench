@@ -86,11 +86,11 @@ destination the owner specifies (open question, see `docs/phase_01_report.md`).
 multi-hundred GB). Options: request a quota increase, stream shards off-cluster as they finish,
 or trim the ladder. Flagged for the owner.
 
-Project layout on scratch (everything is inside the git repo dir, which *is* `EFB_SCRATCH`;
+Project layout on scratch (everything is inside the git repo dir, which *is* `AMPSCAPE_SCRATCH`;
 the heavy directories are git-ignored):
 
 ```
-/storage/ice1/1/8/yxiao413/EcoFlowBench/     # git repo == $EFB_SCRATCH
+/storage/ice1/1/8/yxiao413/EcoFlowBench/     # git repo == $AMPSCAPE_SCRATCH
 ├── .venv/           # uv-managed Python 3.11 venv
 ├── .uv_cache/       # uv download cache
 ├── julia_depot/     # JULIA_DEPOT_PATH (packages, artifacts, compiled cache)
@@ -131,7 +131,7 @@ exception used so far is Julia *precompilation* (CPU-heavy, no network needed) w
 exports `KNEEOA_*` and `HF_HOME=~/scratch/hf_cache`. `scripts/env.sh` undoes all of that:
 it `conda deactivate`s, unloads the anaconda3 module, strips `envs/kneeoa` and `anaconda3`
 from `PATH`, and sets project-specific `HF_HOME`, `UV_*`, `JULIA_DEPOT_PATH`, `XDG_CACHE_HOME`.
-Every job script must start with `source "$EFB_SCRATCH/scripts/env.sh"`.
+Every job script must start with `source "$AMPSCAPE_SCRATCH/scripts/env.sh"`.
 
 Verification after sourcing: `CONDA_DEFAULT_ENV` empty, `which python` → `.venv/bin/python`,
 no `kneeoa` entries in `PATH`.
@@ -149,7 +149,7 @@ Recorded 2026-09-05 after installation; re-verify with `scripts/print_versions.s
 | Omniscape.jl | **0.6.2** | `julia_depot/packages/Omniscape/VSLPS` |
 | AlgebraicMultigrid.jl | 1.2.0 | (Circuitscape dependency, AMG preconditioner) |
 | Krylov.jl | 0.10.9 | (Circuitscape dependency, CG solver) |
-| Julia GDAL (ArchGDAL/GDAL_jll) | see `julia/EcoFlowBenchSolve.jl/Manifest.toml` | pulled in by Circuitscape |
+| Julia GDAL (ArchGDAL/GDAL_jll) | see `julia/AmpScapeSolve.jl/Manifest.toml` | pulled in by Circuitscape |
 | uv | 0.12.10 | `tools/uv/bin/uv` |
 | CPython (uv-managed) | **3.11.16** | `tools/python/cpython-3.11-linux-x86_64-gnu` |
 | numpy / scipy | 2.4.6 / 1.17.1 | `.venv` |
@@ -171,13 +171,13 @@ Recorded 2026-09-05 after installation; re-verify with `scripts/print_versions.s
 | GDAL CLI (conda env) | **3.9.3** | `envs/gdal/bin` (mamba/1.4.9, conda-forge) |
 
 Exact Python pins are in `pyproject.toml` and `uv.lock`; exact Julia pins in
-`julia/EcoFlowBenchSolve.jl/Manifest.toml`. Both lockfiles are committed.
+`julia/AmpScapeSolve.jl/Manifest.toml`. Both lockfiles are committed.
 
 Sizes on scratch after install: `.venv` 6.4 GB, `julia_depot` ~1.5 GB, `envs/gdal` ~0.5 GB.
 
 ### Solver smoke test (2026-09-05, `ice-cpu` node, 4 threads)
 
-`julia --project=julia/EcoFlowBenchSolve.jl julia/EcoFlowBenchSolve.jl/examples/smoke_test.jl data/solver_smoke`
+`julia --project=julia/AmpScapeSolve.jl julia/AmpScapeSolve.jl/examples/smoke_test.jl data/solver_smoke`
 
 | Check | Result |
 |---|---|
@@ -263,7 +263,7 @@ gives 0.6–0.8×. I use **0.7×** below.
 | XXL | 200 | 44 GB | **100** (test only, cum_current + reff + T4 only) | 12 GB |
 | **total** | | **≈ 540 GB** | | **≈ 215 GB** |
 
-`ecoflowbench-mini` (≈ 250 samples at S, all tasks) ≈ 0.3 GB, well under the 500 MB target.
+`ampscape-mini` (≈ 250 samples at S, all tasks) ≈ 0.3 GB, well under the 500 MB target.
 
 Sample counts are placeholders until the Phase 5 mini run gives measured solve times; the
 *size* column is what the storage decision needs. Both ladders exceed the **100 GB free
@@ -274,12 +274,12 @@ PRO). **Decision needed from the owner** (see status report): (a) PRO account fo
 (b) make the repo public earlier than planned, or (c) cap v1.0 at ≈ 90 GB while private
 (roughly: S 30k, M 8k, L 1.5k, XL 250, XXL 50).
 
-**Owner decision 2026-09-05:** deferred to the Phase 5 gate. Until then only `ecoflowbench-mini` and a small dev subset (< 100 GB total) are planned.
+**Owner decision 2026-09-05:** deferred to the Phase 5 gate. Until then only `ampscape-mini` and a small dev subset (< 100 GB total) are planned.
 
 ### 10.3 Shard sizing and HF layout
 
 HF recommends < 100k files per repo, < 10k entries per folder, files well under 200 GB, and
-Parquet/WebDataset-friendly layouts. EcoFlowBench keeps HDF5 shards but sizes them by bytes so
+Parquet/WebDataset-friendly layouts. AmpScape keeps HDF5 shards but sizes them by bytes so
 that every upload is resumable and no shard exceeds ~2 GB:
 
 | Tier | samples / shard | shard size (compressed) |

@@ -20,8 +20,8 @@ from dataclasses import dataclass, field
 import numpy as np
 from scipy import ndimage
 
-from ecoflowbench.sources.config import SourceConfig, SourceFieldCfg
-from ecoflowbench.sources.graph import all_in_one_component, component_labels
+from ampscape.sources.config import SourceConfig, SourceFieldCfg
+from ampscape.sources.graph import all_in_one_component, component_labels
 
 
 @dataclass
@@ -216,7 +216,7 @@ def suitability_field(R: np.ndarray, nodata: np.ndarray, comp: np.ndarray, sc: S
         s = np.power(1.0 / np.asarray(R, dtype=np.float64), sc.power)
         meta = {"mode": sc.mode, "power": sc.power}
     else:
-        from ecoflowbench.landscapes.synthetic import gaussian_random_field
+        from ampscape.landscapes.synthetic import gaussian_random_field
 
         s = gaussian_random_field(R.shape, sc.random_field_length_scale, rng).astype(np.float64)
         meta = {"mode": sc.mode, "length_scale": sc.random_field_length_scale}

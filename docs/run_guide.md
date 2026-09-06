@@ -1,4 +1,4 @@
-# Run guide: generating EcoFlowBench shards on a new Slurm cluster
+# Run guide: generating AmpScape shards on a new Slurm cluster
 
 Audience: someone launching v1.0 generation on a cluster other than PACE-ICE (for example a
 University of Minnesota system). Everything cluster-specific lives in one profile file; the
@@ -22,16 +22,16 @@ scripts themselves contain no paths or partition names.
 ## 2. One-time setup (login node, network)
 
 ```bash
-git clone https://github.com/Xyrro/EcoFlowBench.git /scratch/<you>/EcoFlowBench && cd $_
+git clone https://github.com/Xyrro/AmpScape.git /scratch/<you>/AmpScape && cd $_
 cp configs/cluster/template.yaml configs/cluster/<name>.yaml     # fill in scratch_root, partitions, modules
-export EFB_SCRATCH=$PWD EFB_CLUSTER_PROFILE=<name>
+export AMPSCAPE_SCRATCH=$PWD AMPSCAPE_CLUSTER_PROFILE=<name>
 source scripts/env.sh                                            # loads modules, sets JULIA_* and UV_* on scratch
-curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=$EFB_SCRATCH/tools/uv/bin UV_NO_MODIFY_PATH=1 sh
+curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=$AMPSCAPE_SCRATCH/tools/uv/bin UV_NO_MODIFY_PATH=1 sh
 uv python install 3.11 && uv sync --extra dev                    # exact versions from uv.lock
-julia --project=julia/EcoFlowBenchSolve.jl -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'   # exact Manifest.toml
+julia --project=julia/AmpScapeSolve.jl -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'   # exact Manifest.toml
 python -m pytest -q                                              # 98 tests, ~40 s
 srun -p <cpu-partition> -c 4 --mem 8G -t 20:00 \
-  julia --project=julia/EcoFlowBenchSolve.jl julia/EcoFlowBenchSolve.jl/examples/smoke_test.jl data/solver_smoke
+  julia --project=julia/AmpScapeSolve.jl julia/AmpScapeSolve.jl/examples/smoke_test.jl data/solver_smoke
 ```
 The smoke test must print `SMOKE TEST OK` (reference outputs from the Circuitscape/Omniscape test suites).
 

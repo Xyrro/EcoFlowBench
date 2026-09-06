@@ -7,9 +7,9 @@ surfaces). Same summary in `docs/status/latest.md`.
 
 | Item | Location |
 |---|---|
-| Synthetic generators: GRF (ℓ ∈ {2,8,32,128}, anisotropy, orientation), midpoint-displacement fractal (H ∈ {0.2,0.5,0.8}), NLMpy random cluster / planar / edge / distance gradient / mosaic, linear-barrier and patch-mosaic overlays, NoData blobs, contrast ladder {10,100,1000,10000}, documented prior, deterministic `sample_landscape(seed)` / `regenerate` | `ecoflowbench/landscapes/synthetic.py` |
-| Real-tile pipeline: UTM tile grids, windowed COG readers (WorldCover, Copernicus DEM with GLO-90 fallback), gHM resampling, GRIP4 / HydroRIVERS distance + nearest-attribute rasters, slope, QC, GeoTIFF writer/reader | `ecoflowbench/landscapes/real.py` |
-| Stratified sampling (biome × realm × gHM tercile, uniform-on-sphere land points, balanced round-robin, reserve list) | `ecoflowbench/landscapes/sampling.py` |
+| Synthetic generators: GRF (ℓ ∈ {2,8,32,128}, anisotropy, orientation), midpoint-displacement fractal (H ∈ {0.2,0.5,0.8}), NLMpy random cluster / planar / edge / distance gradient / mosaic, linear-barrier and patch-mosaic overlays, NoData blobs, contrast ladder {10,100,1000,10000}, documented prior, deterministic `sample_landscape(seed)` / `regenerate` | `ampscape/landscapes/synthetic.py` |
+| Real-tile pipeline: UTM tile grids, windowed COG readers (WorldCover, Copernicus DEM with GLO-90 fallback), gHM resampling, GRIP4 / HydroRIVERS distance + nearest-attribute rasters, slope, QC, GeoTIFF writer/reader | `ampscape/landscapes/real.py` |
+| Stratified sampling (biome × realm × gHM tercile, uniform-on-sphere land points, balanced round-robin, reserve list) | `ampscape/landscapes/sampling.py` |
 | Scripts: source downloader with sha256 manifest, tile sampler, tile extractor (idempotent, `--retry-rejected`, `--refresh`), figure scripts | `scripts/download_sources.py`, `sample_tiles.py`, `extract_tiles.py`, `plot_tiles.py`, `preview_synthetic.py` |
 | Licences and access paths for every source | `docs/licenses.md` |
 | Storage plan and HF quota issue | `docs/compute_env.md` §10 |
@@ -100,5 +100,5 @@ Biome coverage of the accepted pilot tiles:
 ## Next step (Phase 3, on confirmation)
 
 Resistance tables (`configs/resistance_tables/*.yaml`, ≥ 4 literature-sourced) and the
-covariates → resistance mapping in `ecoflowbench/resistance/`, applied to all 60 pilot tiles
+covariates → resistance mapping in `ampscape/resistance/`, applied to all 60 pilot tiles
 with range/mask unit tests.

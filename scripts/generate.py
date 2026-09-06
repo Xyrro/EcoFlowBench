@@ -23,15 +23,15 @@ import sys
 import pandas as pd
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-JULIA_PKG = ROOT / "julia" / "EcoFlowBenchSolve.jl"
+JULIA_PKG = ROOT / "julia" / "AmpScapeSolve.jl"
 SBATCH_TEMPLATE = ROOT / "scripts" / "slurm" / "solve_shard.sbatch"
 
 
 def load_profile(name: str | None) -> dict:
-    """Cluster profile from configs/cluster/<name>.yaml (name from --profile or EFB_CLUSTER_PROFILE)."""
+    """Cluster profile from configs/cluster/<name>.yaml (name from --profile or AMPSCAPE_CLUSTER_PROFILE)."""
     import yaml
 
-    name = name or os.environ.get("EFB_CLUSTER_PROFILE", "ice")
+    name = name or os.environ.get("AMPSCAPE_CLUSTER_PROFILE", "ice")
     p = ROOT / "configs" / "cluster" / f"{name}.yaml"
     if not p.exists():
         raise SystemExit(f"cluster profile not found: {p} (copy configs/cluster/template.yaml)")
@@ -50,12 +50,12 @@ def shard_paths(build: pathlib.Path, shard: int) -> dict[str, pathlib.Path]:
 
 
 def cmd_plan(a) -> None:
-    from ecoflowbench.solve.manifest import plan_real, plan_synthetic, to_frame
+    from ampscape.solve.manifest import plan_real, plan_synthetic, to_frame
 
     build = pathlib.Path(a.out)
     build.mkdir(parents=True, exist_ok=True)
     configs = a.configs.split(",") if a.configs else None
-    from ecoflowbench.solve.manifest import DEFAULT_CONFIGS
+    from ampscape.solve.manifest import DEFAULT_CONFIGS
 
     specs = plan_synthetic(a.dataset, a.n_synthetic, a.tier, a.seed0, configs=configs or DEFAULT_CONFIGS, shard_size=a.shard_size)
     if a.k_override:
@@ -79,9 +79,9 @@ def cmd_plan(a) -> None:
 
 
 def cmd_prepare(a) -> None:
-    from ecoflowbench.solve.manifest import from_frame
-    from ecoflowbench.solve.prepare import prepare_shard
-    from ecoflowbench.sources import SourceConfig
+    from ampscape.solve.manifest import from_frame
+    from ampscape.solve.prepare import prepare_shard
+    from ampscape.sources import SourceConfig
 
     build = pathlib.Path(a.build)
     cfg = json.loads((build / "build.json").read_text())
@@ -119,10 +119,10 @@ def cmd_solve(a) -> None:
 
 
 def precompile_julia() -> None:
-    """Precompile EcoFlowBenchSolve on the login node so array tasks never race on the shared depot's
+    """Precompile AmpScapeSolve on the login node so array tasks never race on the shared depot's
     precompile pidfiles (observed hang when several nodes started with a stale cache)."""
     print("precompiling Julia package (login node) ...", end=" ", flush=True)
-    r = subprocess.run(["julia", f"--project={JULIA_PKG}", "-e", "using Pkg; Pkg.precompile(); using EcoFlowBenchSolve"],
+    r = subprocess.run(["julia", f"--project={JULIA_PKG}", "-e", "using Pkg; Pkg.precompile(); using AmpScapeSolve"],
                        capture_output=True, text=True)
     if r.returncode != 0:
         print(r.stderr[-2000:])
@@ -151,16 +151,16 @@ def cmd_submit(a) -> None:
     arr = ",".join(str(s) for s in todo)
     (build / "logs").mkdir(exist_ok=True)
     cmd = ["sbatch", f"--array={arr}%{a.max_concurrent}", f"--time={a.time}", f"--cpus-per-task={a.cpus}", f"--mem={a.mem}",
-           f"--partition={a.partition}", f"--job-name=efb-{build.name}", f"--output={build}/logs/%A_%a.out"]
+           f"--partition={a.partition}", f"--job-name=ampscape-{build.name}", f"--output={build}/logs/%A_%a.out"]
     if prof.get("account"):
         cmd.append(f"--account={prof['account']}")
     if prof.get("qos"):
         cmd.append(f"--qos={prof['qos']}")
     cmd += [
-           f"--export=ALL,EFB_BUILD={build},EFB_SOLVER={a.solver},EFB_FALLBACK={a.fallback},EFB_OSOLVER={a.omniscape_solver},"
-           f"EFB_CONFIGS={a.configs or ''},EFB_FORCE={'1' if a.force_solve else '0'},"
-           f"EFB_SCRATCH={prof['scratch_root']},EFB_NODE_TMP={prof.get('node_tmp', '/tmp')},"
-           f"EFB_MODULES={':'.join(prof.get('modules', []))}",
+           f"--export=ALL,AMPSCAPE_BUILD={build},AMPSCAPE_SOLVER={a.solver},AMPSCAPE_FALLBACK={a.fallback},AMPSCAPE_OSOLVER={a.omniscape_solver},"
+           f"AMPSCAPE_CONFIGS={a.configs or ''},AMPSCAPE_FORCE={'1' if a.force_solve else '0'},"
+           f"AMPSCAPE_SCRATCH={prof['scratch_root']},AMPSCAPE_NODE_TMP={prof.get('node_tmp', '/tmp')},"
+           f"AMPSCAPE_MODULES={':'.join(prof.get('modules', []))}",
            str(SBATCH_TEMPLATE)]
     print(" ".join(cmd))
     if not a.dry_run:
@@ -172,8 +172,8 @@ def cmd_submit(a) -> None:
 def cmd_finalize(a) -> None:
     import yaml
 
-    from ecoflowbench.solve.finalize import finalize_shard
-    from ecoflowbench.solve.quicklook import shard_quicklooks
+    from ampscape.solve.finalize import finalize_shard
+    from ampscape.solve.quicklook import shard_quicklooks
 
     build = pathlib.Path(a.build)
     cfg = json.loads((build / "build.json").read_text())
@@ -262,7 +262,7 @@ def main() -> None:
     s.set_defaults(func=cmd_solve)
     b = sub.add_parser("submit")
     b.add_argument("--build", required=True)
-    b.add_argument("--profile", default=None, help="configs/cluster/<name>.yaml (default: $EFB_CLUSTER_PROFILE or ice)")
+    b.add_argument("--profile", default=None, help="configs/cluster/<name>.yaml (default: $AMPSCAPE_CLUSTER_PROFILE or ice)")
     b.add_argument("--time", default=None, help="override the profile's per-tier default")
     b.add_argument("--cpus", type=int, default=None)
     b.add_argument("--mem", default=None)

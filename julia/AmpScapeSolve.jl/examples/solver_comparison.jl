@@ -3,8 +3,8 @@
 #     differences in cum_current and Reff (pairwise) and current (advanced) and Omniscape cum_current
 #   * determinism: solve M samples twice per solver; report bitwise equality
 # julia --project=. examples/solver_comparison.jl <inputs.h5> <out.json> [n_compare=10] [n_repeat=5]
-using EcoFlowBenchSolve, HDF5, JSON, Statistics, LinearAlgebra
-const E = EcoFlowBenchSolve
+using AmpScapeSolve, HDF5, JSON, Statistics, LinearAlgebra
+const E = AmpScapeSolve
 inputs, outjson = ARGS[1], ARGS[2]
 n_cmp = length(ARGS) >= 3 ? parse(Int, ARGS[3]) : 10
 n_rep = length(ARGS) >= 4 ? parse(Int, ARGS[4]) : 5

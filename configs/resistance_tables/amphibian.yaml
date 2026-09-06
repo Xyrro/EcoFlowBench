@@ -2,7 +2,7 @@
 # built-up and roads extreme (road mortality / desiccation); strong slope penalty.
 # Qualitative structure follows the amphibian landscape-genetics literature summarised in
 # Spear et al. 2010 and Zeller et al. 2012 (moisture and canopy as the dominant permeability
-# axes, roads as near-barriers). Numeric values are EcoFlowBench choices (see README).
+# axes, roads as near-barriers). Numeric values are AmpScape choices (see README).
 table_id: amphibian
 version: 1
 description: "wetland/water/forest 1-2, grass/shrub 15-20, crop 50, bare 200, built 800; roads 150-900; slope x(1+0.06 deg)"

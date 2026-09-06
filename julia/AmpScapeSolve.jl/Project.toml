@@ -1,6 +1,6 @@
-name = "EcoFlowBenchSolve"
+name = "AmpScapeSolve"
 uuid = "6b1b1c32-5994-4079-a933-43431ff108bf"
-authors = ["EcoFlowBench contributors"]
+authors = ["AmpScape contributors"]
 version = "0.0.1"
 
 [deps]

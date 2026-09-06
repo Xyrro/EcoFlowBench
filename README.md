@@ -1,8 +1,8 @@
-# EcoFlowBench
+# AmpScape
 
 **A benchmark dataset and evaluation suite for learned surrogates of circuit-theoretic landscape connectivity (Circuitscape / Omniscape).**
 
-EcoFlowBench provides standardized (resistance landscape, source configuration) → (solver output) pairs for training and fairly comparing machine-learning surrogates of circuit-theory connectivity solvers, together with official splits, out-of-distribution test sets, evaluation metrics, baselines, and a fully reproducible generation pipeline.
+AmpScape provides standardized (resistance landscape, source configuration) → (solver output) pairs for training and fairly comparing machine-learning surrogates of circuit-theory connectivity solvers, together with official splits, out-of-distribution test sets, evaluation metrics, baselines, and a fully reproducible generation pipeline.
 
 > Status: under development. See `docs/TASK_BRIEF.md` for the full project specification.
 
@@ -20,7 +20,7 @@ See `docs/TASK_BRIEF.md` §2.2. Phase 1 documents: `docs/compute_env.md`, `docs/
 ```bash
 source scripts/env.sh          # isolates from ~/.bashrc conda env, points caches at scratch
 uv sync --extra dev            # Python 3.11 venv on scratch (pinned in uv.lock)
-julia --project=julia/EcoFlowBenchSolve.jl -e 'using Pkg; Pkg.instantiate()'
+julia --project=julia/AmpScapeSolve.jl -e 'using Pkg; Pkg.instantiate()'
 bash scripts/setup_gdal_env.sh # optional GDAL CLI tools
 python -m pytest -q
 ```
