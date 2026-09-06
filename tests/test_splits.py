@@ -32,15 +32,15 @@ def _tiles(n_per_tier=400, seed=0):
 
 
 def test_block_ids_and_footprints():
-    g = BlockGrid(5.0)
-    assert g.block_id(0.0, 0.0) == "b018_036" and g.block_id(-90, -180) == "b000_000"
-    g20 = BlockGrid(20.0)
-    assert len(g20.footprint_blocks(20.0, 10.0, 1_024_000)) == 1      # XXL tile inside one 20° cell (10..30, 0..20)
+    g = BlockGrid(20.0, equal_width=False)
+    assert g.block_id(0.0, 0.0) == "b004_009" and g.block_id(-90, -180) == "b000_000"
     assert g.block_id(10, 179.9) != g.block_id(10, -179.9)
-    fb = g.footprint_blocks(0.0, 0.0, 1_024_000)      # XXL tile (2 048 km, ±9.2°) at the equator spans 4×4 blocks
-    assert len(fb) == 16 and g.block_id(0.0, 0.0) in fb
-    assert len(g.footprint_blocks(0.0, 0.0, 256_000)) == 4   # XL (512 km, ±2.3°) around a block corner
-    assert g.footprint_blocks(2.5, 2.5, 6_400) == [g.block_id(2.5, 2.5)]   # S tile inside one block
+    ew = BlockGrid(20.0)                                     # equal-width: fewer lon cells toward the poles
+    assert ew.n_lon(4) == 18 and ew.n_lon(0) == 3 and ew.n_lon(8) == 3
+    assert len(ew.footprint_blocks(15.0, 10.0, 6_400)) == 1  # S tile inside one cell (band 10..30)
+    assert len(ew.footprint_blocks(0.0, 0.0, 1_024_000)) == 2  # XXL on a longitude boundary touches two cells
+    assert ew.interior_bounds(ew.block_id(15, 10), 256_000) is not None   # XL fits inside a 20° cell
+    assert ew.interior_bounds(ew.block_id(15, 10), 1_024_000) is None      # XXL does not (parent regions instead)
 
 
 def test_assignment_deterministic_and_stratified():
@@ -58,27 +58,23 @@ def test_assignment_deterministic_and_stratified():
 def test_no_cross_tier_overlap():
     tiles = _tiles()
     grid = BlockGrid(20.0)
-    ood = {grid.block_id(-25, 135)}                     # one Australasian cell as OOD region
+    ood = {grid.block_id(-25, 135)}                          # one Australasian cell as OOD region
     t = assign_tiles(tiles, grid, seed=20260906, ood_blocks=ood)
     assert set(t.split) <= {"train", "val", "test_id", "ood_region", "excluded"}
-    assert check_no_cross_tier_overlap(t) == []
+    assert check_no_cross_tier_overlap(t) == []             # geometric: no train/val box meets a test box
     kept = t[t.split != "excluded"]
-    # straddling exclusion is rare for small tiles and bounded for XXL (a sampler would resample them)
-    assert (t[t.tier == "S"].split == "excluded").mean() < 0.03
-    assert (t[t.tier == "XXL"].split == "excluded").mean() < 0.9
-    # proportions are close to 80/10/10 for the kept tiles of the small tiers
+    assert (t[t.tier == "XXL"].split == "excluded").sum() == 0          # XXL tiles are never excluded
+    assert (t[t.tier == "S"].split == "excluded").mean() < 0.05
+    assert (t[t.tier == "XL"].split == "excluded").mean() < 0.6
     small = kept[kept.tier.isin(["S", "M", "L"])]
     frac = small.split.value_counts(normalize=True)
     assert 0.6 < frac.get("train", 0) < 0.92 and frac.get("test_id", 0) > 0.03
-    # the same block assignment is used at every tier: an S tile and an XXL tile sharing a block
-    # never end up as train vs test
-    for _, g in kept.groupby("block_id"):
-        kinds = {("trainval" if s in ("train", "val") else "test") for s in g.split}
-        assert len(kinds) == 1
-    # footprint rule: a tile touching an OOD block is OOD
-    touching = kept[kept.footprint_blocks.apply(lambda fb: any(b in ood for b in fb))]
+    # tiles inside an XXL footprint inherit its assignment
+    inh = kept[kept.region.str.startswith("parent:") & (kept.tier != "XXL")]
+    par = kept[kept.tier == "XXL"].drop_duplicates("region").set_index("region").split
+    assert len(inh) > 0 and all(par[r] == s for r, s in zip(inh.region, inh.split, strict=True))
+    touching = kept[kept.footprint_blocks.apply(lambda fb: any(b in ood for b in fb)) & kept.region.str.startswith("cell:")]
     assert (touching.split == "ood_region").all()
-    # re-assignment is reproducible
     t2 = assign_tiles(tiles, grid, seed=20260906, ood_blocks=ood)
     assert list(t.split) == list(t2.split)
 

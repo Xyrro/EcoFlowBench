@@ -214,6 +214,33 @@ string Julia's own binaries use) and `JULIA_PKG_PRECOMPILE_AUTO=0`; the cache is
 login node** (`scripts/generate.py submit` does this before every `sbatch`) and jobs only load it.
 If a hang recurs: `find julia_depot/compiled -name '*.pidfile' -delete` after killing the holders.
 
+## 8.2 Could v1.0 generation run on ICE within two weeks? (checked 2026-09-06)
+
+Per-user limits read from Slurm: QoS `coc-ice` has **no per-user CPU or job-count cap** — only
+`MaxSubmitPU = 500` (queued + running jobs per user; each array task counts) and no `MaxWall` beyond
+the partition limits (18 h CPU). Partition-level group caps: `coc-cpu` cpu = 2 536 across all
+`coc-ice` users; `coc-gpu` gpu = 56. Cluster: `MaxArraySize = 1001`, `MaxJobCount = 10 000`.
+Capacity at inspection: `coc-cpu`/`ice-cpu` 51–52 nodes × 24 cores (1 384 / 1 576 cores), 47 nodes
+idle (≈ 1 290 idle cores); `DefMemPerCPU = 4 GB`, nodes have 191 GB, so an XXL job (9.5 GB) is one core
+plus `--mem=12G`.
+
+Arithmetic for v1.0 (`docs/dataset_plan.md`: ≈ 11 300 core-hours, single-threaded solves, ≤ 9.5 GB/job):
+
+| concurrent 1-core jobs | wall time | note |
+|---|---|---|
+| 500 (the `MaxSubmitPU` ceiling, if all run) | ≈ 23 h | ideal |
+| 300 (realistic share of a teaching cluster) | ≈ 1.6 days | |
+| 100 | ≈ 4.7 days | |
+
+So **technically yes**: even at 100 concurrent cores the compute finishes in under a week, and
+shards of ≤ 4 h keep every job inside the limits. What makes ICE unsuitable for the full run is not
+the limits but (a) the owner's decision that ICE hosts pipeline/mini/dev only and the 500 CPU-hour
+gate (v1.0 is 22× that), (b) the 300 GB scratch quota against ≈ 810 GB of output, which works only
+with the streaming upload (`ampscape/io/sync.py`) keeping < 150 GB local, and (c) etiquette on a
+shared teaching cluster (`%20` concurrency default in the profile). If ICE were chosen anyway, the
+plan would be S/M shards at 1 core, 6 GB; L 1 core, 8 GB; XL 1 core, 16 GB; XXL 1 core, 12 GB;
+arrays of ≤ 500 tasks; sync after every finalized shard.
+
 ## 9. Slurm conventions for this project
 
 - Generation: job arrays on `coc-cpu` (fallback `ice-cpu`), `--time=04:00:00`, one shard per

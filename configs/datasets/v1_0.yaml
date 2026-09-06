@@ -55,9 +55,13 @@ splits:
   train: 0.8
   val: 0.1
   test_id: 0.1
-  spatial_block: {kind: "lonlat_grid", size_deg: 20.0}  # 20°×20° macro-cells (≈ 2 200 km at the equator, larger than an XXL
-                                                        # tile); tiles straddling cells with different assignments are
-                                                        # excluded (resampled by the sampler); footprint rule as safety net
+  spatial_block: {kind: "hierarchical", grid: "equal_width", band_deg: 20.0, parent_tier: XXL}
+    # Equal-width grid: 20° latitude bands, per band n_lon ≈ 360·cos(lat_c)/20 cells (104 cells globally,
+    # ≈ 2 200 km wide at every latitude). XXL tiles are their own assignment regions (overlapping XXL
+    # footprints are merged); every smaller tile inherits the assignment of the XXL footprint that fully
+    # contains it, or of the single grid cell that contains it; tiles straddling two regions are excluded
+    # and resampled. Verified: 0 geometric train/val–test overlaps across tiers, XXL placeable at every
+    # latitude, S–L placeable ≥ 88 %, XL 65–86 % (uniform in latitude).
   seed: 20260906
   xl_trainval_share: 0.25            # C3: 25 % of XL landscapes are train/val (in-distribution), 75 % test
   tier_disjoint_seeds: true          # synthetic seed ranges never overlap across tiers

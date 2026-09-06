@@ -90,20 +90,21 @@ in-distribution splits contain no held-out biome, realm, table, tier or contrast
 
 ## 5. Split design and leakage rules
 
-- **Spatial macro-cells shared across tiers (owner amendment C1).** Tiers are multi-resolution, so S/M
-  tiles physically sit inside XL/XXL tiles. The globe is partitioned into 20° × 20° lon/lat macro-cells
-  (≈ 2 200 km, larger than an XXL tile so every tile of every tier can lie inside one cell); each cell
-  receives exactly one assignment — `train`, `val`, `test_id`, or `ood_region` — from the dataset seed
-  (`splits.seed = 20260906`), stratified by realm so that every realm contributes to every split. The
-  assignment is applied **at every tier**: a landscape belongs to the split of the cell containing its
-  tile. Tiles whose footprint straddles cells with different assignments are **excluded and resampled**
-  by the tile sampler (a sampler constraint, not a cascade); as a safety net the footprint rule (the
-  test-most assignment among touched cells wins, propagated to a fixed point) is still applied, so a
-  test region at any resolution never overlaps a training region at any other resolution. Held-out
-  biomes / realms (`test_ood_region`) are whole cells. A 5°-cell variant was tried first and rejected:
-  with straddling XL/XXL tiles the footprint cascade turned most of the globe into test.
-  `ampscape/splits` implements this; `tests/test_splits.py` checks zero cross-tier overlap on 1 640
-  random tiles over five tiers and that the kept proportions stay near 80/10/10.
+- **Hierarchical spatial regions shared across tiers (owner amendment C1, revised 2026-09-06).** Tiers
+  are multi-resolution, so S/M tiles physically sit inside XL/XXL tiles, and a fixed lon/lat grid cannot
+  hold an XXL tile outside the tropics (20° cells are 1 570 km wide at 45° latitude; measured: 0 % of
+  random XXL centres fit, and equal-width 30° bands still confine XXL to three latitude strips). The
+  adopted scheme: (i) an **equal-width grid** — 20° latitude bands with n ≈ 360·cos(lat)/20 longitude
+  cells per band (104 cells, ≈ 2 200 km wide at every latitude) — receives one seeded assignment per
+  cell (`train`/`val`/`test_id`/`ood_region`, stratified by realm); (ii) **XXL tiles are their own
+  assignment regions** (overlapping XXL footprints merged, assigned unstratified from the same seed);
+  (iii) every smaller tile inherits the assignment of the XXL footprint that fully contains it, or
+  otherwise of the single grid cell that contains it; (iv) tiles straddling two regions are excluded
+  and resampled by the sampler (`BlockGrid.interior_bounds` gives the sampler the admissible centre
+  box). Leakage is checked **geometrically**: no train/val tile's bounding box intersects any test/OOD
+  tile's box at any tier (`tests/test_splits.py`, 1 640 random tiles, 0 overlaps). Placeability is
+  uniform in latitude: XXL 100 %, S–L ≥ 88 %, XL 65–86 % of random centres (before sampler placement).
+  Held-out biomes / realms (`test_ood_region`) are whole cells; XXL parents centred in them are OOD.
 - **Unit for synthetic landscapes = seed family.** A base seed defines the landscape; its 4-neighbour
   ablation duplicate and any hard-case variant derived from it inherit the split. Seed ranges are
   tier-disjoint.

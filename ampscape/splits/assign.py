@@ -27,15 +27,16 @@ DEFAULT_CFG = pathlib.Path(__file__).resolve().parents[2] / "configs" / "dataset
 def add_splits(index: pd.DataFrame, build: pathlib.Path, cfg_path: pathlib.Path = DEFAULT_CFG) -> pd.DataFrame:
     cfg = yaml.safe_load(open(cfg_path))
     sp = cfg["splits"]
-    grid = BlockGrid(float(sp["spatial_block"]["size_deg"]))
+    sb = sp["spatial_block"]
+    grid = BlockGrid(float(sb.get("band_deg", sb.get("size_deg", 20.0))), equal_width=(sb.get("grid", "equal_width") == "equal_width"))
     seed = int(sp["seed"])
     fractions = {k: sp[k] for k in ("train", "val", "test_id")}
     df = index.copy()
     # real tiles: one row per tile with centre and size
     real = df[df.family == "real"].drop_duplicates("sample_id")
     if len(real):
-        tiles = pd.DataFrame({"tile_id": real.tile_id, "lat": real.lat, "lon": real.lon, "size": real.H, "pixel_m": real.pixel_m,
-                              "realm": real.realm, "biome_num": real.biome_num}).drop_duplicates("tile_id")
+        tiles = pd.DataFrame({"tile_id": real.tile_id, "tier": real.tier, "lat": real.lat, "lon": real.lon, "size": real.H,
+                              "pixel_m": real.pixel_m, "realm": real.realm, "biome_num": real.biome_num}).drop_duplicates("tile_id")
         ood_cfg = cfg["ood"]["test_ood_region"]
         ood_blocks = {grid.block_id(r.lat, r.lon) for r in tiles.itertuples()
                       if r.realm in ood_cfg.get("hold_out_realms", []) or r.biome_num in ood_cfg.get("hold_out_biome_nums", [])}
