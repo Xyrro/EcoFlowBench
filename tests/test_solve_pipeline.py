@@ -16,7 +16,7 @@ from ecoflowbench.solve.manifest import (
     sample_uuid,
     to_frame,
 )
-from ecoflowbench.solve.prepare import prepare_shard
+from ecoflowbench.solve.prepare import omni_params, prepare_shard
 from ecoflowbench.solve.qc import qc_advanced, qc_omniscape, qc_pairwise, qc_pass
 from ecoflowbench.sources import SourceConfig
 
@@ -49,7 +49,8 @@ def test_prepare_layout(tmp_path):
             assert set(g["configs"]) == set(DEFAULT_CONFIGS)
             assert g["configs"]["points"].attrs["kind"] == "points"
             assert g["configs"]["advanced"]["ground"].dtype == np.int8
-            assert g.attrs["omni_radius"] == 16 and g.attrs["omni_block_size"] == 3
+            r, b = omni_params("S")            # follows configs/solver/omniscape_reference.yaml
+            assert g.attrs["omni_radius"] == r and g.attrs["omni_block_size"] == b and b % 2 == 1
             meta = json.loads(g.attrs["meta"])
             assert meta["source_config"]["config_id"] == "sources_default_v1" and meta["generator"]
         k = len(json.loads(f["samples"][specs[0].sample_id].attrs["meta"])["configs"]["points"]["focal_table"])
