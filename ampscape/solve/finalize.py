@@ -114,6 +114,7 @@ def finalize_shard(inputs_h5: str, outputs_h5: str, final_h5: str, dataset_versi
                     "tier": meta["tier"], "H": meta["H"], "W": meta["W"], "generator": meta.get("generator"),
                     "resistance_table_id": meta.get("resistance_table_id"), "tile_id": meta.get("tile_id"),
                     "biome_num": meta.get("biome_num"), "realm": meta.get("realm"), "contrast": meta.get("contrast"),
+                    "lat": meta.get("lat"), "lon": meta.get("lon"), "pixel_m": meta.get("pixel_size_m"),
                     "K": k_focal, "placement": cm.get("meta", {}).get("placement"), "seed": meta["seed"],
                     "solver": q["solver"], "converged": q["converged"], "solve_time_s": q["solve_time_s"],
                     "maxrss_mb": q["maxrss_mb"], "residual_rel": q["residual_rel"], "residual_rel_f32": q.get("residual_rel_f32"),
