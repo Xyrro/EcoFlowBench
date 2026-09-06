@@ -20,7 +20,8 @@ SHARD="${SLURM_ARRAY_TASK_ID:-0}"
 echo "host=$(hostname) build=$AMPSCAPE_BUILD shard=$SHARD cpus=${SLURM_CPUS_PER_TASK:-1} start=$(date -u +%FT%TZ)"
 cd "$AMPSCAPE_SCRATCH"
 EXTRA=()
-[ -n "${AMPSCAPE_CONFIGS:-}" ] && EXTRA+=(--configs "$AMPSCAPE_CONFIGS")
+# config list is '+'-separated in --export (sbatch splits --export on commas)
+[ -n "${AMPSCAPE_CONFIGS:-}" ] && EXTRA+=(--configs "${AMPSCAPE_CONFIGS//+/,}")
 [ "${AMPSCAPE_FORCE:-0}" = "1" ] && EXTRA+=(--force)
 python scripts/generate.py solve --build "$AMPSCAPE_BUILD" --shard "$SHARD" \
     --solver "${AMPSCAPE_SOLVER:-cholmod}" --fallback "${AMPSCAPE_FALLBACK:-cg+amg}" --omniscape-solver "${AMPSCAPE_OSOLVER:-cholmod}" "${EXTRA[@]}"

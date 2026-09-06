@@ -166,7 +166,7 @@ def cmd_submit(a) -> None:
         cmd.append(f"--qos={prof['qos']}")
     cmd += [
            f"--export=ALL,AMPSCAPE_BUILD={build},AMPSCAPE_SOLVER={a.solver},AMPSCAPE_FALLBACK={a.fallback},AMPSCAPE_OSOLVER={a.omniscape_solver},"
-           f"AMPSCAPE_CONFIGS={a.configs or ''},AMPSCAPE_FORCE={'1' if a.force_solve else '0'},"
+           f"AMPSCAPE_CONFIGS={(a.configs or '').replace(',', '+')},AMPSCAPE_FORCE={'1' if a.force_solve else '0'},"
            f"AMPSCAPE_SCRATCH={prof['scratch_root']},AMPSCAPE_NODE_TMP={prof.get('node_tmp', '/tmp')},"
            f"AMPSCAPE_MODULES={':'.join(prof.get('modules', []))}",
            str(SBATCH_TEMPLATE)]
