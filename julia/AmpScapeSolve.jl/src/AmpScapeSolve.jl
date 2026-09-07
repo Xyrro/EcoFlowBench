@@ -32,7 +32,7 @@ using JSON
 using Statistics
 using Logging
 
-export solve_pairwise, solve_advanced, solve_omniscape, solve_shard, solver_versions, SolveStats, cg_baseline, graph_laplacian, kirchhoff_residual, sanitize_nan
+export solve_pairwise, solve_advanced, solve_omniscape, solve_shard, solver_versions, SolveStats, cg_baseline, graph_laplacian, kirchhoff_residual, node_current_map, refine_voltage!, sanitize_nan
 
 const NODATA = -9999.0
 
@@ -238,6 +238,112 @@ function cg_baseline(L, idx, injection::AbstractMatrix, grounded::AbstractMatrix
 end
 
 # ---------------------------------------------------------------------------
+# Current maps from voltages (Circuitscape's node-current definition) and iterative refinement
+# ---------------------------------------------------------------------------
+"""
+    node_current_map(L, idx, voltage; region_pixels=nothing, region_current=1.0)
+
+Circuitscape's node current (out.jl `get_node_currents`): for every node the larger of the summed
+positive inflow and summed positive outflow over its branches, where branch current = g_ij (v_i − v_j)
+and g_ij = −L_ij. Pixels of a short-circuited focal region (repeated label) share one merged node in
+Circuitscape and all display that node's current, which for a unit source/ground is the full injected
+current; `region_pixels` (a Bool mask) receive `region_current`.
+"""
+function node_current_map(L::SparseMatrixCSC, idx::AbstractMatrix{<:Integer}, voltage::AbstractMatrix;
+                          region_pixels = nothing, region_current = 1.0)
+    valid = idx .> 0
+    v = zeros(Float64, maximum(idx))
+    v[vec(idx[valid])] .= Float64.(vec(voltage[valid]))
+    n = length(v)
+    inflow = zeros(n); outflow = zeros(n)
+    rows = rowvals(L); vals = nonzeros(L)
+    for j in 1:n
+        for k in nzrange(L, j)
+            i = rows[k]
+            i == j && continue
+            g = -vals[k]                      # conductance between i and j
+            c = g * (v[i] - v[j])             # current flowing from i into j
+            if c > 0
+                inflow[j] += c
+            else
+                outflow[j] -= c
+            end
+        end
+    end
+    node = max.(inflow, outflow)
+    out = zeros(Float32, size(idx))
+    out[valid] .= Float32.(node[vec(idx[valid])])
+    if region_pixels !== nothing
+        out[region_pixels] .= Float32(region_current)
+    end
+    return out
+end
+
+"""
+    refine_voltage!(L, idx, voltage, injection, grounded; source_region=nothing, rtol_trigger=1e-8)
+
+One step of iterative refinement of a solved voltage map: r = b − A x, A d = r (CHOLMOD factorisation
+of the reduced system: grounded nodes removed, a short-circuited source region collapsed to one
+node), x += d. Applied only when the achieved relative residual exceeds `rtol_trigger`. Returns a
+Dict with residual before/after, whether refinement ran and the extra wall time. The voltage map is
+updated in place (all pixels of the source region get the merged node's voltage).
+"""
+function refine_voltage!(L::SparseMatrixCSC, idx::AbstractMatrix{<:Integer}, voltage::AbstractMatrix{Float64},
+                         injection::AbstractMatrix, grounded::AbstractMatrix{Bool};
+                         source_region = nothing, rtol_trigger = 1e-8)
+    t0 = time()
+    valid = idx .> 0
+    n = maximum(idx)
+    ids = vec(idx[valid])
+    v = zeros(Float64, n); v[ids] .= Float64.(vec(voltage[valid]))
+    b = zeros(Float64, n); b[ids] .= Float64.(vec(injection[valid]))
+    gnd = falses(n); gnd[ids] .= vec(grounded[valid])
+    # collapse a short-circuited source region into one node: P (n × m) indicator, A_c = P' L P
+    if source_region !== nothing && count(source_region) > 1
+        reg = falses(n); reg[ids] .= vec(source_region[valid])
+        rep = findfirst(reg)                              # representative node
+        col = collect(1:n)
+        col[reg] .= rep
+        keep = .!reg; keep[rep] = true
+        newid = zeros(Int, n); newid[keep] .= 1:count(keep)
+        P = sparse(1:n, newid[col], ones(n), n, count(keep))
+        A = P' * L * P
+        bc = P' * b
+        vc = zeros(count(keep)); vc[newid[keep]] .= v[keep]  # region pixels share v[rep]
+        gc = falses(count(keep)); gc[newid[keep]] .= gnd[keep]
+    else
+        P = nothing; A = L; bc = b; vc = copy(v); gc = gnd
+    end
+    free = .!gc
+    Af = A[free, free]
+    bf = bc[free]
+    xf = vc[free]
+    r = bf .- Af * xf
+    nb = norm(bf)
+    before = nb > 0 ? norm(r) / nb : NaN
+    out = Dict{String,Any}("residual_before" => before, "refined" => false, "trigger" => rtol_trigger)
+    if isfinite(before) && before > rtol_trigger
+        F = cholesky(Af)                                   # CHOLMOD (SuiteSparse)
+        d = F \ r
+        xf .+= d
+        r2 = bf .- Af * xf
+        out["residual_after"] = norm(r2) / nb
+        out["refined"] = true
+        vc[free] .= xf
+        if P !== nothing
+            v = P * vc
+        else
+            v = vc
+        end
+        voltage[valid] .= v[ids]
+    else
+        out["residual_after"] = before
+    end
+    out["time_s"] = time() - t0
+    return out
+end
+
+# ---------------------------------------------------------------------------
 # Pairwise (T1 / T1W / T2)
 # ---------------------------------------------------------------------------
 struct PairwiseResult
@@ -278,7 +384,8 @@ is set.
 """
 function solve_pairwise(R::AbstractMatrix, nodata::AbstractMatrix{Bool}, focal::AbstractMatrix{<:Integer};
                         solver = "cholmod", fallback = "cg+amg", keep_pair_maps = true,
-                        four_neighbors = false, workdir = mktempdir(), cg_baseline_enabled = true)
+                        four_neighbors = false, workdir = mktempdir(), cg_baseline_enabled = true,
+                        refine = true, refine_trigger = 1e-8)
     H, W = size(R)
     Rw = Float64.(R); Rw[nodata] .= NODATA
     write_asc(joinpath(workdir, "habitat.asc"), Rw)
@@ -327,6 +434,7 @@ function solve_pairwise(R::AbstractMatrix, nodata::AbstractMatrix{Bool}, focal::
     # full-precision Float64 voltages before the float32 cast.
     resid = 0.0
     L = idx = nothing
+    refinements = Any[]; cum_rebuild = false
     for (p, (i, j)) in enumerate(pairs)
         pair_index[p, 1] = i; pair_index[p, 2] = j
         if keep_pair_maps
@@ -336,6 +444,16 @@ function solve_pairwise(R::AbstractMatrix, nodata::AbstractMatrix{Bool}, focal::
             src = focal .== j; gnd = focal .== i
             inj = zeros(Float64, size(R)); inj[src] .= 1.0 / count(src)
             r_p = kirchhoff_residual(L, idx, v64, inj, gnd; supernode = count(src) > 1 ? src : nothing)
+            if refine && r_p > refine_trigger
+                ref = refine_voltage!(L, idx, v64, inj, gnd; source_region = count(src) > 1 ? src : nothing, rtol_trigger = refine_trigger)
+                push!(refinements, Dict("pair" => [i, j], ref...))
+                r_p = ref["residual_after"]
+                # regenerate this pair's current map and Reff from the refined voltages
+                pc[end] = node_current_map(L, idx, v64; region_pixels = src .| gnd, region_current = 1.0)
+                vj = maximum(v64[src])
+                reff[pos[i], pos[j]] = vj; reff[pos[j], pos[i]] = vj
+                cum_rebuild = true
+            end
             resid = max(resid, r_p)
             if p == 1 && cg_baseline_enabled && count(src) == 1
                 # solver-acceleration baseline (zero-start AMG-CG on the first pair; point sources only)
@@ -348,6 +466,11 @@ function solve_pairwise(R::AbstractMatrix, nodata::AbstractMatrix{Bool}, focal::
             push!(pv, Float32.(v64))
         end
     end
+    if cum_rebuild                                   # cumulative map = Σ over pairs of the (refined) node currents
+        cum = zeros(Float32, size(R)); for m in pc; cum .+= m; end
+    end
+    st.solver_params["refinement"] = Dict("enabled" => refine, "trigger" => refine_trigger, "n_refined" => length(refinements),
+                                          "pairs" => refinements)
     st.solver_params["pair_convention"] = "pair (i,j): i grounded (0 V), 1 A injected at j"
     st.solver_params["residual_rel"] = keep_pair_maps ? resid : NaN
     return PairwiseResult(cum, reff, labels, pair_index, pc, pv, st)
@@ -364,7 +487,7 @@ end
 
 function solve_advanced(R::AbstractMatrix, nodata::AbstractMatrix{Bool}, S::AbstractMatrix, G::AbstractMatrix;
                         solver = "cholmod", fallback = "cg+amg", four_neighbors = false, workdir = mktempdir(),
-                        cg_baseline_enabled = true)
+                        cg_baseline_enabled = true, refine = true, refine_trigger = 1e-8)
     H, W = size(R)
     Rw = Float64.(R); Rw[nodata] .= NODATA
     write_asc(joinpath(workdir, "habitat.asc"), Rw)
@@ -399,6 +522,15 @@ function solve_advanced(R::AbstractMatrix, nodata::AbstractMatrix{Bool}, S::Abst
     v64 = read_asc(joinpath(workdir, "out_voltmap.asc")); v64[v64 .== NODATA] .= 0.0
     L, idx = graph_laplacian(R, nodata)
     r_a = kirchhoff_residual(L, idx, v64, Float64.(S), G .> 0)
+    if refine && r_a > refine_trigger
+        ref = refine_voltage!(L, idx, v64, Float64.(S), G .> 0; rtol_trigger = refine_trigger)
+        st.solver_params["refinement"] = Dict("enabled" => true, "trigger" => refine_trigger, "n_refined" => 1, "pairs" => [ref])
+        r_a = ref["residual_after"]
+        cur = node_current_map(L, idx, v64; region_pixels = G .> 0, region_current = 0.0)
+        cur[G .> 0] .= Float32.(vec(node_current_map(L, idx, v64)[G .> 0]))   # grounds keep their own node current
+    else
+        st.solver_params["refinement"] = Dict("enabled" => refine, "trigger" => refine_trigger, "n_refined" => 0, "pairs" => [])
+    end
     st.solver_params["residual_rel"] = r_a
     if cg_baseline_enabled
         st.solver_params["cg_baseline"] = try
@@ -537,6 +669,7 @@ function solve_shard(inputs_h5::AbstractString, outputs_h5::AbstractString; solv
         end
         R = h5_hw(gin["inputs"], "resistance")
         nodata = h5_hw(gin["inputs"], "nodata_mask") .> 0
+        cgb = haskey(attrs(gin), "cg_baseline") ? Int(attrs(gin)["cg_baseline"]) == 1 : true
         gout = haskey(fout["samples"], sid) ? fout["samples"][sid] : create_group(fout["samples"], sid)
         if force && haskey(gout, "outputs")
             oo = gout["outputs"]                      # re-solve only the listed configs, keep the others
@@ -556,7 +689,7 @@ function solve_shard(inputs_h5::AbstractString, outputs_h5::AbstractString; solv
                     focal = Int32.(h5_hw(gc, "focal_mask"))
                     K = length(unique(focal[focal .> 0]))
                     keep = K <= keep_pair_maps_max_k
-                    res = solve_pairwise(R, nodata, focal; solver, fallback, keep_pair_maps = keep, workdir = wd)
+                    res = solve_pairwise(R, nodata, focal; solver, fallback, keep_pair_maps = keep, workdir = wd, cg_baseline_enabled = cgb)
                     h5_hw!(og, "cum_current", res.cum_current)
                     og["reff"] = permutedims(res.reff)
                     og["labels"] = Int32.(res.labels)
@@ -568,7 +701,7 @@ function solve_shard(inputs_h5::AbstractString, outputs_h5::AbstractString; solv
                     attrs(og)["stats"] = stats_json(res.stats)
                 elseif kind == "advanced"
                     S = h5_hw(gc, "source_strength"); G = h5_hw(gc, "ground")
-                    res = solve_advanced(R, nodata, S, G; solver, fallback, workdir = wd)
+                    res = solve_advanced(R, nodata, S, G; solver, fallback, workdir = wd, cg_baseline_enabled = cgb)
                     h5_hw!(og, "current", res.current)
                     h5_hw!(og, "voltage", res.voltage)
                     attrs(og)["stats"] = stats_json(res.stats)

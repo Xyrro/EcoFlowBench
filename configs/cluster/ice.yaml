@@ -25,7 +25,8 @@ defaults:                    # per-tier resources for solve shards (measured Pha
   M:   {cpus: 1, mem: "6G",  time: "04:00:00", shard_size: 100}
   L:   {cpus: 2, mem: "8G",  time: "04:00:00", shard_size: 40}
   XL:  {cpus: 4, mem: "16G", time: "04:00:00", shard_size: 8}
-  XXL: {cpus: 8, mem: "32G", time: "04:00:00", shard_size: 2}
+  XXL: {cpus: 8, mem: "12G", time: "04:00:00", shard_size: 2}        # train/val shards: 9.5 GB peak (no CG baseline)
+  XXL_test: {cpus: 8, mem: "20G", time: "04:00:00", shard_size: 2}   # test/OOD shards: ~14.5 GB peak (AMG-CG baseline)
 network:
   compute_nodes_have_internet: true      # verified 2026-09-05 but never relied upon
   installs_on: login

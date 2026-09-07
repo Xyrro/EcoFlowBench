@@ -29,6 +29,16 @@ SOURCES = {
         "url": "https://ndownloader.figshare.com/files/13448294",
         "file": "gHM.zip", "license": "CC BY 4.0", "sets": ["pilot", "full"]},
 }
+# Published resistance surfaces (docs/survey_resistance_surfaces.md; owner-approved 2026-09-06) -> test_ood_published
+SOURCES["published_eurac_alps_permeability"] = {
+    "url": "https://zenodo.org/records/6602481/files/Landscape%20permeability.zip?download=1",
+    "file": "published_eurac_alps_landscape_permeability.zip", "license": "CC BY 4.0 (Zenodo 10.5281/zenodo.6602481)", "sets": ["published"]}
+SOURCES["published_raccoon_europe_maps"] = {
+    "url": "https://ndownloader.figshare.com/files/52023179",
+    "file": "published_raccoon_europe_output_maps.zip", "license": "CC BY 4.0 (figshare 10.6084/m9.figshare.27311484.v1)", "sets": ["published"]}
+SOURCES["published_hawaiian_gallinule_resistance"] = {
+    "url": "https://datadryad.org/api/v2/files/5409/download",
+    "file": "published_hawaiian_gallinule_dryad.zip", "license": "CC0 1.0 (Dryad 10.5061/dryad.p90b87p)", "sets": ["published"]}
 HYDRO = "https://data.hydrosheds.org/file/HydroRIVERS/HydroRIVERS_v10_{r}_shp.zip"
 for r in ["na", "sa", "af", "au", "eu", "as", "ar", "si", "gr"]:
     SOURCES[f"hydrorivers_v10_{r}"] = {
@@ -51,7 +61,7 @@ def sha256(path: pathlib.Path) -> str:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--set", default="pilot", choices=["pilot", "full"])
+    ap.add_argument("--set", default="pilot", choices=["pilot", "full", "published"])
     ap.add_argument("--only", nargs="*", help="subset of source keys")
     ap.add_argument("--dest", default=os.path.join(os.environ.get("AMPSCAPE_DATA", "data"), "sources"))
     ap.add_argument("--dry-run", action="store_true")

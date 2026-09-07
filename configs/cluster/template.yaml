@@ -23,7 +23,8 @@ defaults:
   M:   {cpus: 1, mem: "6G",  time: "04:00:00", shard_size: 100}
   L:   {cpus: 2, mem: "8G",  time: "04:00:00", shard_size: 40}
   XL:  {cpus: 4, mem: "16G", time: "04:00:00", shard_size: 8}
-  XXL: {cpus: 8, mem: "32G", time: "04:00:00", shard_size: 2}
+  XXL: {cpus: 8, mem: "12G", time: "04:00:00", shard_size: 2}
+  XXL_test: {cpus: 8, mem: "20G", time: "04:00:00", shard_size: 2}   # shards containing test/OOD samples (CG baseline adds ~5 GB)
 network:
   compute_nodes_have_internet: false
   installs_on: login

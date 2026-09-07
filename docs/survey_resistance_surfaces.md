@@ -23,6 +23,14 @@ Not found within the time box: a CC-licensed multi-region *expert-table* resista
 mammals at ≤ 100 m outside Europe; Belote et al. 2016 and Dickson et al. 2017 (US corridors / ecological
 flow) publish results through PLoS/CSP without a repository link for the resistance rasters.
 
+## Download status (2026-09-07, owner-approved)
+
+| candidate | status |
+|---|---|
+| 1 Eurac Alps landscape permeability | downloaded (159 MB, sha256 in `data/sources/manifest.json`) |
+| 2 Raccoon Europe output maps | downloaded (121 MB, sha256 in the manifest) |
+| 3 Hawaiian gallinule resistance layers (Dryad, 299 MB `f_wet_negbin.zip`) | **blocked**: Dryad answers 401 on the API file download and 403 on the web file stream for scripted requests from the cluster; needs a browser download by the owner (or a Dryad API token), then `data/sources/published_hawaiian_gallinule_dryad.zip` + a manifest entry |
+
 ## Recommendation (no action taken)
 
 Candidates 1–3 (CC BY 4.0 / CC0, explicit resistance rasters, ≥ 3 regions) are suitable for a small

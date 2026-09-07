@@ -158,7 +158,8 @@ and 52 / 134 / 577 / 1 896 / 9 613 s at the fidelity blocks (S b1 and M b1 measu
 M b1 → b3 scaled; L/XL/XXL scaled by (b_old/b_new)², a law the XL 17→33 pair confirms: predicted
 ×0.265, measured ×0.28);
 T1W 0.08 s, T3 0.07 s, T1R 0.21 s at S, scaling linearly in pixels (exponents 1.00–1.07).
-Peak RSS (process high-water incl. ≈ 1 GB Julia baseline): 1.4 / 1.4 / 1.6 / 3.3 / 9.5 GB.
+Peak RSS (process high-water incl. ≈ 1 GB Julia baseline): 1.4 / 1.4 / 1.6 / 3.3 / 9.5 GB for train/val shards;
+test/OOD shards additionally run the AMG-CG acceleration baseline, which raises XXL to ≈ 14.5 GB (measured 14.3–14.6 GB).
 Compressed storage per landscape (all configs): synthetic 0.93 / 3.0 / 11 / 41 / 140 MB, real ≈ 1.5×.
 
 ### 6.1 Recommended ladder, recommended Omniscape blocks (fidelity rule b/r ≤ 0.10, §7)
@@ -211,7 +212,22 @@ config as the cheaper alternative if the run location cannot afford the differen
 XL 33 / XXL 65 blocks are rejected. Whatever option is run, `block_size` and `radius` are recorded
 per sample and must be identical across all samples of a tier.
 
-## 8. Portability
+### 5.4 Published-resistance evaluation set (`test_ood_published`, Phase 9)
+
+Three permissively licensed resistance surfaces from published studies (Eurac Alps forest-mammal
+permeability, CC BY 4.0; Northern raccoon Europe, CC BY 4.0; Hawaiian gallinule Oʻahu, CC0; see
+`docs/survey_resistance_surfaces.md`) are tiled at tiers S/M with their resistance **as given**
+(rescaled only to R ≥ 1 if needed, documented), AmpScape's focal-node / source configurations, and all
+applicable tasks. They form a test-only split: real resistance from independent authors rather than
+AmpScape's tables.
+
+## 8. Portability and publication route
+
+**Publication route (decided 2026-09-06):** v1.0 is generated and assembled on a cluster with ≥ 1 TB
+scratch and published to the Hugging Face Hub as a public dataset in a single push; the streaming
+validate → upload → verify → delete sync (`ampscape/io/sync.py`) stays available as a fallback for
+storage-constrained clusters. The mini set was pushed to the private `Xirro/AmpScape` as the
+end-to-end test of that path.
 
 Everything cluster-specific lives in `configs/cluster/<profile>.yaml` (`ice.yaml` and
 `template.yaml` provided): scratch root, node temp dir, modules, partitions, account/QoS, per-tier

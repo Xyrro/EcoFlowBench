@@ -99,6 +99,7 @@ def prepare_shard(specs: list[SampleSpec], out_h5: str, source_cfg: SourceConfig
             g.attrs["tier"] = spec.tier
             g.attrs["omni_radius"] = radius
             g.attrs["omni_block_size"] = bs
+            g.attrs["cg_baseline"] = int(bool(getattr(spec, "cg_baseline", True)))   # test/OOD samples only (owner decision)
             gi = g.create_group("inputs")
             gi.create_dataset("resistance", data=R.astype(np.float32), compression="gzip", compression_opts=4)
             gi.create_dataset("nodata_mask", data=nd.astype(np.uint8), compression="gzip", compression_opts=4)

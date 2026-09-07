@@ -3,6 +3,10 @@
 ## [Unreleased]
 
 ### Phase 7 — 2026-09-06
+- Owner decisions on the contrast probe: CHOLMOD iterative refinement (`refine_voltage!`, our own CHOLMOD factorisation of the
+  reduced/collapsed system, maps regenerated via `node_current_map`), CG baseline only for test/OOD samples (plan-time
+  splits, `XXL_test` profile entry), solver cross-check re-run (PCG vs CHOLMOD vs Circuitscape cg+amg), published
+  resistance rasters downloaded, mini pushed to the private HF repo, publication route decided.
 - External review: contrast ladder to 10⁶ (10⁶ test-only) with residual probes at S/XXL; solver-acceleration track
   (`SolveStats.cg_baseline`, explicit AMG-PCG zero/warm start) documented in the task spec and brief §11;
   log10(C + ε·max C) transform (`ampscape.metrics.transforms`) replaces log1p, SSIM/PSNR secondary; unvalidated-threshold

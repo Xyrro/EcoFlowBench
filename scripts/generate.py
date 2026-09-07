@@ -70,8 +70,11 @@ def cmd_plan(a) -> None:
     if a.n_real:
         specs += plan_real(a.dataset, str(ROOT / a.pilot / "resistance.parquet"), str(ROOT / a.pilot / "sources.parquet"),
                            a.n_real, a.tier, a.seed0, configs=configs or DEFAULT_CONFIGS, shard_size=a.shard_size, shard0=n_shards)
-    df = to_frame(specs)
+    from ampscape.solve.manifest import assign_plan_splits
+
+    df = assign_plan_splits(to_frame(specs), str(ROOT / a.pilot) if a.n_real else None)
     df.to_parquet(build / "manifest.parquet", index=False)
+    print("provisional splits:", df.split.value_counts().to_dict(), "| cg_baseline on", int(df.cg_baseline.sum()), "samples")
     cfg = {"dataset_id": a.dataset, "tier": a.tier, "seed0": a.seed0, "shard_size": a.shard_size, "pilot": a.pilot,
            "n_synthetic": a.n_synthetic, "n_real": a.n_real, "source_config": a.source_config,
            "solver_preset": a.solver_preset, "dataset_version": a.dataset_version}
@@ -143,7 +146,10 @@ def cmd_submit(a) -> None:
     prof = load_profile(a.profile)
     df = load_manifest(build)
     tier = str(df.tier.iloc[0])
-    d = prof.get("defaults", {}).get(tier, {})
+    key = tier
+    if "cg_baseline" in df and bool(df.cg_baseline.any()) and f"{tier}_test" in prof.get("defaults", {}):
+        key = f"{tier}_test"
+    d = prof.get("defaults", {}).get(key, {})
     a.partition = a.partition or prof["partitions"]["cpu"]
     a.cpus = a.cpus or d.get("cpus", 1)
     a.mem = a.mem or d.get("mem", "8G")
