@@ -1,8 +1,10 @@
-# Status — 2026-09-06 (Phase 7 code complete; HF push blocked on login)
+# Status — 2026-09-07 (external-review items done; Phase 7 complete; HF end-to-end test passed)
 
-- Macro-cell check: previous 20° lon/lat grid could not hold XXL tiles anywhere (0 % fit); adopted equal-width 20° grid + XXL footprints as regions; placeability uniform in latitude, 0 geometric cross-tier overlaps.
-- Phase 7: `AmpScapeDataset` + `load_from_hub`, HF layout by tier × task group (any tier/task downloads alone), nested mini/core/full subsets, Croissant 1.0 + RAI (validated, 0 errors), push script with verified uploads, dataset card draft with the honest framing. Mini staged: 38 files, 300 MB. Tests: 110 passing.
-- ICE feasibility: v1.0 (11 300 core-h) would finish in ≈ 1–5 days on ICE by the limits alone (`docs/compute_env.md` §8.2); policy and the 300 GB scratch are the real constraints.
-- Paper note recorded: mini's real tiles skew to held-out regions (pilot artifact).
+- **Contrast ladder to 10⁶:** all CHOLMOD residuals at 10⁵ and 10⁶ (tiers S and XXL; T1, T1W, T3) below 1e-6. The apparent XXL wall-to-wall failures were a residual-normalisation inconsistency for short-circuited regions (now the collapsed-system residual everywhere). Iterative refinement (trigger > 1e-8, our own CHOLMOD factorisation, maps regenerated) implemented and recorded per sample; it fired once (2.75e-8 → 6.6e-9, +17 s). Uniform threshold 1e-6 kept.
+- **Acceleration track:** explicit AMG-PCG baseline in `SolveStats.cg_baseline` (Krylov mis-preconditioning found and removed), recorded only for test/OOD samples (plan-time splits; XXL_test profile, ~14.5 GB); mini carries baselines for all T3 and K ≤ 4 T1 solves.
+- **Solver cross-check re-run:** PCG vs CHOLMOD 1.9e-9 (current), 2e-11 (Reff); Circuitscape cg+amg vs CHOLMOD 6e-7 / 3e-9; **no stored output anywhere came from a CG path** (2 660 configurations checked). Phase 5 report bannered.
+- **HF end-to-end test:** mini pushed to private `Xirro/AmpScape` (21 shards, sha256-verified, 0 mismatches); `load_from_hub("T4","S")` fetched one task group alone (22 files, 65 MB, 7 s); sync validate→upload→verify→delete exercised on the smoke build (test files then removed from the repo). Publication route recorded: v1.0 assembled on a ≥ 1 TB-scratch cluster and published in one public push; streaming sync kept as fallback.
+- **Published resistance rasters:** Eurac Alps (CC BY 4.0) and raccoon Europe (CC BY 4.0) downloaded and in the manifest (sources 5.15 GB); **Dryad blocks scripted downloads** (401/403) — the Hawaiian gallinule archive needs a browser download by the owner. `test_ood_published` planned for Phase 9.
+- log10(C + ε·max C) transform, SSIM/PSNR secondary, unvalidated-threshold caveat, survey doc: done. Tests: 111 passing.
 
-**Blocked:** the login node has no Hugging Face token (`hf auth whoami` → Not logged in). After `hf auth login`, the real push, the download-alone check and the sync delete test run.
+**Needs owner:** browser download of Dryad `f_wet_negbin.zip` (10.5061/dryad.p90b87p) into `data/sources/`; go-ahead for Phase 8.

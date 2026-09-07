@@ -41,8 +41,11 @@ def test_split_and_qc_filters_and_torch():
     te = AmpScapeDataset("T1", split=["test_id", "test_ood", "ood_region"], tier="S", root=MINI)
     assert set(tr.index.sample_id).isdisjoint(set(te.index.sample_id))
     assert tr.index.qc_trainval.all()
-    ood = AmpScapeDataset("T1", split=None, tier="S", root=MINI, ood="test_ood_contrast")
-    assert len(ood) > 0 and (ood.index.contrast >= 10000).all()
+    ood = AmpScapeDataset("T1", split=None, tier="S", root=MINI, ood="test_ood_table")
+    assert len(ood) > 0 and (ood.index.resistance_table_id == "forest_bird").all()
+    # the contrast hold-out is 10^6 (2026-09-06 ladder); the mini predates it, so the set may be empty
+    oodc = AmpScapeDataset("T1", split=None, tier="S", root=MINI, ood="test_ood_contrast")
+    assert (oodc.index.contrast >= 1_000_000).all()
     torch_ds = tr.torch()
     b = torch_ds[0]
     assert tuple(b["cum_current"].shape) == (1, 128, 128) and str(b["cum_current"].dtype) == "torch.float32"

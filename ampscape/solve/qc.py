@@ -41,11 +41,12 @@ TRAINVAL_ONLY_FLAGS = {"rmax_saturated"}
 def kirchhoff_residual(R: np.ndarray, nodata: np.ndarray, voltage: np.ndarray, injection: np.ndarray,
                        grounded: np.ndarray | None = None, supernode: np.ndarray | None = None,
                        graph: tuple | None = None) -> float:
-    """‖L v − b‖₂ / ‖b‖₂ on the exact solver graph (mirror of the Julia implementation).
+    """‖L v − b‖₂ / ‖b‖₂ on the exact solver graph (matches AmpScapeSolve.kirchhoff_residual).
 
-    ``injection`` (H,W) is the current injected per pixel, ``grounded`` marks pixels held at 0 V
-    (rows dropped), ``supernode`` marks pixels of one short-circuited focal region whose rows are
-    replaced by the single net-current equation Σ_region (L v) = Σ_region b.
+    ``injection`` (H,W) holds the current injected per pixel, ``grounded`` marks pixels held at 0 V
+    (their rows are dropped). ``supernode`` marks a short-circuited source region: its rows are
+    collapsed into one (sum), so the residual is that of the system Circuitscape actually solves and
+    ‖b‖ counts the region's total injected current once.
     """
     if graph is None:
         G, idx = build_conductance_graph(R, nodata)
@@ -56,14 +57,17 @@ def kirchhoff_residual(R: np.ndarray, nodata: np.ndarray, voltage: np.ndarray, i
     v = voltage[valid].astype(np.float64)
     b = injection[valid].astype(np.float64)
     r = L @ v - b
-    gnd = grounded[valid] if grounded is not None else np.zeros_like(v, dtype=bool)
-    sn = supernode[valid] if supernode is not None else np.zeros_like(v, dtype=bool)
-    free = ~gnd & ~sn
-    rr = float(np.sum(r[free] ** 2))
-    if sn.any():
-        rr += float(np.sum(r[sn])) ** 2
-    nb = np.linalg.norm(b[~gnd])
-    return float(np.sqrt(rr) / nb) if nb > 0 else float("nan")
+    keep = np.ones_like(v, dtype=bool)
+    if grounded is not None:
+        keep &= ~grounded[valid]
+    if supernode is not None:
+        sn = supernode[valid]
+        keep &= ~sn
+        r_reg, b_reg = r[sn].sum(), b[sn].sum()
+        nb = np.sqrt((b[keep] ** 2).sum() + b_reg**2)
+        return float(np.sqrt((r[keep] ** 2).sum() + r_reg**2) / nb) if nb > 0 else float("nan")
+    nb = np.linalg.norm(b[keep])
+    return float(np.linalg.norm(r[keep]) / nb) if nb > 0 else float("nan")
 
 
 def qc_pairwise(R, nodata, focal, out: dict, r_max: float | None, residual_tol=1e-6, rmax_frac=0.5) -> dict:

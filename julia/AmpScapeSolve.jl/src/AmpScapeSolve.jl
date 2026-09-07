@@ -174,19 +174,26 @@ repeated labels this way): their rows are replaced by the single equation
 Σ_region (L v) = Σ_region b, i.e. only the region's net injected current is checked.
 """
 function kirchhoff_residual(L, idx, voltage::AbstractMatrix, injection::AbstractMatrix, grounded::AbstractMatrix{Bool};
-                            supernode::Union{Nothing,AbstractMatrix{Bool}} = nothing)
+                            supernode = nothing)
     valid = idx .> 0
     order = sortperm(vec(idx[valid]))
     v = Float64.(vec(voltage[valid]))[order]
     b = Float64.(vec(injection[valid]))[order]
     gnd = vec(grounded[valid])[order]
-    sn = supernode === nothing ? falses(length(v)) : vec(supernode[valid])[order]
     r = L * v .- b
-    free = .!gnd .& .!sn
-    rr = sum(abs2, r[free])
-    any(sn) && (rr += (sum(r[sn]))^2)
-    nb = norm(b[.!gnd])
-    return nb > 0 ? sqrt(rr) / nb : NaN
+    if supernode === nothing
+        keep = .!gnd
+        nb = norm(b[keep])
+        return nb > 0 ? norm(r[keep]) / nb : NaN
+    end
+    # short-circuited source region: residual of the COLLAPSED system (region rows summed into one
+    # node, as Circuitscape solves it), so that ‖b‖ = total injected current, not 1/√(region size)
+    sn = vec(supernode[valid])[order]
+    keep = .!gnd .& .!sn
+    r_region = sum(r[sn])
+    b_region = sum(b[sn])
+    nb = sqrt(sum(abs2, b[keep]) + b_region^2)
+    return nb > 0 ? sqrt(sum(abs2, r[keep]) + r_region^2) / nb : NaN
 end
 
 """
@@ -446,7 +453,7 @@ function solve_pairwise(R::AbstractMatrix, nodata::AbstractMatrix{Bool}, focal::
             r_p = kirchhoff_residual(L, idx, v64, inj, gnd; supernode = count(src) > 1 ? src : nothing)
             if refine && r_p > refine_trigger
                 ref = refine_voltage!(L, idx, v64, inj, gnd; source_region = count(src) > 1 ? src : nothing, rtol_trigger = refine_trigger)
-                push!(refinements, Dict("pair" => [i, j], ref...))
+                ref["refined"] && push!(refinements, Dict("pair" => [i, j], ref...))
                 r_p = ref["residual_after"]
                 # regenerate this pair's current map and Reff from the refined voltages
                 pc[end] = node_current_map(L, idx, v64; region_pixels = src .| gnd, region_current = 1.0)
